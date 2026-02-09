@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAGMap Demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ee;
+        --ink: #121212;
+        --muted: #5b5b5b;
+        --accent: #1f6feb;
+        --card: #ffffff;
+        --border: #e2ddd6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Iosevka", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      main {
+        max-width: 960px;
+        margin: 36px auto 72px;
+        padding: 0 24px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      h1 { font-size: 32px; margin: 0; }
+      .tag {
+        background: var(--accent);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      }
+      .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+      input {
+        width: min(680px, 100%);
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+      }
+      button {
+        border: 1px solid var(--border);
+        background: #0b1220;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      button:hover { opacity: 0.92; }
+      pre {
+        overflow: auto;
+        background: #0b1220;
+        color: #e9eefc;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      footer { font-size: 12px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <div class="tag">RAG demo</div>
+          <h1>RAGMap Search</h1>
+        </div>
+        <div><a href="/docs">OpenAPI</a></div>
+      </header>
+
+      <section class="card">
+        <div class="label">Query</div>
+        <div class="row">
+          <input id="q" placeholder="e.g. qdrant embeddings pdf ingestion" />
+          <button id="go">Search</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">Results</div>
+        <pre id="out">{}</pre>
+      </section>
+
+      <footer>
+        Endpoint: <code>/rag/search</code>
+      </footer>
+    </main>
+
+    <script>
+      async function run() {
+        const q = document.getElementById("q").value.trim();
+        const out = document.getElementById("out");
+        out.textContent = "Loading...";
+        const url = new URL("/rag/search", window.location.origin);
+        url.searchParams.set("q", q || "rag");
+        url.searchParams.set("limit", "10");
+        const resp = await fetch(url.toString(), { headers: { accept: "application/json" } });
+        const json = await resp.json().catch(() => ({ error: "invalid_json" }));
+        out.textContent = JSON.stringify(json, null, 2);
+      }
+      document.getElementById("go").addEventListener("click", run);
+      document.getElementById("q").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") run();
+      });
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "ragmap-prod"
+  },
+  "targets": {
+    "ragmap-prod": {
+      "hosting": {
+        "api": [
+          "ragmap-api"
+        ],
+        "mcp": [
+          "ragmap-mcp"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
+

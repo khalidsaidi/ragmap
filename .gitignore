@@ -1,0 +1,33 @@
+# Env
+.env
+**/*.local
+
+# Agent workspace
+.ai/logs/
+.ai/scratch/
+.ai/runs/
+.ai/artifacts/
+.ai/audit/
+.ai/archive/
+.ai/cache/
+.ai/tmp/
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Build
+/dist/
+/build/
+**/dist/
+**/build/
+
+# Logs
+npm-debug.log*
+
+# Firebase
+.firebase/
+
+# Editor
+.cursor/
+

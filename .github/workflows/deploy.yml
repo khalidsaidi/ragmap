@@ -1,0 +1,82 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+      ARTIFACT_REPO: ${{ vars.ARTIFACT_REPO || 'ragmap' }}
+      API_SERVICE: ${{ vars.API_SERVICE || 'ragmap-api' }}
+      MCP_SERVICE: ${{ vars.MCP_SERVICE || 'ragmap-mcp-remote' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Auth to Google (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install deps
+        run: pnpm -r install
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker "${{ env.GCP_REGION }}-docker.pkg.dev" --quiet
+
+      - name: Build & push API image
+        run: |
+          set -euo pipefail
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.API_SERVICE }}:${{ github.sha }}"
+          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" --tag "$IMAGE" -f apps/api/Dockerfile .
+          echo "API_IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Build & push MCP image
+        run: |
+          set -euo pipefail
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.MCP_SERVICE }}:${{ github.sha }}"
+          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" --tag "$IMAGE" -f apps/mcp-remote/Dockerfile .
+          echo "MCP_IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy Cloud Run (API)
+        run: |
+          set -euo pipefail
+          gcloud run deploy "${{ env.API_SERVICE }}" \
+            --project "${{ env.GCP_PROJECT_ID }}" \
+            --region "${{ env.GCP_REGION }}" \
+            --image "$API_IMAGE" \
+            --allow-unauthenticated
+
+      - name: Deploy Cloud Run (MCP)
+        run: |
+          set -euo pipefail
+          gcloud run deploy "${{ env.MCP_SERVICE }}" \
+            --project "${{ env.GCP_PROJECT_ID }}" \
+            --region "${{ env.GCP_REGION }}" \
+            --image "$MCP_IMAGE" \
+            --allow-unauthenticated
+
+      - name: Deploy Firebase Hosting
+        run: |
+          set -euo pipefail
+          pnpm -w dlx firebase-tools@latest deploy --only hosting:api,hosting:mcp
+

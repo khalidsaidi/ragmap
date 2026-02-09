@@ -1,0 +1,149 @@
+{
+  "hosting": [
+    {
+      "target": "api",
+      "public": "docs/hosting/api",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "/docs",
+          "type": 302
+        }
+      ],
+      "rewrites": [
+        {
+          "source": "/v0.1/**",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/rag/**",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/internal/**",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/docs{,/**}",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/.well-known/**",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/health{,/**}",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/readyz{,/**}",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        }
+      ]
+    },
+    {
+      "target": "mcp",
+      "public": "docs/hosting/mcp",
+      "ignore": [
+        "firebase.json",
+        "**/node_modules/**"
+      ],
+      "headers": [
+        {
+          "source": "/health{,/**}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        {
+          "source": "/healthz{,/**}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      ],
+      "rewrites": [
+        {
+          "source": "/health",
+          "destination": "/health.json"
+        },
+        {
+          "source": "/health/",
+          "destination": "/health.json"
+        },
+        {
+          "source": "/healthz/",
+          "destination": "/healthz.json"
+        },
+        {
+          "source": "/mcp",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/mcp/**",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/readyz",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/readyz/**",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
+            "region": "us-central1"
+          }
+        }
+      ],
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "/mcp",
+          "type": 301
+        }
+      ]
+    }
+  ]
+}
+
