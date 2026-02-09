@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configure Firebase Hosting targets for RAGMap.
+#
+# Prereqs:
+# - firebase CLI installed + authenticated
+# - .firebaserc updated with your project id OR pass PROJECT_ID
+#
+# Usage:
+#   PROJECT_ID=ragmap-abc123 ./scripts/bootstrap-firebase.sh
+
+PROJECT_ID="${PROJECT_ID:-}"
+if [[ -z "$PROJECT_ID" ]]; then
+  echo "PROJECT_ID is required" >&2
+  exit 1
+fi
+
+firebase use --add "$PROJECT_ID"
+
+echo "Creating Hosting sites..."
+firebase hosting:sites:create ragmap-api || true
+firebase hosting:sites:create ragmap-mcp || true
+
+echo "Applying hosting targets..."
+firebase target:apply hosting api ragmap-api
+firebase target:apply hosting mcp ragmap-mcp
+
+echo "Firebase targets configured."
+
