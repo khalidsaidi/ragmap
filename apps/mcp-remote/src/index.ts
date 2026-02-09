@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { createServer } from 'node:http';
-import { randomUUID } from 'node:crypto';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
@@ -181,7 +180,8 @@ async function main() {
       const mcpServer = createMcpServer();
       registerTools(mcpServer);
       const transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: randomUUID,
+        // Stateless mode: create a fresh transport per request.
+        sessionIdGenerator: undefined,
         enableJsonResponse: true
       });
       await mcpServer.connect(transport);
@@ -223,4 +223,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
