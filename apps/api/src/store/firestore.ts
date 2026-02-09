@@ -224,7 +224,13 @@ export class FirestoreStore implements RegistryStore {
 
   async listServerVersions(name: string): Promise<RegistryServerEntry[]> {
     const serverId = encodeServerId(name);
-    const col = this.serversCol().doc(serverId).collection('versions');
+    const serverRef = this.serversCol().doc(serverId);
+    const srvSnap = await serverRef.get();
+    if (!srvSnap.exists) return [];
+    const srvData = srvSnap.data() as any;
+    if (srvData?.hidden === true) return [];
+
+    const col = serverRef.collection('versions');
     const snap = await col.get();
     const rows = snap.docs
       .map((doc) => doc.data() as any)
@@ -255,6 +261,11 @@ export class FirestoreStore implements RegistryStore {
         ragmap: data.latestRagmap ?? null
       });
     }
+
+    const srvSnap = await serverRef.get();
+    if (!srvSnap.exists) return null;
+    const srvData = srvSnap.data() as any;
+    if (srvData?.hidden === true) return null;
 
     const verSnap = await serverRef.collection('versions').doc(version).get();
     if (!verSnap.exists) return null;

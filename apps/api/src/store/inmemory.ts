@@ -172,7 +172,7 @@ export class InMemoryStore implements RegistryStore {
 
   async listServerVersions(name: string) {
     const srv = this.servers.get(name);
-    if (!srv) return [];
+    if (!srv || srv.hidden) return [];
     const rows = Array.from(srv.versions.values())
       .filter((row) => !row.hidden)
       .sort(sortByPublishedDesc);
@@ -181,7 +181,7 @@ export class InMemoryStore implements RegistryStore {
 
   async getServerVersion(name: string, version: string | 'latest') {
     const srv = this.servers.get(name);
-    if (!srv) return null;
+    if (!srv || srv.hidden) return null;
     const v = version === 'latest' ? srv.latestVersion : version;
     const row = srv.versions.get(v);
     if (!row || row.hidden) return null;
