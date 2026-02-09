@@ -1,9 +1,10 @@
 import { Firestore, Timestamp } from '@google-cloud/firestore';
 import type { RagFilters, RagmapEnrichment, RegistryServer, RegistryServerEntry } from '@ragmap/shared';
-import { META_OFFICIAL_KEY, META_PUBLISHER_KEY, META_RAGMAP_KEY } from '@ragmap/shared';
+import { META_RAGMAP_KEY } from '@ragmap/shared';
 import { buildSearchText } from '../rag/enrich.js';
 import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
 import type { Env } from '../env.js';
+import { buildMeta } from './types.js';
 import type { IngestMode, ListServersParams, ListServersResult, RagExplain, RagSearchResult, RegistryStore, StoreHealth } from './types.js';
 
 function encodeServerId(name: string) {
@@ -21,11 +22,14 @@ function parseIsoToDate(value: string | undefined | null) {
 }
 
 function buildEntry(doc: any): RegistryServerEntry {
-  const meta: Record<string, unknown> = {};
-  if (doc.official) meta[META_OFFICIAL_KEY] = doc.official;
-  if (doc.publisherProvided) meta[META_PUBLISHER_KEY] = doc.publisherProvided;
-  if (doc.ragmap) meta[META_RAGMAP_KEY] = doc.ragmap;
-  return { server: doc.server as any, _meta: meta };
+  return {
+    server: doc.server as any,
+    _meta: buildMeta({
+      official: doc.official ?? null,
+      publisherProvided: doc.publisherProvided ?? undefined,
+      ragmap: doc.ragmap ?? null
+    })
+  };
 }
 
 export class FirestoreStore implements RegistryStore {

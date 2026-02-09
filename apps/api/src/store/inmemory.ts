@@ -1,6 +1,5 @@
 import { buildSearchText } from '../rag/enrich.js';
 import type { RagFilters, RagmapEnrichment, RegistryServerEntry, RegistryServer } from '@ragmap/shared';
-import { META_OFFICIAL_KEY, META_PUBLISHER_KEY, META_RAGMAP_KEY } from '@ragmap/shared';
 import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
 import { buildMeta, type IngestMode, type RegistryStore } from './types.js';
 
@@ -41,11 +40,14 @@ function sortByPublishedDesc(a: VersionRow, b: VersionRow) {
 }
 
 function buildEntry(row: VersionRow): RegistryServerEntry {
-  const meta: Record<string, unknown> = {};
-  if (row.official) meta[META_OFFICIAL_KEY] = row.official;
-  if (row.publisherProvided) meta[META_PUBLISHER_KEY] = row.publisherProvided;
-  if (row.ragmap) meta[META_RAGMAP_KEY] = row.ragmap;
-  return { server: row.server as any, _meta: meta };
+  return {
+    server: row.server as any,
+    _meta: buildMeta({
+      official: row.official ?? null,
+      publisherProvided: row.publisherProvided,
+      ragmap: row.ragmap ?? null
+    })
+  };
 }
 
 export class InMemoryStore implements RegistryStore {
