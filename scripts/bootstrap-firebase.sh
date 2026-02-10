@@ -16,6 +16,20 @@ if [[ -z "$PROJECT_ID" ]]; then
   exit 1
 fi
 
+echo "Adding Firebase to project (if not already enabled)..."
+if ! firebase projects:addfirebase "$PROJECT_ID"; then
+  cat <<EOF >&2
+
+Failed to add Firebase to $PROJECT_ID.
+
+Common root cause: the account hasn't accepted Firebase Terms of Service yet.
+Open the Firebase console, accept the terms, then re-run:
+  firebase projects:addfirebase $PROJECT_ID
+
+EOF
+  exit 1
+fi
+
 firebase use --add "$PROJECT_ID"
 
 echo "Creating Hosting sites..."
@@ -27,4 +41,3 @@ firebase target:apply hosting api ragmap-api
 firebase target:apply hosting mcp ragmap-mcp
 
 echo "Firebase targets configured."
-
