@@ -23,7 +23,7 @@ MapRag does **not** do RAG itself.
 It helps you choose the best *RAG tool/server* to do the retrieval.
 
 **Status (v0.1)**
-- Ingests the official MCP Registry (read-only) into Firestore.
+- Ingests the official MCP Registry (read-only) and enriches server records for retrieval use-cases.
 - Adds lightweight enrichment (`categories`, `ragScore`, `reasons`).
 - Exposes two programmable interfaces: registry-compatible REST API (subregistry) + MCP servers (remote HTTP + local stdio).
 
@@ -33,6 +33,10 @@ It helps you choose the best *RAG tool/server* to do the retrieval.
 - Human UI for browsing/filtering/comparing servers.
 
 Full overview: `https://github.com/khalidsaidi/ragmap/blob/main/docs/OVERVIEW.md`
+
+## Architecture (at a glance)
+
+![RAGMap architecture diagram](https://raw.githubusercontent.com/khalidsaidi/ragmap/main/docs/diagrams/ragmap-architecture.png)
 
 ---
 

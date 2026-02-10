@@ -52,6 +52,63 @@ export type RagExplain = {
   reasons: string[];
 };
 
+export type UsageEvent = {
+  createdAt: Date;
+  method: string;
+  route: string;
+  status: number;
+  durationMs: number;
+  userAgent: string | null;
+  ip: string | null;
+  referer: string | null;
+  agentName: string | null;
+};
+
+export type UsageSummary = {
+  days: number;
+  since: string;
+  total: number;
+  last24h: number;
+  byRoute: Array<{ route: string; count: number }>;
+  byStatus: Array<{ status: number; count: number }>;
+  byIp: Array<{ ip: string; count: number }>;
+  byReferer: Array<{ referer: string; count: number }>;
+  byUserAgent: Array<{ userAgent: string; count: number }>;
+  byAgentName: Array<{ agentName: string; count: number }>;
+  recentErrors: Array<{
+    createdAt: string;
+    status: number;
+    route: string;
+    ip: string | null;
+    referer: string | null;
+    userAgent: string | null;
+    agentName: string | null;
+  }>;
+  daily: Array<{ day: string; count: number }>;
+  truncated?: boolean;
+};
+
+export type AgentPayloadEventInput = {
+  createdAt: Date;
+  source: string;
+  kind: string;
+  method?: string | null;
+  route?: string | null;
+  status?: number | null;
+  durationMs?: number | null;
+  tool?: string | null;
+  requestId?: string | null;
+  agentName?: string | null;
+  userAgent?: string | null;
+  ip?: string | null;
+  requestBody?: string | null;
+  responseBody?: string | null;
+};
+
+export type AgentPayloadEvent = Omit<AgentPayloadEventInput, 'createdAt'> & {
+  createdAt: string;
+};
+
 export interface RegistryStore {
   kind: 'firestore' | 'inmemory';
   healthCheck(): Promise<StoreHealth>;
@@ -78,4 +135,10 @@ export interface RegistryStore {
   listCategories(): Promise<string[]>;
   searchRag(params: RagSearchParams): Promise<RagSearchResult>;
   getRagExplain(name: string): Promise<RagExplain | null>;
+
+  writeUsageEvent(event: UsageEvent): Promise<void>;
+  getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary>;
+
+  writeAgentPayloadEvent(event: AgentPayloadEventInput): Promise<void>;
+  listAgentPayloadEvents(params: { limit: number; source?: string; kind?: string }): Promise<AgentPayloadEvent[]>;
 }

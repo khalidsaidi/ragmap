@@ -3,7 +3,7 @@
 RAGMap is a lightweight MCP Registry-compatible subregistry + MCP server focused on **RAG-related MCP servers**.
 
 It:
-- Ingests the official MCP Registry into Firestore, enriches records for RAG use-cases, and serves a subregistry API.
+- Ingests the official MCP Registry, enriches records for RAG use-cases, and serves a subregistry API.
 - Exposes an MCP server (remote Streamable HTTP + local stdio) so agents can search/filter RAG MCP servers.
 
 ## MapRag (RAGMap)
@@ -15,9 +15,79 @@ RAGMap does **not** do retrieval itself. It indexes and enriches retrieval-capab
 
 Full overview: `docs/OVERVIEW.md`
 
+## Architecture
+
+![RAGMap architecture diagram](docs/diagrams/ragmap-architecture.png)
+
+<details>
+<summary>Mermaid source</summary>
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":40,"rankSpacing":60}}}%%
+flowchart TD
+  %% Concept-only diagram (no deployment, framework, or datastore details)
+
+  subgraph S["Sources"]
+    direction TB
+    Upstream["Official MCP Registry"]:::mono
+    Other["Other directories (opt)"]:::mono
+    Publisher["Publisher metadata (opt)"]:::mono
+    Scheduler["Scheduler trigger (opt)"]:::mono
+  end
+
+  subgraph C["MapRag core"]
+    direction TB
+    Ingest["Ingest + normalize"]:::mono
+    Enrich["Enrich + classify"]:::mono
+    Index["Catalog + index"]:::mono
+    Find["Find + rank + explain"]:::mono
+    Ingest --> Enrich --> Index --> Find
+  end
+
+  subgraph I["Interfaces"]
+    direction TB
+    Rest["REST subregistry"]:::mono
+    McpRemote["MCP remote (HTTP)"]:::mono
+    McpLocal["MCP local (stdio)"]:::mono
+    UI["UI"]:::mono
+  end
+
+  subgraph U["Who uses it"]
+    direction TB
+    Agents["Agents"]:::mono
+    Humans["Humans"]:::mono
+  end
+
+  RagServers["RAG MCP servers (do retrieval)"]:::mono
+
+  %% Sync loop
+  Upstream --> Ingest
+  Other --> Ingest
+  Scheduler --> Ingest
+  Publisher --> Enrich
+
+  %% Query loop
+  Agents --> McpRemote --> Find
+  Agents --> McpLocal --> Find
+  Agents --> Rest --> Find
+  Humans --> UI --> Find
+  Humans --> Rest --> Find
+
+  %% Results
+  Find --> Rest
+  Find --> McpRemote
+  Find --> McpLocal
+  Find --> UI
+
+  %% Routing: MapRag returns connect info; agents connect to the chosen server(s).
+  Agents --> RagServers
+```
+
+</details>
+
 ## Monorepo layout
 
-- `apps/api`: REST API + MCP registry-compatible endpoints + ingestion worker (Firestore)
+- `apps/api`: REST API + MCP registry-compatible endpoints + ingestion worker
 - `apps/mcp-remote`: Remote MCP server (Streamable HTTP)
 - `packages/mcp-local`: Local MCP server (stdio)
 - `packages/shared`: Zod schemas + shared types

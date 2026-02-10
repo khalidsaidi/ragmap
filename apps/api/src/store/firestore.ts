@@ -5,7 +5,19 @@ import { buildSearchText } from '../rag/enrich.js';
 import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
 import type { Env } from '../env.js';
 import { buildMeta } from './types.js';
-import type { IngestMode, ListServersParams, ListServersResult, RagExplain, RagSearchResult, RegistryStore, StoreHealth } from './types.js';
+import type {
+  AgentPayloadEvent,
+  AgentPayloadEventInput,
+  IngestMode,
+  ListServersParams,
+  ListServersResult,
+  RagExplain,
+  RagSearchResult,
+  RegistryStore,
+  StoreHealth,
+  UsageEvent,
+  UsageSummary
+} from './types.js';
 
 type CacheEntry<T> = {
   value: T;
@@ -66,6 +78,14 @@ export class FirestoreStore implements RegistryStore {
 
   private serversCol() {
     return this.firestore.collection('servers');
+  }
+
+  private usageEventsCol() {
+    return this.firestore.collection('usageEvents');
+  }
+
+  private agentPayloadEventsCol() {
+    return this.firestore.collection('agentPayloadEvents');
   }
 
   private metaDoc() {
@@ -403,5 +423,257 @@ export class FirestoreStore implements RegistryStore {
       categories: Array.isArray(ragmap.categories) ? ragmap.categories : [],
       reasons: Array.isArray(ragmap.reasons) ? ragmap.reasons : []
     };
+  }
+
+  async writeUsageEvent(event: UsageEvent): Promise<void> {
+    await this.usageEventsCol().add({
+      createdAt: Timestamp.fromDate(event.createdAt),
+      method: event.method,
+      route: event.route,
+      status: event.status,
+      durationMs: event.durationMs,
+      userAgent: event.userAgent ?? null,
+      ip: event.ip ?? null,
+      referer: event.referer ?? null,
+      agentName: event.agentName ?? null
+    });
+  }
+
+  async getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary> {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    function isNoiseEvent(entry: { method: string; route: string; status: number }) {
+      const method = entry.method.toUpperCase();
+      if (method !== 'GET' && method !== 'HEAD') return false;
+
+      if (entry.status === 404) {
+        if (entry.route === '/') return true;
+      }
+
+      if (entry.status === 401 || entry.status === 403) {
+        if (entry.route === '/admin/usage') return true;
+        if (entry.route === '/admin/usage/data') return true;
+        if (entry.route === '/admin/agent-events') return true;
+        if (entry.route === '/admin/agent-events/data') return true;
+      }
+
+      return false;
+    }
+
+    const byRoute = new Map<string, number>();
+    const byStatus = new Map<number, number>();
+    const byIp = new Map<string, number>();
+    const byReferer = new Map<string, number>();
+    const byUserAgent = new Map<string, number>();
+    const byAgentName = new Map<string, number>();
+    const daily = new Map<string, number>();
+    const recentErrors: UsageSummary['recentErrors'] = [];
+
+    let total = 0;
+    let lastDay = 0;
+    let truncated = false;
+    const maxDocs = 50_000;
+
+    const col = this.usageEventsCol();
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = col
+        .where('createdAt', '>=', Timestamp.fromDate(since))
+        .orderBy('createdAt', 'desc')
+        .limit(500);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+
+      for (const doc of snap.docs) {
+        last = doc;
+        const data = doc.data() as any;
+        const createdAt = data?.createdAt instanceof Timestamp ? data.createdAt.toDate() : null;
+        if (!createdAt) continue;
+        const method = typeof data?.method === 'string' ? data.method : 'GET';
+        const route = typeof data?.route === 'string' ? data.route : '';
+        const status = Number(data?.status ?? 0) || 0;
+        const ip = typeof data?.ip === 'string' && data.ip ? data.ip : null;
+        const referer = typeof data?.referer === 'string' && data.referer ? data.referer : null;
+        const userAgent = typeof data?.userAgent === 'string' && data.userAgent ? data.userAgent : null;
+        const agentName = typeof data?.agentName === 'string' && data.agentName ? data.agentName : null;
+
+        if (!route) continue;
+        if (!includeNoise && isNoiseEvent({ method, route, status })) continue;
+
+        total += 1;
+        if (createdAt.getTime() >= last24h.getTime()) lastDay += 1;
+
+        byRoute.set(route, (byRoute.get(route) ?? 0) + 1);
+        byStatus.set(status, (byStatus.get(status) ?? 0) + 1);
+        if (ip) byIp.set(ip, (byIp.get(ip) ?? 0) + 1);
+        if (referer) byReferer.set(referer, (byReferer.get(referer) ?? 0) + 1);
+        if (userAgent) byUserAgent.set(userAgent, (byUserAgent.get(userAgent) ?? 0) + 1);
+        if (agentName) byAgentName.set(agentName, (byAgentName.get(agentName) ?? 0) + 1);
+
+        const day = createdAt.toISOString().slice(0, 10);
+        daily.set(day, (daily.get(day) ?? 0) + 1);
+
+        if (status >= 400 && recentErrors.length < 50) {
+          recentErrors.push({
+            createdAt: createdAt.toISOString(),
+            status,
+            route,
+            ip,
+            referer,
+            userAgent,
+            agentName
+          });
+        }
+
+        if (total >= maxDocs) {
+          truncated = true;
+          break;
+        }
+      }
+
+      if (truncated) break;
+    }
+
+    function topK<K>(map: Map<K, number>, limit: number) {
+      const rows = Array.from(map.entries()).map(([key, count]) => ({ key, count }));
+      rows.sort((a, b) => b.count - a.count);
+      return rows.slice(0, limit);
+    }
+
+    const dailyRows = Array.from(daily.entries())
+      .map(([day, count]) => ({ day, count }))
+      .sort((a, b) => a.day.localeCompare(b.day));
+
+    return {
+      days,
+      since: since.toISOString(),
+      total,
+      last24h: lastDay,
+      byRoute: topK(byRoute, 10).map((row) => ({ route: String(row.key), count: row.count })),
+      byStatus: topK(byStatus, 100).map((row) => ({ status: Number(row.key), count: row.count })),
+      byIp: topK(byIp, 10).map((row) => ({ ip: String(row.key), count: row.count })),
+      byReferer: topK(byReferer, 10).map((row) => ({ referer: String(row.key), count: row.count })),
+      byUserAgent: topK(byUserAgent, 10).map((row) => ({ userAgent: String(row.key), count: row.count })),
+      byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
+      recentErrors,
+      daily: dailyRows,
+      ...(truncated ? { truncated: true } : {})
+    };
+  }
+
+  private async pruneAgentPayloadEvents() {
+    const col = this.agentPayloadEventsCol();
+
+    const ttlMs = this.env.agentPayloadTtlHours * 60 * 60 * 1000;
+    if (ttlMs > 0) {
+      const cutoff = Timestamp.fromDate(new Date(Date.now() - ttlMs));
+      const writer = this.firestore.bulkWriter();
+      let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+      for (;;) {
+        let q = col.where('createdAt', '<', cutoff).orderBy('createdAt').limit(500);
+        if (last) q = q.startAfter(last);
+        const snap = await q.get();
+        if (snap.empty) break;
+        for (const doc of snap.docs) {
+          last = doc;
+          writer.delete(doc.ref);
+        }
+      }
+      await writer.close();
+    }
+
+    const maxEvents = this.env.agentPayloadMaxEvents;
+    if (maxEvents > 0) {
+      const keep = await col.orderBy('createdAt', 'desc').limit(maxEvents).get();
+      if (keep.empty) return;
+      const lastKept = keep.docs[keep.docs.length - 1];
+
+      const writer = this.firestore.bulkWriter();
+      let last = lastKept;
+      for (;;) {
+        const snap = await col.orderBy('createdAt', 'desc').startAfter(last).limit(500).get();
+        if (snap.empty) break;
+        for (const doc of snap.docs) {
+          last = doc;
+          writer.delete(doc.ref);
+        }
+      }
+      await writer.close();
+    }
+  }
+
+  async writeAgentPayloadEvent(event: AgentPayloadEventInput): Promise<void> {
+    if (!this.env.captureAgentPayloads) return;
+    await this.agentPayloadEventsCol().add({
+      createdAt: Timestamp.fromDate(event.createdAt),
+      source: event.source,
+      kind: event.kind,
+      method: event.method ?? null,
+      route: event.route ?? null,
+      status: event.status ?? null,
+      durationMs: event.durationMs ?? null,
+      tool: event.tool ?? null,
+      requestId: event.requestId ?? null,
+      agentName: event.agentName ?? null,
+      userAgent: event.userAgent ?? null,
+      ip: event.ip ?? null,
+      requestBody: event.requestBody ?? null,
+      responseBody: event.responseBody ?? null
+    });
+    void this.pruneAgentPayloadEvents().catch(() => undefined);
+  }
+
+  async listAgentPayloadEvents(params: { limit: number; source?: string; kind?: string }): Promise<AgentPayloadEvent[]> {
+    const want = Math.min(500, Math.max(1, params.limit));
+    const out: AgentPayloadEvent[] = [];
+    const col = this.agentPayloadEventsCol();
+
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = col.orderBy('createdAt', 'desc').limit(200);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+
+      for (const doc of snap.docs) {
+        last = doc;
+        const data = doc.data() as any;
+        const createdAt = data?.createdAt instanceof Timestamp ? data.createdAt.toDate() : null;
+        if (!createdAt) continue;
+        const source = typeof data?.source === 'string' ? data.source : '';
+        const kind = typeof data?.kind === 'string' ? data.kind : '';
+        if (!source || !kind) continue;
+
+        if (params.source && source !== params.source) continue;
+        if (params.kind && kind !== params.kind) continue;
+
+        out.push({
+          createdAt: createdAt.toISOString(),
+          source,
+          kind,
+          method: typeof data?.method === 'string' ? data.method : null,
+          route: typeof data?.route === 'string' ? data.route : null,
+          status: typeof data?.status === 'number' ? data.status : data?.status != null ? Number(data.status) : null,
+          durationMs: typeof data?.durationMs === 'number' ? data.durationMs : data?.durationMs != null ? Number(data.durationMs) : null,
+          tool: typeof data?.tool === 'string' ? data.tool : null,
+          requestId: typeof data?.requestId === 'string' ? data.requestId : null,
+          agentName: typeof data?.agentName === 'string' ? data.agentName : null,
+          userAgent: typeof data?.userAgent === 'string' ? data.userAgent : null,
+          ip: typeof data?.ip === 'string' ? data.ip : null,
+          requestBody: typeof data?.requestBody === 'string' ? data.requestBody : null,
+          responseBody: typeof data?.responseBody === 'string' ? data.responseBody : null
+        });
+        if (out.length >= want) return out;
+      }
+
+      // Avoid scanning unbounded history if filters are too selective.
+      if (out.length >= want) break;
+      if (!last) break;
+      if (out.length === 0 && !params.source && !params.kind) break;
+    }
+
+    return out;
   }
 }

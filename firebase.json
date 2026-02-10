@@ -38,6 +38,13 @@
           }
         },
         {
+          "source": "/admin/**",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
           "source": "/docs{,/**}",
           "run": {
             "serviceId": "ragmap-api",
@@ -146,4 +153,3 @@
     }
   ]
 }
-

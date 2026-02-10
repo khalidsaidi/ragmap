@@ -10,17 +10,30 @@ const env: Env = {
   publicBaseUrl: 'http://localhost:3000',
   serviceVersion: '0.1.0-test',
   logLevel: 'silent',
+  logNoise: false,
   storage: 'inmemory',
   gcpProjectId: '',
   cacheTtlMs: 0,
+  adminDashUser: 'admin',
+  adminDashPass: 'password',
   registryBaseUrl: 'https://registry.modelcontextprotocol.io',
   ingestToken: 'test-token',
   ingestPageLimit: 2,
+  captureAgentPayloads: false,
+  agentPayloadTtlHours: 24,
+  agentPayloadMaxEvents: 1000,
+  agentPayloadMaxBytes: 16_384,
+  agentEventToken: 'test-agent-event-token',
   embeddingsEnabled: false,
   embeddingsProvider: 'openai',
   openaiApiKey: '',
   openaiEmbeddingsModel: 'text-embedding-3-small'
 };
+
+function basicAuthHeader(user: string, pass: string) {
+  const encoded = Buffer.from(`${user}:${pass}`, 'utf8').toString('base64');
+  return `Basic ${encoded}`;
+}
 
 test('health endpoint', async () => {
   const store = new InMemoryStore();
@@ -29,6 +42,61 @@ test('health endpoint', async () => {
   assert.equal(res.statusCode, 200);
   const body = res.json();
   assert.equal(body.status, 'ok');
+  await app.close();
+});
+
+test('admin usage is protected by basic auth', async () => {
+  const store = new InMemoryStore();
+  const app = await buildApp({ env, store });
+
+  const unauthorized = await app.inject({ method: 'GET', url: '/admin/usage' });
+  assert.equal(unauthorized.statusCode, 401);
+  assert.ok(unauthorized.headers['www-authenticate']);
+
+  const ok = await app.inject({
+    method: 'GET',
+    url: '/admin/usage',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(ok.statusCode, 200);
+  assert.match(ok.headers['content-type'] ?? '', /text\/html/);
+
+  const data = await app.inject({
+    method: 'GET',
+    url: '/admin/usage/data?days=7',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(data.statusCode, 200);
+  const body = data.json() as any;
+  assert.equal(typeof body.total, 'number');
+
+  await app.close();
+});
+
+test('admin agent-events is protected by basic auth', async () => {
+  const store = new InMemoryStore();
+  const app = await buildApp({ env, store });
+
+  const unauthorized = await app.inject({ method: 'GET', url: '/admin/agent-events' });
+  assert.equal(unauthorized.statusCode, 401);
+
+  const ok = await app.inject({
+    method: 'GET',
+    url: '/admin/agent-events',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(ok.statusCode, 200);
+  assert.match(ok.headers['content-type'] ?? '', /text\/html/);
+
+  const data = await app.inject({
+    method: 'GET',
+    url: '/admin/agent-events/data?limit=50',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(data.statusCode, 200);
+  const body = data.json() as any;
+  assert.equal(Array.isArray(body), true);
+
   await app.close();
 });
 

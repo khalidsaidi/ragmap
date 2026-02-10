@@ -1,7 +1,7 @@
 import { buildSearchText } from '../rag/enrich.js';
 import type { RagFilters, RagmapEnrichment, RegistryServerEntry, RegistryServer } from '@ragmap/shared';
 import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
-import { buildMeta, type IngestMode, type RegistryStore } from './types.js';
+import { buildMeta, type AgentPayloadEvent, type AgentPayloadEventInput, type IngestMode, type RegistryStore, type UsageEvent, type UsageSummary } from './types.js';
 
 type VersionRow = {
   server: RegistryServer;
@@ -54,6 +54,8 @@ export class InMemoryStore implements RegistryStore {
   kind = 'inmemory' as const;
   private servers = new Map<string, ServerRow>();
   private lastIngestAt: Date | null = null;
+  private usageEvents: UsageEvent[] = [];
+  private agentPayloadEvents: AgentPayloadEventInput[] = [];
 
   async healthCheck() {
     return { ok: true };
@@ -253,5 +255,129 @@ export class InMemoryStore implements RegistryStore {
       categories: latest.ragmap.categories,
       reasons: latest.ragmap.reasons
     };
+  }
+
+  async writeUsageEvent(event: UsageEvent) {
+    this.usageEvents.push(event);
+  }
+
+  async getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary> {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    function isNoiseEvent(entry: { method: string; route: string; status: number }) {
+      const method = entry.method.toUpperCase();
+      if (method !== 'GET' && method !== 'HEAD') return false;
+
+      if (entry.status === 404) {
+        if (entry.route === '/') return true;
+      }
+
+      if (entry.status === 401 || entry.status === 403) {
+        if (entry.route === '/admin/usage') return true;
+        if (entry.route === '/admin/usage/data') return true;
+        if (entry.route === '/admin/agent-events') return true;
+        if (entry.route === '/admin/agent-events/data') return true;
+      }
+
+      return false;
+    }
+
+    const byRoute = new Map<string, number>();
+    const byStatus = new Map<number, number>();
+    const byIp = new Map<string, number>();
+    const byReferer = new Map<string, number>();
+    const byUserAgent = new Map<string, number>();
+    const byAgentName = new Map<string, number>();
+    const daily = new Map<string, number>();
+    const recentErrors: UsageSummary['recentErrors'] = [];
+
+    let total = 0;
+    let lastDay = 0;
+
+    for (const ev of this.usageEvents) {
+      if (ev.createdAt.getTime() < since.getTime()) continue;
+      if (!includeNoise && isNoiseEvent(ev)) continue;
+
+      total += 1;
+      if (ev.createdAt.getTime() >= last24h.getTime()) lastDay += 1;
+
+      byRoute.set(ev.route, (byRoute.get(ev.route) ?? 0) + 1);
+      byStatus.set(ev.status, (byStatus.get(ev.status) ?? 0) + 1);
+      if (ev.ip) byIp.set(ev.ip, (byIp.get(ev.ip) ?? 0) + 1);
+      if (ev.referer) byReferer.set(ev.referer, (byReferer.get(ev.referer) ?? 0) + 1);
+      if (ev.userAgent) byUserAgent.set(ev.userAgent, (byUserAgent.get(ev.userAgent) ?? 0) + 1);
+      if (ev.agentName) byAgentName.set(ev.agentName, (byAgentName.get(ev.agentName) ?? 0) + 1);
+
+      const day = ev.createdAt.toISOString().slice(0, 10);
+      daily.set(day, (daily.get(day) ?? 0) + 1);
+
+      if (ev.status >= 400) {
+        recentErrors.push({
+          createdAt: ev.createdAt.toISOString(),
+          status: ev.status,
+          route: ev.route,
+          ip: ev.ip ?? null,
+          referer: ev.referer ?? null,
+          userAgent: ev.userAgent ?? null,
+          agentName: ev.agentName ?? null
+        });
+      }
+    }
+
+    recentErrors.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    function topK<K>(map: Map<K, number>, limit: number) {
+      const rows = Array.from(map.entries()).map(([key, count]) => ({ key, count }));
+      rows.sort((a, b) => b.count - a.count);
+      return rows.slice(0, limit);
+    }
+
+    const dailyRows = Array.from(daily.entries())
+      .map(([day, count]) => ({ day, count }))
+      .sort((a, b) => a.day.localeCompare(b.day));
+
+    return {
+      days,
+      since: since.toISOString(),
+      total,
+      last24h: lastDay,
+      byRoute: topK(byRoute, 10).map((row) => ({ route: String(row.key), count: row.count })),
+      byStatus: topK(byStatus, 100).map((row) => ({ status: Number(row.key), count: row.count })),
+      byIp: topK(byIp, 10).map((row) => ({ ip: String(row.key), count: row.count })),
+      byReferer: topK(byReferer, 10).map((row) => ({ referer: String(row.key), count: row.count })),
+      byUserAgent: topK(byUserAgent, 10).map((row) => ({ userAgent: String(row.key), count: row.count })),
+      byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
+      recentErrors: recentErrors.slice(0, 50),
+      daily: dailyRows
+    };
+  }
+
+  async writeAgentPayloadEvent(event: AgentPayloadEventInput) {
+    this.agentPayloadEvents.push(event);
+  }
+
+  async listAgentPayloadEvents(params: { limit: number; source?: string; kind?: string }): Promise<AgentPayloadEvent[]> {
+    const limit = Math.min(500, Math.max(1, params.limit));
+    let rows = this.agentPayloadEvents.slice();
+    if (params.source) rows = rows.filter((row) => row.source === params.source);
+    if (params.kind) rows = rows.filter((row) => row.kind === params.kind);
+    rows.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return rows.slice(0, limit).map((row) => ({
+      createdAt: row.createdAt.toISOString(),
+      source: row.source,
+      kind: row.kind,
+      method: row.method ?? null,
+      route: row.route ?? null,
+      status: row.status ?? null,
+      durationMs: row.durationMs ?? null,
+      tool: row.tool ?? null,
+      requestId: row.requestId ?? null,
+      agentName: row.agentName ?? null,
+      userAgent: row.userAgent ?? null,
+      ip: row.ip ?? null,
+      requestBody: row.requestBody ?? null,
+      responseBody: row.responseBody ?? null
+    }));
   }
 }
