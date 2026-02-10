@@ -6,6 +6,15 @@ It:
 - Ingests the official MCP Registry into Firestore, enriches records for RAG use-cases, and serves a subregistry API.
 - Exposes an MCP server (remote Streamable HTTP + local stdio) so agents can search/filter RAG MCP servers.
 
+## MapRag (RAGMap)
+
+**MapRag is a discovery + routing layer for retrieval.**
+It helps agents and humans answer: *which retrieval MCP server should I use for this task, given my constraints?*
+
+RAGMap does **not** do retrieval itself. It indexes and enriches retrieval-capable servers, then routes you to the right tool/server.
+
+Full overview: `docs/OVERVIEW.md`
+
 ## Monorepo layout
 
 - `apps/api`: REST API + MCP registry-compatible endpoints + ingestion worker (Firestore)
@@ -84,6 +93,7 @@ MCP_URL=https://ragmap-mcp.web.app/mcp ./scripts/smoke-mcp.sh
 ## Docs
 
 - `docs/DEPLOYMENT.md`
+- `docs/OVERVIEW.md`
 - `docs/DATA_MODEL.md`
 - `docs/PRIVACY.md`
 - `docs/PUBLISHING.md`

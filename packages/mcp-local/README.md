@@ -14,6 +14,28 @@ Find and filter **RAG-capable MCP servers** in seconds. This package is the loca
 
 ---
 
+## MapRag (RAGMap)
+
+**MapRag is a discovery + routing layer for retrieval.**
+It indexes **RAG-capable MCP servers**, enriches them with structured metadata, and helps **agents (and humans)** quickly find the right retrieval server for a task under constraints like citations, freshness, privacy, domain, and latency.
+
+MapRag does **not** do RAG itself.
+It helps you choose the best *RAG tool/server* to do the retrieval.
+
+**Status (v0.1)**
+- Ingests the official MCP Registry (read-only) into Firestore.
+- Adds lightweight enrichment (`categories`, `ragScore`, `reasons`).
+- Exposes two programmable interfaces: registry-compatible REST API (subregistry) + MCP servers (remote HTTP + local stdio).
+
+**Roadmap**
+- Richer capability model (domain, grounding/citations, freshness, privacy/residency, auth, limits).
+- Trust signals (reachability, schema stability, latency/uptime).
+- Human UI for browsing/filtering/comparing servers.
+
+Full overview: `https://github.com/khalidsaidi/ragmap/blob/main/docs/OVERVIEW.md`
+
+---
+
 ## Quick start (60 seconds)
 
 ```bash
@@ -93,10 +115,26 @@ Notes:
 
 ### Example tool calls
 
-- Find remote (streamable-http) servers that look RAG-y:
-  - `rag_find_servers({ query: "rag", minScore: 30, transport: "streamable-http", limit: 10 })`
-- Find servers published via a specific registry type:
-  - `rag_find_servers({ query: "qdrant", registryType: "pypi" })`
+- Find remote (streamable-http) servers that look RAG-y: `rag_find_servers({ query: "rag", minScore: 30, transport: "streamable-http", limit: 10 })`
+- Find servers published via a specific registry type: `rag_find_servers({ query: "qdrant", registryType: "pypi" })`
+- List categories: `rag_list_categories({})`
+
+### Example: “privacy-first docs RAG with citations”
+
+This is the kind of query MapRag is designed for. Today, you can approximate it with categories and transport filters:
+
+```json
+{
+  "tool": "rag_find_servers",
+  "input": {
+    "query": "docs rag citations",
+    "categories": ["documents"],
+    "minScore": 30,
+    "transport": "stdio",
+    "limit": 5
+  }
+}
+```
 
 ---
 
