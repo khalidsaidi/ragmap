@@ -44,6 +44,12 @@ Remote (Streamable HTTP):
 claude mcp add --transport http ragmap https://<your-mcp-domain>/mcp
 ```
 
+Local (stdio, npm):
+
+```bash
+npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+```
+
 Local (stdio):
 
 ```bash
@@ -80,3 +86,4 @@ MCP_URL=https://ragmap-mcp.web.app/mcp ./scripts/smoke-mcp.sh
 - `docs/DEPLOYMENT.md`
 - `docs/DATA_MODEL.md`
 - `docs/PRIVACY.md`
+- `docs/PUBLISHING.md`

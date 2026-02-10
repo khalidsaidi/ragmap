@@ -1,25 +1,40 @@
 {
   "name": "@khalidsaidi/ragmap-mcp",
   "version": "0.1.0",
-  "description": "RAGMap MCP server (local) — find/filter RAG-related MCP servers via subregistry API.",
+  "description": "RAGMap MCP server (local) - find and filter RAG-capable MCP servers via the RAGMap subregistry API.",
   "keywords": [
     "mcp",
     "model-context-protocol",
+    "mcp-server",
+    "agent-tools",
     "agents",
+    "claude",
+    "claude-desktop",
+    "cursor",
     "rag",
     "retrieval",
+    "search",
     "registry",
+    "subregistry",
+    "json-rpc",
+    "stdio",
     "firestore"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/khalidsaidi/ragmap",
+  "homepage": "https://ragmap-api.web.app/docs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/khalidsaidi/ragmap",
+    "url": "git+https://github.com/khalidsaidi/ragmap.git",
     "directory": "packages/mcp-local"
   },
   "bugs": {
     "url": "https://github.com/khalidsaidi/ragmap/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "type": "module",
   "private": false,
@@ -29,7 +44,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "tsx src/cli.ts",
@@ -52,4 +68,3 @@
     "typescript": "^5.4.0"
   }
 }
-

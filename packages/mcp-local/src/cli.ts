@@ -4,7 +4,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-const API_BASE_URL = process.env.API_BASE_URL ?? process.env.RAGMAP_API_BASE_URL ?? 'http://localhost:3000';
+// Default to the hosted API so `npx @khalidsaidi/ragmap-mcp` works out of the box.
+const API_BASE_URL =
+  process.env.RAGMAP_API_BASE_URL ?? process.env.API_BASE_URL ?? 'https://ragmap-api.web.app';
 const MCP_AGENT_NAME = process.env.MCP_AGENT_NAME ?? 'ragmap-mcp-local';
 const SERVICE_VERSION = process.env.SERVICE_VERSION ?? '0.1.0';
 
