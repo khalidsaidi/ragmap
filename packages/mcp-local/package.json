@@ -1,6 +1,6 @@
 {
   "name": "@khalidsaidi/ragmap-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "RAGMap MCP server (local) - find and filter RAG-capable MCP servers via the RAGMap subregistry API.",
   "keywords": [
     "mcp",
