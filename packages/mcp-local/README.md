@@ -30,6 +30,15 @@ RAGMAP_API_BASE_URL=http://localhost:3000 \
 npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
 ```
 
+## Install (optional)
+
+If you prefer a global install:
+
+```bash
+npm i -g @khalidsaidi/ragmap-mcp
+ragmap-mcp
+```
+
 ### Smoke test (one command)
 
 ```bash
@@ -82,6 +91,13 @@ Notes:
 - Tool responses are returned as JSON text (so any MCP host can display them verbatim).
 - Filtering is done server-side via the RAGMap API.
 
+### Example tool calls
+
+- Find remote (streamable-http) servers that look RAG-y:
+  - `rag_find_servers({ query: "rag", minScore: 30, transport: "streamable-http", limit: 10 })`
+- Find servers published via a specific registry type:
+  - `rag_find_servers({ query: "qdrant", registryType: "pypi" })`
+
 ---
 
 ## Environment variables
@@ -95,10 +111,20 @@ Notes:
 
 ---
 
+## Troubleshooting (fast)
+
+- No results
+  - Try a broader query like `rag`, `retrieval`, `vector`, `qdrant`.
+  - Lower `minScore` or omit it.
+- Connection errors
+  - Confirm `RAGMAP_API_BASE_URL` is reachable from your environment.
+  - For the hosted API, try opening `https://ragmap-api.web.app/health` in a browser.
+
+---
+
 ## Links
 
 - Docs/OpenAPI: `https://ragmap-api.web.app/docs`
 - Agent card: `https://ragmap-api.web.app/.well-known/agent.json`
 - MCP remote (HTTP): `https://ragmap-mcp.web.app/mcp`
 - Repo: `https://github.com/khalidsaidi/ragmap`
-
