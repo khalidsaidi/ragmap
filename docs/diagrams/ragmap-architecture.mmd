@@ -1,22 +1,21 @@
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":90,"rankSpacing":110}}}%%
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":80,"rankSpacing":110}}}%%
 flowchart LR
-  %% Concept-only diagram (no deployment, framework, or datastore details)
+  %% Concept-only diagram (shows "added value", not deployment or datastore)
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  Sources["Sources\n(registry metadata)"]:::mono
-  Agents["Agents / MCP hosts"]:::mono
-  Humans["Humans / developers"]:::mono
-  Retrieval["RAG MCP servers\n(do retrieval)"]:::mono
+  Sources["Registry metadata\n(what exists)"]:::mono
+  Users["Agents + humans\nconstraints:\ncitations, freshness,\nprivacy, domain,\nlatency"]:::mono
+  Retrieval["Selected retrieval MCP server(s)\n(do retrieval)"]:::mono
 
-  subgraph MR["MapRag"]
+  subgraph MR["MapRag (RAGMap) added value"]
     direction TB
-    Criteria["Routing criteria\n(citations, freshness,\nprivacy, domain,\nlatency)"]:::mono
-    Engine["Match + rank\n(shortlist + reasons\n+ connect info)"]:::mono
-    Criteria --> Engine
+    Normalize["Normalize\n(stable, queryable shapes)"]:::mono
+    Enrich["Enrich\n(capabilities taxonomy\n+ trust signals)"]:::mono
+    Route["Route\n(rank + explain\n+ connect config)"]:::mono
+    Normalize --> Enrich --> Route
   end
 
-  Sources -->|sync| Engine
-  Agents <-->|query + constraints| Engine
-  Humans <-->|query + constraints| Engine
-  Agents -->|use selected server| Retrieval
+  Sources -->|sync| Normalize
+  Users <-->|ask ↔ shortlist + reasons| Route
+  Users -->|connect + retrieve| Retrieval
