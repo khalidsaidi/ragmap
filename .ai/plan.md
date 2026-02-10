@@ -33,3 +33,5 @@ Delta vs A2ABench:
 - GitHub Actions:
   - WIF pool/provider created: `ragmap-github` / `github`
   - Deployer service account: `ragmap-github-deployer@ragmap-22xp3a.iam.gserviceaccount.com`
+  - Build service account (Cloud Build): `ragmap-build@ragmap-22xp3a.iam.gserviceaccount.com`
+  - CI + deploy workflows are passing (Cloud Build -> Cloud Run -> Firebase Hosting)
