@@ -23,26 +23,32 @@ Full overview: `docs/OVERVIEW.md`
 <summary>Mermaid source</summary>
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":70,"rankSpacing":80}}}%%
-flowchart TD
-  %% Concept-only diagram (shows value; no deployment/framework/datastore details)
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":60,"rankSpacing":120}}}%%
+flowchart TB
+  %% Concept-only diagram (shows product value; no deployment/framework/datastore details)
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  Sources["Upstream registries\n(what exists)"]:::mono
-  Normalize["Normalize\n(stable schema)"]:::mono
-  Enrich["Enrich\n(capabilities + trust signals)"]:::mono
-  Catalog["Catalog + index\n(queryable records)"]:::mono
-  Router["Route\n(match + rank + explain)"]:::mono
-  Output["Shortlist\n(reasons + connect info)"]:::mono
-  Use["Use\n(agent connects to selected\nretrieval server(s))"]:::mono
+  Sources["Upstream MCP registries\n(official + optional)"]:::mono
+  Sync["Sync + normalize\n(read-only)"]:::mono
+  Catalog["Enriched catalog\n(server records + versions)"]:::mono
 
-  Need["Need + constraints\n(citations, freshness,\nprivacy, domain, latency)"]:::mono
-  Consumers["Agents + humans"]:::mono
+  Cap["Structured metadata\n(domain, retrieval, freshness,\ngrounding, privacy, auth, limits)\n\nExamples:\n- domain: docs|code|web|mixed\n- retrieval: dense|sparse|hybrid\n  (+rerank)\n- freshness: static|continuous\n  (max lag)\n- grounding: citations\n  provenance fields\n- privacy: local|remote\n  stores user data?\n- auth: req|optional\n  methods\n- limits: top_k|rate\n  max context"]:::mono
 
-  Sources --> Normalize --> Enrich --> Catalog --> Router --> Output --> Use
-  Need --> Router
-  Consumers --> Router
+  Trust["Trust signals (lightweight)\n- upstream status\n- reachability/latency\n- schema stability\n- reports (optional)"]:::mono
+
+  Router["Router\nmatch + rank + explain"]:::mono
+  Ranked["Ranked candidates\n+ reasons"]:::mono
+  Retrieval["Chosen retrieval MCP server(s)\n(do retrieval)"]:::mono
+
+  Users["Agents + humans"]:::mono
+  Tools["MCP tools\nrag_find_servers\nrag_get_server\nrag_list_categories\nrag_explain_score"]:::mono
+  Criteria["Routing constraints\n(domain, privacy, citations,\nfreshness, auth, limits, ...)"]:::mono
+
+  Sources --> Sync --> Catalog --> Router --> Ranked --> Retrieval
+  Catalog --> Cap
+  Catalog --> Trust
+  Users --> Tools --> Criteria --> Router
 ```
 
 </details>
