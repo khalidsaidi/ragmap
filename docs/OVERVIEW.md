@@ -1,7 +1,7 @@
 # MapRag (RAGMap)
 
 **MapRag is a discovery + routing layer for retrieval.**
-It indexes **RAG-capable MCP servers**, enriches them with structured **capabilities + trust signals**, and lets **agents (and humans)** quickly find the right retrieval server for a task under constraints like **citations, freshness, privacy, domain, and latency**.
+It indexes **RAG-capable MCP servers**, enriches them with lightweight explainable metadata today (and richer **capabilities + trust signals** over time), and lets **agents (and humans)** quickly find the right retrieval server for a task under constraints like **citations, freshness, privacy, domain, and latency**.
 
 MapRag does **not** do RAG itself.
 It helps you choose the best *RAG tool/server* to do the retrieval.
@@ -238,4 +238,3 @@ MapRag becomes the default answer to:
 > I need retrieval. Which MCP server should I use, and why?
 
 It’s a map of the retrieval landscape and a router for agent systems that need grounding without tool overload.
-
