@@ -4,21 +4,21 @@ flowchart TB
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  Sources["Upstream MCP registries\n(official + optional)"]:::mono
-  Sync["Sync + normalize\n(read-only)"]:::mono
-  Catalog["Enriched catalog\n(server records + versions)"]:::mono
+  Sources["Upstream MCP registries<br/>(official + optional)"]:::mono
+  Sync["Sync + normalize<br/>(read-only)"]:::mono
+  Catalog["Enriched catalog<br/>(server records + versions)"]:::mono
 
-  Cap["Structured metadata\n(domain, retrieval, freshness,\ngrounding, privacy, auth, limits)\n\nExamples:\n- domain: docs|code|web|mixed\n- retrieval: dense|sparse|hybrid\n  (+rerank)\n- freshness: static|continuous\n  (max lag)\n- grounding: citations\n  provenance fields\n- privacy: local|remote\n  stores user data?\n- auth: req|optional\n  methods\n- limits: top_k|rate\n  max context"]:::mono
+  Cap["Structured metadata<br/>(domain, retrieval, freshness,<br/>grounding, privacy, auth, limits)<br/><br/>Examples:<br/>- domain: docs|code|web|mixed<br/>- retrieval: dense|sparse|hybrid<br/>  (+rerank)<br/>- freshness: static|continuous<br/>  (max lag)<br/>- grounding: citations<br/>  provenance fields<br/>- privacy: local|remote<br/>  stores user data?<br/>- auth: req|optional<br/>  methods<br/>- limits: top_k|rate<br/>  max context"]:::mono
 
-  Trust["Trust signals (lightweight)\n- upstream status\n- reachability/latency\n- schema stability\n- reports (optional)"]:::mono
+  Trust["Trust signals (lightweight)<br/>- upstream status<br/>- reachability/latency<br/>- schema stability<br/>- reports (optional)"]:::mono
 
-  Router["Router\nmatch + rank + explain"]:::mono
-  Ranked["Ranked candidates\n+ reasons"]:::mono
-  Retrieval["Chosen retrieval MCP server(s)\n(do retrieval)"]:::mono
+  Router["Router<br/>match + rank + explain"]:::mono
+  Ranked["Ranked candidates<br/>+ reasons"]:::mono
+  Retrieval["Chosen retrieval MCP server(s)<br/>(do retrieval)"]:::mono
 
   Users["Agents + humans"]:::mono
-  Tools["MCP tools\nrag_find_servers\nrag_get_server\nrag_list_categories\nrag_explain_score"]:::mono
-  Criteria["Routing constraints\n(domain, privacy, citations,\nfreshness, auth, limits, ...)"]:::mono
+  Tools["MCP tools<br/>rag_find_servers<br/>rag_get_server<br/>rag_list_categories<br/>rag_explain_score"]:::mono
+  Criteria["Routing constraints<br/>(domain, privacy, citations,<br/>freshness, auth, limits, ...)"]:::mono
 
   Sources --> Sync --> Catalog --> Router --> Ranked --> Retrieval
   Catalog --> Cap
