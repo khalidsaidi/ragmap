@@ -4,12 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "dev": "pnpm --filter @ragmap/shared run build && tsx watch src/index.ts",
+    "build": "pnpm --filter @ragmap/shared run build && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "echo 'lint not configured'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test --import tsx tests/*.test.ts"
+    "test": "pnpm --filter @ragmap/shared run build && node --test --import tsx tests/*.test.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
@@ -28,4 +28,3 @@
     "typescript": "^5.4.0"
   }
 }
-

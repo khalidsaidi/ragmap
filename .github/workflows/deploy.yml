@@ -47,14 +47,20 @@ jobs:
         run: |
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.API_SERVICE }}:${{ github.sha }}"
-          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" --tag "$IMAGE" -f apps/api/Dockerfile .
+          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
+            --config cloudbuild.dockerfile.yaml \
+            --substitutions=_IMAGE="$IMAGE",_DOCKERFILE="apps/api/Dockerfile" \
+            .
           echo "API_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Build & push MCP image
         run: |
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.MCP_SERVICE }}:${{ github.sha }}"
-          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" --tag "$IMAGE" -f apps/mcp-remote/Dockerfile .
+          gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
+            --config cloudbuild.dockerfile.yaml \
+            --substitutions=_IMAGE="$IMAGE",_DOCKERFILE="apps/mcp-remote/Dockerfile" \
+            .
           echo "MCP_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - name: Deploy Cloud Run (API)
@@ -79,4 +85,3 @@ jobs:
         run: |
           set -euo pipefail
           pnpm -w dlx firebase-tools@latest deploy --only hosting:api,hosting:mcp
-

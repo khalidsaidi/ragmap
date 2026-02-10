@@ -27,7 +27,8 @@ npm-debug.log*
 
 # Firebase
 .firebase/
+firebase-debug.log
+firebase-debug.*.log
 
 # Editor
 .cursor/
-

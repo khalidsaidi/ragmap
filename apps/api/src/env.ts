@@ -42,7 +42,8 @@ export function loadEnv(): Env {
 
   const registryBaseUrl = process.env.REGISTRY_BASE_URL ?? 'https://registry.modelcontextprotocol.io';
   const ingestToken = process.env.INGEST_TOKEN ?? '';
-  const ingestPageLimit = Math.max(1, Math.min(200, parseIntStrict(process.env.INGEST_PAGE_LIMIT, 200)));
+  // Upstream registry currently enforces `limit <= 100`.
+  const ingestPageLimit = Math.max(1, Math.min(100, parseIntStrict(process.env.INGEST_PAGE_LIMIT, 100)));
 
   const embeddingsEnabled = parseBool(process.env.EMBEDDINGS_ENABLED, false);
   const embeddingsProvider = 'openai' as const;
@@ -66,4 +67,3 @@ export function loadEnv(): Env {
     openaiEmbeddingsModel
   };
 }
-
