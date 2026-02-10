@@ -1,58 +1,16 @@
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":40,"rankSpacing":60}}}%%
-flowchart TD
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":70,"rankSpacing":90}}}%%
+flowchart LR
   %% Concept-only diagram (no deployment, framework, or datastore details)
 
-  subgraph S["Sources"]
-    direction TB
-    Upstream["Official MCP Registry"]:::mono
-    Other["Other directories (opt)"]:::mono
-    Publisher["Publisher metadata (opt)"]:::mono
-    Scheduler["Scheduler trigger (opt)"]:::mono
-  end
+  classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  subgraph C["MapRag core"]
-    direction TB
-    Ingest["Ingest + normalize"]:::mono
-    Enrich["Enrich + classify"]:::mono
-    Index["Catalog + index"]:::mono
-    Find["Find + rank + explain"]:::mono
-    Ingest --> Enrich --> Index --> Find
-  end
+  Sources["Sources\n(registry metadata)"]:::mono
+  MapRag["MapRag\n(discover + route)"]:::mono
+  Agents["Agents / MCP hosts"]:::mono
+  Humans["Humans / developers"]:::mono
+  Retrieval["RAG MCP servers\n(do retrieval)"]:::mono
 
-  subgraph I["Interfaces"]
-    direction TB
-    Rest["REST subregistry"]:::mono
-    McpRemote["MCP remote (HTTP)"]:::mono
-    McpLocal["MCP local (stdio)"]:::mono
-    UI["UI"]:::mono
-  end
-
-  subgraph U["Who uses it"]
-    direction TB
-    Agents["Agents"]:::mono
-    Humans["Humans"]:::mono
-  end
-
-  RagServers["RAG MCP servers (do retrieval)"]:::mono
-
-  %% Sync loop
-  Upstream --> Ingest
-  Other --> Ingest
-  Scheduler --> Ingest
-  Publisher --> Enrich
-
-  %% Query loop
-  Agents --> McpRemote --> Find
-  Agents --> McpLocal --> Find
-  Agents --> Rest --> Find
-  Humans --> UI --> Find
-  Humans --> Rest --> Find
-
-  %% Results
-  Find --> Rest
-  Find --> McpRemote
-  Find --> McpLocal
-  Find --> UI
-
-  %% Routing: MapRag returns connect info; agents connect to the chosen server(s).
-  Agents --> RagServers
+  Sources -->|sync| MapRag
+  Agents <-->|MCP tools or REST| MapRag
+  Humans <-->|UI or REST| MapRag
+  Agents -->|use selected server| Retrieval
