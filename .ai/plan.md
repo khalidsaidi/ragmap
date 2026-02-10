@@ -26,4 +26,10 @@ Delta vs A2ABench:
   - Full ingest executed successfully and populated Firestore
   - Cloud Scheduler job created: `ragmap-ingest` (HTTP POST to `/internal/ingest/run`)
 - Firebase:
-  - `firebase projects:addfirebase` currently fails with `403 The caller does not have permission` (likely needs Firebase ToS acceptance in console)
+  - Firebase added to project successfully
+  - Hosting sites created + deployed:
+    - API: `https://ragmap-api.web.app`
+    - MCP: `https://ragmap-mcp.web.app`
+- GitHub Actions:
+  - WIF pool/provider created: `ragmap-github` / `github`
+  - Deployer service account: `ragmap-github-deployer@ragmap-22xp3a.iam.gserviceaccount.com`
