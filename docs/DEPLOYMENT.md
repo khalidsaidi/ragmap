@@ -70,3 +70,34 @@ gcloud firestore indexes composite create \
   --field-config field-path="hidden",order="ascending" \
   --field-config field-path="name",order="ascending"
 ```
+
+## GitHub Actions (CI/CD)
+
+This repo includes:
+- `.github/workflows/ci.yml` (lint/typecheck/test)
+- `.github/workflows/deploy.yml` (Cloud Build + Cloud Run + Firebase Hosting)
+
+### Workload Identity Federation (recommended)
+
+1) Create WIF + deployer service account:
+
+```bash
+PROJECT_ID=ragmap-xxxxxx ./scripts/setup-github-wif.sh
+```
+
+2) In GitHub repo settings add secrets:
+- `WIF_PROVIDER`
+- `WIF_SERVICE_ACCOUNT`
+
+3) Add GitHub repo variables:
+- `GCP_PROJECT_ID`
+- `GCP_REGION` (default: `us-central1`)
+- `ARTIFACT_REPO` (default: `ragmap`)
+- `API_SERVICE` (default: `ragmap-api`)
+- `MCP_SERVICE` (default: `ragmap-mcp-remote`)
+
+4) Ensure Firebase Hosting targets exist for the project:
+
+```bash
+PROJECT_ID=ragmap-xxxxxx ./scripts/bootstrap-firebase.sh
+```
