@@ -53,7 +53,7 @@ jobs:
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.API_SERVICE }}:${{ github.sha }}"
           gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
-            --service-account "${{ env.BUILD_SA_EMAIL }}" \
+            --service-account "projects/${{ env.GCP_PROJECT_ID }}/serviceAccounts/${{ env.BUILD_SA_EMAIL }}" \
             --gcs-log-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/logs" \
             --gcs-source-staging-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/source" \
             --config cloudbuild.dockerfile.yaml \
@@ -66,7 +66,7 @@ jobs:
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.MCP_SERVICE }}:${{ github.sha }}"
           gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
-            --service-account "${{ env.BUILD_SA_EMAIL }}" \
+            --service-account "projects/${{ env.GCP_PROJECT_ID }}/serviceAccounts/${{ env.BUILD_SA_EMAIL }}" \
             --gcs-log-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/logs" \
             --gcs-source-staging-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/source" \
             --config cloudbuild.dockerfile.yaml \
