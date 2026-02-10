@@ -21,6 +21,7 @@ jobs:
       API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL || 'https://ragmap-api.web.app' }}
       MCP_PUBLIC_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-mcp.web.app/mcp' }}
       RUNTIME_SA_EMAIL: ragmap-runtime@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+      BUILD_SA_EMAIL: ragmap-build@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
     steps:
       - uses: actions/checkout@v4
 
@@ -52,6 +53,9 @@ jobs:
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.API_SERVICE }}:${{ github.sha }}"
           gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
+            --service-account "${{ env.BUILD_SA_EMAIL }}" \
+            --gcs-log-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/logs" \
+            --gcs-source-staging-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/source" \
             --config cloudbuild.dockerfile.yaml \
             --substitutions=_IMAGE="$IMAGE",_DOCKERFILE="apps/api/Dockerfile" \
             .
@@ -62,6 +66,9 @@ jobs:
           set -euo pipefail
           IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.MCP_SERVICE }}:${{ github.sha }}"
           gcloud builds submit --project "${{ env.GCP_PROJECT_ID }}" \
+            --service-account "${{ env.BUILD_SA_EMAIL }}" \
+            --gcs-log-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/logs" \
+            --gcs-source-staging-dir "gs://${{ env.GCP_PROJECT_ID }}_cloudbuild/source" \
             --config cloudbuild.dockerfile.yaml \
             --substitutions=_IMAGE="$IMAGE",_DOCKERFILE="apps/mcp-remote/Dockerfile" \
             .
