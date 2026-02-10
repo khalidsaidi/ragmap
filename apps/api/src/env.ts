@@ -8,6 +8,8 @@ export type Env = {
   storage: 'firestore' | 'inmemory';
   gcpProjectId: string;
 
+  cacheTtlMs: number;
+
   registryBaseUrl: string;
   ingestToken: string;
   ingestPageLimit: number;
@@ -40,6 +42,8 @@ export function loadEnv(): Env {
   const storage = storageRaw === 'inmemory' ? 'inmemory' : 'firestore';
   const gcpProjectId = process.env.GCP_PROJECT_ID ?? '';
 
+  const cacheTtlMs = Math.max(0, Math.min(60 * 60 * 1000, parseIntStrict(process.env.CACHE_TTL_MS, 60_000)));
+
   const registryBaseUrl = process.env.REGISTRY_BASE_URL ?? 'https://registry.modelcontextprotocol.io';
   const ingestToken = process.env.INGEST_TOKEN ?? '';
   // Upstream registry currently enforces `limit <= 100`.
@@ -58,6 +62,7 @@ export function loadEnv(): Env {
     logLevel,
     storage,
     gcpProjectId,
+    cacheTtlMs,
     registryBaseUrl,
     ingestToken,
     ingestPageLimit,

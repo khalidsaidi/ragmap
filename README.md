@@ -61,6 +61,20 @@ pnpm -C packages/mcp-local dev
 - `GET /rag/categories`
 - `POST /internal/ingest/run` (protected)
 
+`GET /rag/search` query params:
+- `q` (string)
+- `categories` (comma-separated)
+- `minScore` (0-100)
+- `transport` (`stdio` or `streamable-http`)
+- `registryType` (string)
+
+## Smoke tests
+
+```bash
+API_BASE_URL=https://ragmap-api.web.app ./scripts/smoke-public.sh
+MCP_URL=https://ragmap-mcp.web.app/mcp ./scripts/smoke-mcp.sh
+```
+
 ## Docs
 
 - `docs/DEPLOYMENT.md`

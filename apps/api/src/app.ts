@@ -60,7 +60,9 @@ const RagSearchQuerySchema = z.object({
   q: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(50).optional(),
   categories: z.string().optional(),
-  minScore: z.coerce.number().int().min(0).max(100).optional()
+  minScore: z.coerce.number().int().min(0).max(100).optional(),
+  transport: z.enum(['stdio', 'streamable-http']).optional(),
+  registryType: z.string().optional()
 });
 
 const IngestRunBodySchema = z.object({
@@ -68,7 +70,7 @@ const IngestRunBodySchema = z.object({
 });
 
 export async function buildApp(params: { env: Env; store: RegistryStore }) {
-  const fastify = Fastify({ logger: true, trustProxy: true, ignoreTrailingSlash: true });
+  const fastify = Fastify({ logger: true, trustProxy: true, routerOptions: { ignoreTrailingSlash: true } });
 
   await fastify.register(cors, { origin: true });
   await fastify.register(rateLimit, { global: false });
@@ -195,9 +197,12 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const categories = query.categories
       ? query.categories.split(',').map((c) => c.trim()).filter(Boolean)
       : undefined;
+    const registryType = (query.registryType ?? '').trim() || undefined;
     const filters: RagFilters = RagFiltersSchema.parse({
       categories,
-      minScore: query.minScore
+      minScore: query.minScore,
+      transport: query.transport,
+      registryType
     });
 
     let queryEmbedding: number[] | null = null;

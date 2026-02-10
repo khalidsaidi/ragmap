@@ -12,6 +12,7 @@ const env: Env = {
   logLevel: 'silent',
   storage: 'inmemory',
   gcpProjectId: '',
+  cacheTtlMs: 0,
   registryBaseUrl: 'https://registry.modelcontextprotocol.io',
   ingestToken: 'test-token',
   ingestPageLimit: 2,
@@ -88,5 +89,25 @@ test('rag explain supports serverName with slash', async () => {
   const body = res.json();
   assert.equal(body.name, 'ai.aliengiraffe/spotdb');
   assert.equal(body.ragScore, 42);
+  await app.close();
+});
+
+test('rag search does not match substring inside words (rag vs storage)', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: { name: 'example/storage-only', version: '0.1.0', description: 'storage' },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: [], ragScore: 0, reasons: [], keywords: [] },
+    hidden: false
+  });
+  const app = await buildApp({ env, store });
+
+  const res = await app.inject({ method: 'GET', url: '/rag/search?q=rag&limit=10' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.results.length, 0);
+
   await app.close();
 });

@@ -7,6 +7,11 @@ import type { Env } from '../env.js';
 import { buildMeta } from './types.js';
 import type { IngestMode, ListServersParams, ListServersResult, RagExplain, RagSearchResult, RegistryStore, StoreHealth } from './types.js';
 
+type CacheEntry<T> = {
+  value: T;
+  expiresAtMs: number;
+};
+
 function encodeServerId(name: string) {
   return encodeURIComponent(name);
 }
@@ -35,9 +40,28 @@ function buildEntry(doc: any): RegistryServerEntry {
 export class FirestoreStore implements RegistryStore {
   kind = 'firestore' as const;
   private firestore: Firestore;
+  private categoriesCache: CacheEntry<string[]> | null = null;
+  private searchItemsCache: CacheEntry<RagSearchItem[]> | null = null;
 
   constructor(private env: Env) {
     this.firestore = new Firestore(env.gcpProjectId ? { projectId: env.gcpProjectId } : undefined);
+  }
+
+  private clearCaches() {
+    this.categoriesCache = null;
+    this.searchItemsCache = null;
+  }
+
+  private cacheGet<T>(cache: CacheEntry<T> | null): T | null {
+    if (!this.env.cacheTtlMs) return null;
+    if (!cache) return null;
+    if (Date.now() >= cache.expiresAtMs) return null;
+    return cache.value;
+  }
+
+  private cacheSet<T>(value: T): CacheEntry<T> | null {
+    if (!this.env.cacheTtlMs) return null;
+    return { value, expiresAtMs: Date.now() + this.env.cacheTtlMs };
   }
 
   private serversCol() {
@@ -58,6 +82,8 @@ export class FirestoreStore implements RegistryStore {
   }
 
   async beginIngestRun(_mode: IngestMode) {
+    // Avoid serving stale results during/after an ingestion run.
+    this.clearCaches();
     const runId = `run_${Math.random().toString(16).slice(2)}_${Date.now()}`;
     return { runId, startedAt: new Date() };
   }
@@ -145,6 +171,7 @@ export class FirestoreStore implements RegistryStore {
   }
 
   async hideServersNotSeen(runId: string) {
+    this.clearCaches();
     const col = this.serversCol();
     const writer = this.firestore.bulkWriter();
     let hidden = 0;
@@ -275,39 +302,68 @@ export class FirestoreStore implements RegistryStore {
   }
 
   async listCategories(): Promise<string[]> {
+    const cached = this.cacheGet(this.categoriesCache);
+    if (cached) return cached;
+
     const categories = new Set<string>();
-    const snap = await this.serversCol().where('hidden', '==', false).limit(2000).get();
-    for (const doc of snap.docs) {
-      const data = doc.data() as any;
-      const cats: unknown = data?.latestRagmap?.categories;
-      if (Array.isArray(cats)) {
-        for (const c of cats) {
-          if (typeof c === 'string' && c) categories.add(c);
+    const col = this.serversCol();
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = col.where('hidden', '==', false).orderBy('name').select('name', 'latestRagmap').limit(500);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+      for (const doc of snap.docs) {
+        last = doc;
+        const data = doc.data() as any;
+        const cats: unknown = data?.latestRagmap?.categories;
+        if (Array.isArray(cats)) {
+          for (const c of cats) {
+            if (typeof c === 'string' && c) categories.add(c);
+          }
         }
       }
     }
-    return Array.from(categories).sort();
+    const out = Array.from(categories).sort();
+    this.categoriesCache = this.cacheSet(out);
+    return out;
   }
 
   private async loadSearchItems(filters?: RagFilters): Promise<RagSearchItem[]> {
+    const cached = this.cacheGet(this.searchItemsCache);
+    if (cached) return cached;
+
     const items: RagSearchItem[] = [];
-    const snap = await this.serversCol().where('hidden', '==', false).limit(2000).get();
-    for (const doc of snap.docs) {
-      const data = doc.data() as any;
-      if (!data?.latestServer) continue;
-      const entry = buildEntry({
-        server: data.latestServer,
-        official: data.latestOfficial ?? null,
-        publisherProvided: data.latestPublisherProvided ?? null,
-        ragmap: data.latestRagmap ?? null
-      });
-      items.push({
-        entry,
-        enrichment: data.latestRagmap ?? null,
-        searchText: buildSearchText(data.latestServer)
-      });
+    const col = this.serversCol();
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = col
+        .where('hidden', '==', false)
+        .orderBy('name')
+        .select('name', 'latestServer', 'latestOfficial', 'latestPublisherProvided', 'latestRagmap')
+        .limit(500);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+      for (const doc of snap.docs) {
+        last = doc;
+        const data = doc.data() as any;
+        if (!data?.latestServer) continue;
+        const entry = buildEntry({
+          server: data.latestServer,
+          official: data.latestOfficial ?? null,
+          publisherProvided: data.latestPublisherProvided ?? null,
+          ragmap: data.latestRagmap ?? null
+        });
+        items.push({
+          entry,
+          enrichment: data.latestRagmap ?? null,
+          searchText: buildSearchText(data.latestServer)
+        });
+      }
     }
     void filters;
+    this.searchItemsCache = this.cacheSet(items);
     return items;
   }
 

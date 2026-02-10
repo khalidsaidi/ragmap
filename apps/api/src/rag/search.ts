@@ -9,13 +9,16 @@ function tokenize(query: string) {
     .slice(0, 16);
 }
 
-function keywordScore(text: string, tokens: string[]) {
-  if (!tokens.length) return 0;
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function keywordScore(text: string, tokenRegexes: RegExp[]) {
+  if (!tokenRegexes.length) return 0;
   const lower = text.toLowerCase();
   let score = 0;
-  for (const token of tokens) {
-    if (!token) continue;
-    if (lower.includes(token)) score += 1;
+  for (const re of tokenRegexes) {
+    if (re.test(lower)) score += 1;
   }
   return score;
 }
@@ -51,8 +54,9 @@ export type RagSearchHit = {
   score: number;
 };
 
-function passesFilters(enrichment: RagmapEnrichment | null | undefined, filters: RagFilters | undefined) {
+function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (!filters) return true;
+  const enrichment: RagmapEnrichment | null | undefined = item.enrichment ?? null;
   if (filters.minScore != null) {
     const score = enrichment?.ragScore ?? 0;
     if (score < filters.minScore) return false;
@@ -62,6 +66,44 @@ function passesFilters(enrichment: RagmapEnrichment | null | undefined, filters:
     for (const need of filters.categories) {
       if (!categories.has(need.toLowerCase())) return false;
     }
+  }
+  if (filters.transport) {
+    const need = filters.transport;
+    const server: any = item.entry.server as any;
+    const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+    const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+
+    let ok = false;
+    for (const pkg of packages) {
+      const t = pkg?.transport?.type;
+      if (t === need) {
+        ok = true;
+        break;
+      }
+    }
+    if (!ok) {
+      for (const remote of remotes) {
+        if (remote?.type === need) {
+          ok = true;
+          break;
+        }
+      }
+    }
+    if (!ok) return false;
+  }
+  if (filters.registryType) {
+    const need = filters.registryType.toLowerCase();
+    const server: any = item.entry.server as any;
+    const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+    let ok = false;
+    for (const pkg of packages) {
+      const rt = pkg?.registryType;
+      if (typeof rt === 'string' && rt.toLowerCase() === need) {
+        ok = true;
+        break;
+      }
+    }
+    if (!ok) return false;
   }
   return true;
 }
@@ -73,10 +115,12 @@ export function ragSearchKeyword(
   filters?: RagFilters
 ): RagSearchHit[] {
   const tokens = tokenize(query);
+  // Match tokens at word boundaries (prefix match) so "rag" doesn't match "storage".
+  const tokenRegexes = tokens.map((t) => new RegExp(`\\b${escapeRegExp(t)}`, 'i'));
   const scored: RagSearchHit[] = [];
   for (const item of items) {
-    if (!passesFilters(item.enrichment ?? null, filters)) continue;
-    const score = keywordScore(item.searchText, tokens);
+    if (!passesFilters(item, filters)) continue;
+    const score = keywordScore(item.searchText, tokenRegexes);
     if (score <= 0) continue;
     scored.push({ entry: item.entry, kind: 'keyword', score });
   }
@@ -92,7 +136,7 @@ export function ragSearchSemantic(
 ): RagSearchHit[] {
   const scored: RagSearchHit[] = [];
   for (const item of items) {
-    if (!passesFilters(item.enrichment ?? null, filters)) continue;
+    if (!passesFilters(item, filters)) continue;
     const vec = item.enrichment?.embedding?.vector;
     if (!Array.isArray(vec) || vec.length === 0) continue;
     const score = cosineSimilarity(queryVector, vec);
@@ -102,4 +146,3 @@ export function ragSearchSemantic(
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, limit);
 }
-

@@ -44,7 +44,10 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
       const official = (item._meta as any)?.[META_OFFICIAL_KEY] ?? null;
       const publisherProvided = (item._meta as any)?.[META_PUBLISHER_KEY] ?? null;
 
-      const hidden = official?.status && official.status !== 'active' ? true : false;
+      // Only hide upstream-deleted entries from public listings.
+      // Deprecated entries should remain visible (with official status preserved in _meta).
+      const status = typeof official?.status === 'string' ? official.status : '';
+      const hidden = status.toLowerCase() === 'deleted';
 
       const enrichment = enrichRag(server);
       const embeddingText = buildSearchText(server);

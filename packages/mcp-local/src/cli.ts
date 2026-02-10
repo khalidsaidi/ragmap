@@ -32,15 +32,19 @@ server.registerTool(
       query: z.string().min(1).optional(),
       categories: z.array(z.string()).optional(),
       minScore: z.number().int().min(0).max(100).optional(),
+      transport: z.enum(['stdio', 'streamable-http']).optional(),
+      registryType: z.string().min(1).optional(),
       limit: z.number().int().min(1).max(50).optional()
     }
   },
-  async ({ query, categories, minScore, limit }) => {
+  async ({ query, categories, minScore, transport, registryType, limit }) => {
     const response = await apiGet('/rag/search', {
       q: query ?? 'rag',
       limit: String(limit ?? 10),
       ...(categories && categories.length ? { categories: categories.join(',') } : {}),
-      ...(minScore != null ? { minScore: String(minScore) } : {})
+      ...(minScore != null ? { minScore: String(minScore) } : {}),
+      ...(transport ? { transport } : {}),
+      ...(registryType ? { registryType } : {})
     });
     if (!response.ok) return { content: [{ type: 'text', text: JSON.stringify({ results: [] }) }] };
     const data = (await response.json()) as any;
@@ -95,4 +99,3 @@ server.registerTool(
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-
