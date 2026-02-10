@@ -131,16 +131,33 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     };
   });
 
-  fastify.get('/v0.1/servers/:serverName/versions', async (request, reply) => {
-    const serverName = decodeURIComponent((request.params as any).serverName);
-    const servers = await params.store.listServerVersions(serverName);
-    if (servers.length === 0) return reply.code(404).send({ error: 'Not found' });
-    return { servers, metadata: { count: servers.length } };
-  });
+  // IMPORTANT:
+  // Many registry server names contain "/" (e.g. "ai.auteng/mcp"). Most clients URL-encode this as "%2F".
+  // Firebase Hosting decodes "%2F" to "/" before proxying to Cloud Run, which breaks normal ":param" routes.
+  // We use a wildcard route so both encoded and decoded forms work:
+  // - /v0.1/servers/ai.auteng%2Fmcp/versions
+  // - /v0.1/servers/ai.auteng/mcp/versions
+  fastify.get('/v0.1/servers/*', async (request, reply) => {
+    const splat = (request.params as any)['*'] as string | undefined;
+    const raw = (splat ?? '').replace(/^\/+/, '').replace(/\/+$/, '');
+    if (!raw) return reply.code(404).send({ error: 'Not found' });
 
-  fastify.get('/v0.1/servers/:serverName/versions/:version', async (request, reply) => {
-    const serverName = decodeURIComponent((request.params as any).serverName);
-    const version = (request.params as any).version as string;
+    const parts = raw.split('/').filter(Boolean);
+    const versionsIdx = parts.lastIndexOf('versions');
+    if (versionsIdx < 1) return reply.code(404).send({ error: 'Not found' });
+
+    const serverNameRaw = parts.slice(0, versionsIdx).join('/');
+    const serverName = decodeURIComponent(serverNameRaw);
+    const rest = parts.slice(versionsIdx + 1);
+
+    if (rest.length === 0) {
+      const servers = await params.store.listServerVersions(serverName);
+      if (servers.length === 0) return reply.code(404).send({ error: 'Not found' });
+      return { servers, metadata: { count: servers.length } };
+    }
+
+    if (rest.length !== 1) return reply.code(404).send({ error: 'Not found' });
+    const version = rest[0];
     const entry = await params.store.getServerVersion(serverName, version === 'latest' ? 'latest' : version);
     if (!entry) return reply.code(404).send({ error: 'Not found' });
     return entry;
@@ -152,8 +169,18 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return { categories };
   });
 
-  fastify.get('/rag/servers/:serverName/explain', async (request, reply) => {
-    const serverName = decodeURIComponent((request.params as any).serverName);
+  // Same "serverName may contain '/'" issue as above.
+  fastify.get('/rag/servers/*', async (request, reply) => {
+    const splat = (request.params as any)['*'] as string | undefined;
+    const raw = (splat ?? '').replace(/^\/+/, '').replace(/\/+$/, '');
+    if (!raw) return reply.code(404).send({ error: 'Not found' });
+
+    const parts = raw.split('/').filter(Boolean);
+    if (parts.length < 2) return reply.code(404).send({ error: 'Not found' });
+    if (parts[parts.length - 1] !== 'explain') return reply.code(404).send({ error: 'Not found' });
+
+    const serverNameRaw = parts.slice(0, -1).join('/');
+    const serverName = decodeURIComponent(serverNameRaw);
     const explain = await params.store.getRagExplain(serverName);
     if (!explain) return reply.code(404).send({ error: 'Not found' });
     return explain;
