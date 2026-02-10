@@ -11,7 +11,7 @@
 .ai/archive/
 .ai/cache/
 .ai/tmp/
-.ai/.secret
+.ai/.secret*
 
 # Node
 node_modules/
