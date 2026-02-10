@@ -1,9 +1,9 @@
 {
   "projects": {
-    "default": "ragmap-prod"
+    "default": "ragmap-22xp3a"
   },
   "targets": {
-    "ragmap-prod": {
+    "ragmap-22xp3a": {
       "hosting": {
         "api": [
           "ragmap-api"
@@ -16,4 +16,3 @@
   },
   "etags": {}
 }
-
