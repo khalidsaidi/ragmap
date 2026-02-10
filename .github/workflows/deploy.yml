@@ -17,6 +17,10 @@ jobs:
       ARTIFACT_REPO: ${{ vars.ARTIFACT_REPO || 'ragmap' }}
       API_SERVICE: ${{ vars.API_SERVICE || 'ragmap-api' }}
       MCP_SERVICE: ${{ vars.MCP_SERVICE || 'ragmap-mcp-remote' }}
+      # Public stable URLs (Firebase Hosting by default).
+      API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL || 'https://ragmap-api.web.app' }}
+      MCP_PUBLIC_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-mcp.web.app/mcp' }}
+      RUNTIME_SA_EMAIL: ragmap-runtime@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
     steps:
       - uses: actions/checkout@v4
 
@@ -70,18 +74,26 @@ jobs:
             --project "${{ env.GCP_PROJECT_ID }}" \
             --region "${{ env.GCP_REGION }}" \
             --image "$API_IMAGE" \
+            --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
+            --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=0.1.0,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,EMBEDDINGS_ENABLED=false,GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }}" \
+            --set-secrets "INGEST_TOKEN=ragmap-ingest-token:latest" \
+            --timeout=900 \
             --allow-unauthenticated
 
       - name: Deploy Cloud Run (MCP)
         run: |
           set -euo pipefail
+          API_URL="$(gcloud run services describe "${{ env.API_SERVICE }}" --project "${{ env.GCP_PROJECT_ID }}" --region "${{ env.GCP_REGION }}" --format='value(status.url)')"
           gcloud run deploy "${{ env.MCP_SERVICE }}" \
             --project "${{ env.GCP_PROJECT_ID }}" \
             --region "${{ env.GCP_REGION }}" \
             --image "$MCP_IMAGE" \
+            --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
+            --set-env-vars "API_BASE_URL=${API_URL},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},PUBLIC_MCP_URL=${{ env.MCP_PUBLIC_URL }},SERVICE_VERSION=0.1.0" \
+            --timeout=300 \
             --allow-unauthenticated
 
       - name: Deploy Firebase Hosting
         run: |
           set -euo pipefail
-          pnpm -w dlx firebase-tools@latest deploy --only hosting:api,hosting:mcp
+          pnpm -w dlx firebase-tools@latest deploy --only hosting:api,hosting:mcp --project "${{ env.GCP_PROJECT_ID }}" --non-interactive
