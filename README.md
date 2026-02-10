@@ -23,27 +23,26 @@ Full overview: `docs/OVERVIEW.md`
 <summary>Mermaid source</summary>
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":80,"rankSpacing":110}}}%%
-flowchart LR
-  %% Concept-only diagram (shows "added value", not deployment or datastore)
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":70,"rankSpacing":80}}}%%
+flowchart TD
+  %% Concept-only diagram (shows value; no deployment/framework/datastore details)
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  Sources["Registry metadata\n(what exists)"]:::mono
-  Users["Agents + humans\nconstraints:\ncitations, freshness,\nprivacy, domain,\nlatency"]:::mono
-  Retrieval["Selected retrieval MCP server(s)\n(do retrieval)"]:::mono
+  Sources["Upstream registries\n(what exists)"]:::mono
+  Normalize["Normalize\n(stable schema)"]:::mono
+  Enrich["Enrich\n(capabilities + trust signals)"]:::mono
+  Catalog["Catalog + index\n(queryable records)"]:::mono
+  Router["Route\n(match + rank + explain)"]:::mono
+  Output["Shortlist\n(reasons + connect info)"]:::mono
+  Use["Use\n(agent connects to selected\nretrieval server(s))"]:::mono
 
-  subgraph MR["MapRag (RAGMap) added value"]
-    direction TB
-    Normalize["Normalize\n(stable, queryable shapes)"]:::mono
-    Enrich["Enrich\n(capabilities taxonomy\n+ trust signals)"]:::mono
-    Route["Route\n(rank + explain\n+ connect config)"]:::mono
-    Normalize --> Enrich --> Route
-  end
+  Need["Need + constraints\n(citations, freshness,\nprivacy, domain, latency)"]:::mono
+  Consumers["Agents + humans"]:::mono
 
-  Sources -->|sync| Normalize
-  Users <-->|ask ↔ shortlist + reasons| Route
-  Users -->|connect + retrieve| Retrieval
+  Sources --> Normalize --> Enrich --> Catalog --> Router --> Output --> Use
+  Need --> Router
+  Consumers --> Router
 ```
 
 </details>
