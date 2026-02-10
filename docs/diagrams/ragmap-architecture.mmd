@@ -1,26 +1,54 @@
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":60,"rankSpacing":120}}}%%
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":75,"rankSpacing":70}}}%%
 flowchart TB
-  %% Concept-only diagram (shows product value; no deployment/framework/datastore details)
+  %% Concept-only diagram (product value; no deployment/framework/datastore details)
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
-  Sources["Upstream MCP registries<br/>(official + optional)"]:::mono
-  Sync["Sync + normalize<br/>(read-only)"]:::mono
-  Catalog["Enriched catalog<br/>(server records + versions)"]:::mono
+  subgraph Inputs[" "]
+    direction LR
 
-  Cap["Structured metadata<br/>(domain, retrieval, freshness,<br/>grounding, privacy, auth, limits)<br/><br/>Examples:<br/>- domain: docs|code|web|mixed<br/>- retrieval: dense|sparse|hybrid<br/>  (+rerank)<br/>- freshness: static|continuous<br/>  (max lag)<br/>- grounding: citations<br/>  provenance fields<br/>- privacy: local|remote<br/>  stores user data?<br/>- auth: req|optional<br/>  methods<br/>- limits: top_k|rate<br/>  max context"]:::mono
+    subgraph Query["Agent-native interface"]
+      direction TB
+      Users["Agents + humans"]:::mono
+      subgraph Tooling["Tool call"]
+        direction LR
+        Criteria["Routing constraints<br/>domain, privacy, citations,<br/>freshness, auth, limits"]:::mono
+        Tools["MCP tools<br/>rag_find_servers<br/>rag_get_server<br/>rag_list_categories<br/>rag_explain_score"]:::mono
+      end
+      Users --> Criteria --> Tools
+    end
 
-  Trust["Trust signals (lightweight)<br/>- upstream status<br/>- reachability/latency<br/>- schema stability<br/>- reports (optional)"]:::mono
+    subgraph Subregistry["Subregistry (read-only)"]
+      direction TB
+      subgraph Ingest["Ingest"]
+        direction LR
+        Sources["Upstream MCP registries<br/>(official + optional)"]:::mono
+        Sync["Sync + normalize<br/>(stable schema)"]:::mono
+        Catalog["Enriched catalog<br/>(servers + versions)"]:::mono
+        Sources --> Sync --> Catalog
+      end
 
-  Router["Router<br/>match + rank + explain"]:::mono
-  Ranked["Ranked candidates<br/>+ reasons"]:::mono
-  Retrieval["Chosen retrieval MCP server(s)<br/>(do retrieval)"]:::mono
+      subgraph Enrich["Enrich (adds value)"]
+        direction LR
+        Cap["Structured metadata<br/>domain: docs|code|web|mixed<br/>retrieval: dense|sparse|hybrid (+rerank)<br/>freshness: static|continuous (max lag)<br/>grounding: citations|provenance<br/>privacy/auth: local|remote + req|optional<br/>limits: top_k|rate|max ctx"]:::mono
+        Trust["Trust signals (lightweight)<br/>status, reachability,<br/>schema stability, reports"]:::mono
+      end
 
-  Users["Agents + humans"]:::mono
-  Tools["MCP tools<br/>rag_find_servers<br/>rag_get_server<br/>rag_list_categories<br/>rag_explain_score"]:::mono
-  Criteria["Routing constraints<br/>(domain, privacy, citations,<br/>freshness, auth, limits, ...)"]:::mono
+      Catalog --> Cap
+      Catalog --> Trust
+    end
+  end
 
-  Sources --> Sync --> Catalog --> Router --> Ranked --> Retrieval
-  Catalog --> Cap
-  Catalog --> Trust
-  Users --> Tools --> Criteria --> Router
+  subgraph Selection["Selection (the added value)"]
+    direction LR
+    Router["Router<br/>match + rank + explain"]:::mono
+    Ranked["Ranked candidates<br/>+ reasons + connect info"]:::mono
+    Retrieval["Chosen retrieval MCP server(s)<br/>(do retrieval)"]:::mono
+    Router --> Ranked --> Retrieval
+  end
+
+  Tools --> Router
+  Catalog --> Router
+
+  %% Keep the layout without adding a third visible "box" around Inputs.
+  style Inputs fill:#ffffff,stroke:#ffffff,stroke-width:0px
