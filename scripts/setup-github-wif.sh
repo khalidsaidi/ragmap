@@ -19,11 +19,14 @@ if [[ -z "$PROJECT_ID" ]]; then
 fi
 
 GITHUB_REPO="${GITHUB_REPO:-khalidsaidi/ragmap}"
+REGION="${REGION:-us-central1}"
 
 POOL_ID="${POOL_ID:-ragmap-github}"
 PROVIDER_ID="${PROVIDER_ID:-github}"
 DEPLOYER_SA_ID="${DEPLOYER_SA_ID:-ragmap-github-deployer}"
 RUNTIME_SA_EMAIL="${RUNTIME_SA_EMAIL:-ragmap-runtime@${PROJECT_ID}.iam.gserviceaccount.com}"
+BUILD_SA_ID="${BUILD_SA_ID:-ragmap-build}"
+CLOUDBUILD_BUCKET="${CLOUDBUILD_BUCKET:-${PROJECT_ID}_cloudbuild}"
 
 PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
 
@@ -32,6 +35,9 @@ echo "Repo:      $GITHUB_REPO"
 echo "Pool:      $POOL_ID"
 echo "Provider:  $PROVIDER_ID"
 echo "Deployer:  $DEPLOYER_SA_ID"
+echo "Build SA:  $BUILD_SA_ID"
+echo "CB bucket: $CLOUDBUILD_BUCKET"
+echo "Region:    $REGION"
 
 echo "Enabling required APIs..."
 gcloud services enable \
@@ -56,6 +62,9 @@ gcloud iam workload-identity-pools providers create-oidc "$PROVIDER_ID" \
   --attribute-condition "assertion.repository == '${GITHUB_REPO}'" >/dev/null 2>&1 || true
 
 DEPLOYER_SA_EMAIL="${DEPLOYER_SA_ID}@${PROJECT_ID}.iam.gserviceaccount.com"
+BUILD_SA_EMAIL="${BUILD_SA_ID}@${PROJECT_ID}.iam.gserviceaccount.com"
+CLOUDBUILD_BUCKET_URL="gs://${CLOUDBUILD_BUCKET}"
+CLOUDBUILD_AGENT="service-${PROJECT_NUMBER}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
 
 echo "Creating deployer service account (if needed)..."
 gcloud iam service-accounts create "$DEPLOYER_SA_ID" \
@@ -91,6 +100,42 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member "serviceAccount:${DEPLOYER_SA_EMAIL}" \
   --role "roles/secretmanager.viewer" >/dev/null
 
+echo "Creating build service account (if needed)..."
+gcloud iam service-accounts create "$BUILD_SA_ID" \
+  --project "$PROJECT_ID" \
+  --display-name "ragmap build" >/dev/null 2>&1 || true
+
+echo "Ensuring Cloud Build staging bucket exists..."
+gcloud storage buckets describe "$CLOUDBUILD_BUCKET_URL" --project "$PROJECT_ID" >/dev/null 2>&1 || \
+  gcloud storage buckets create "$CLOUDBUILD_BUCKET_URL" --project "$PROJECT_ID" --location "US" >/dev/null
+
+echo "Granting Artifact Registry writer to build service account..."
+gcloud artifacts repositories add-iam-policy-binding ragmap \
+  --project "$PROJECT_ID" \
+  --location "$REGION" \
+  --member "serviceAccount:${BUILD_SA_EMAIL}" \
+  --role "roles/artifactregistry.writer" >/dev/null
+
+echo "Granting Cloud Build bucket access to build service account..."
+gcloud storage buckets add-iam-policy-binding "$CLOUDBUILD_BUCKET_URL" \
+  --member "serviceAccount:${BUILD_SA_EMAIL}" \
+  --role "roles/storage.bucketViewer" >/dev/null
+gcloud storage buckets add-iam-policy-binding "$CLOUDBUILD_BUCKET_URL" \
+  --member "serviceAccount:${BUILD_SA_EMAIL}" \
+  --role "roles/storage.objectAdmin" >/dev/null
+
+echo "Allowing Cloud Build service agent to actAs build service account..."
+gcloud iam service-accounts add-iam-policy-binding "$BUILD_SA_EMAIL" \
+  --project "$PROJECT_ID" \
+  --member "serviceAccount:${CLOUDBUILD_AGENT}" \
+  --role "roles/iam.serviceAccountUser" >/dev/null
+
+echo "Allowing GitHub deployer to actAs build service account..."
+gcloud iam service-accounts add-iam-policy-binding "$BUILD_SA_EMAIL" \
+  --project "$PROJECT_ID" \
+  --member "serviceAccount:${DEPLOYER_SA_EMAIL}" \
+  --role "roles/iam.serviceAccountUser" >/dev/null
+
 echo "Granting actAs on runtime service account..."
 gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA_EMAIL" \
   --project "$PROJECT_ID" \
@@ -119,5 +164,9 @@ GitHub repo variables to add:
 - ARTIFACT_REPO:  ragmap
 - API_SERVICE:    ragmap-api
 - MCP_SERVICE:    ragmap-mcp-remote
+
+Cloud Build:
+- Build service account: $BUILD_SA_EMAIL
+- Staging bucket:        $CLOUDBUILD_BUCKET_URL
 
 EOF

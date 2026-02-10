@@ -35,7 +35,13 @@ Build with the repo Dockerfiles:
 To build and push with Cloud Build from the repo root:
 
 ```bash
+BUILD_SA="projects/PROJECT_ID/serviceAccounts/ragmap-build@PROJECT_ID.iam.gserviceaccount.com"
+CB_BUCKET="gs://PROJECT_ID_cloudbuild"
+
 gcloud builds submit \
+  --service-account "$BUILD_SA" \
+  --gcs-log-dir "${CB_BUCKET}/logs" \
+  --gcs-source-staging-dir "${CB_BUCKET}/source" \
   --config cloudbuild.dockerfile.yaml \
   --substitutions _IMAGE="REGION-docker.pkg.dev/PROJECT_ID/ragmap/ragmap-api:TAG",_DOCKERFILE="apps/api/Dockerfile" \
   .
