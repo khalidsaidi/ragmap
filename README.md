@@ -23,21 +23,27 @@ Full overview: `docs/OVERVIEW.md`
 <summary>Mermaid source</summary>
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":70,"rankSpacing":90}}}%%
+%%{init: {"theme":"base","themeVariables":{"primaryColor":"#ffffff","primaryTextColor":"#000000","primaryBorderColor":"#000000","lineColor":"#000000","secondaryColor":"#ffffff","tertiaryColor":"#ffffff","clusterBkg":"#ffffff","clusterBorder":"#000000","edgeLabelBackground":"#ffffff"},"flowchart":{"curve":"linear","nodeSpacing":90,"rankSpacing":110}}}%%
 flowchart LR
   %% Concept-only diagram (no deployment, framework, or datastore details)
 
   classDef mono fill:#ffffff,stroke:#000000,color:#000000,stroke-width:1px;
 
   Sources["Sources\n(registry metadata)"]:::mono
-  MapRag["MapRag\n(discover + route)"]:::mono
   Agents["Agents / MCP hosts"]:::mono
   Humans["Humans / developers"]:::mono
   Retrieval["RAG MCP servers\n(do retrieval)"]:::mono
 
-  Sources -->|sync| MapRag
-  Agents <-->|MCP tools or REST| MapRag
-  Humans <-->|UI or REST| MapRag
+  subgraph MR["MapRag"]
+    direction TB
+    Criteria["Routing criteria\n(citations, freshness,\nprivacy, domain,\nlatency)"]:::mono
+    Engine["Match + rank\n(shortlist + reasons\n+ connect info)"]:::mono
+    Criteria --> Engine
+  end
+
+  Sources -->|sync| Engine
+  Agents <-->|query + constraints| Engine
+  Humans <-->|query + constraints| Engine
   Agents -->|use selected server| Retrieval
 ```
 
