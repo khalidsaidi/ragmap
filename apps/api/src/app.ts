@@ -25,6 +25,10 @@ type RouteRequest = {
   id?: string;
 };
 
+type UsageTrafficClass = 'product_api' | 'crawler_probe';
+
+const CANONICAL_DISCOVERY_PATHS = ['/.well-known/agent.json', '/.well-known/agent-card.json'] as const;
+
 function normalizeHeader(value: string | string[] | undefined) {
   if (value == null) return '';
   if (Array.isArray(value)) return String(value[0] ?? '').trim();
@@ -45,6 +49,34 @@ function getBaseUrl(env: Env, request: { headers: Record<string, string | string
 function resolveRoute(request: RouteRequest) {
   const value = request.routerPath ?? request.routeOptions?.url ?? request.raw.url ?? request.url ?? '';
   return value.split('?')[0] ?? '';
+}
+
+function parseBoolish(value: unknown) {
+  if (value === true || value === 1 || value === '1') return true;
+  if (typeof value === 'string' && value.toLowerCase() === 'true') return true;
+  return false;
+}
+
+function getDiscoveryRedirectTarget(rawUrl: string) {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl, 'http://localhost');
+  } catch {
+    return null;
+  }
+
+  const pathname = parsed.pathname;
+  for (const canonicalPath of CANONICAL_DISCOVERY_PATHS) {
+    if (pathname === canonicalPath) return null;
+    if (pathname.endsWith(canonicalPath)) return `${canonicalPath}${parsed.search}`;
+    if (pathname.length > 1 && pathname.endsWith('/')) {
+      const trimmed = pathname.replace(/\/+$/, '');
+      if (trimmed === canonicalPath) return `${canonicalPath}${parsed.search}`;
+      if (trimmed.endsWith(canonicalPath)) return `${canonicalPath}${parsed.search}`;
+    }
+  }
+
+  return null;
 }
 
 function firstHeaderIp(value: string) {
@@ -248,7 +280,8 @@ const IngestRunBodySchema = z.object({
 
 const AdminUsageQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).optional(),
-  includeNoise: z.union([z.string(), z.number(), z.boolean()]).optional()
+  includeNoise: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  includeCrawlerProbes: z.union([z.string(), z.number(), z.boolean()]).optional()
 });
 
 const AdminAgentEventsQuerySchema = z.object({
@@ -283,16 +316,15 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   fastify.addHook('onRequest', async (request, reply) => {
     (request as { startTimeNs?: bigint }).startTimeNs = process.hrtime.bigint();
-    if (request.method === 'GET') {
-      const rawUrl = request.raw.url ?? request.url;
-      if (rawUrl) {
-        const canonicalPaths = ['/.well-known/agent.json', '/.well-known/agent-card.json'];
-        for (const canonical of canonicalPaths) {
-          if (rawUrl.startsWith(canonical) && rawUrl !== canonical && !rawUrl.startsWith(`${canonical}?`)) {
-            reply.redirect(canonical, 301);
-            return;
-          }
-        }
+    (request as { usageTrafficClass?: UsageTrafficClass }).usageTrafficClass = 'product_api';
+
+    const rawUrl = request.raw.url ?? request.url;
+    if (rawUrl && (request.method === 'GET' || request.method === 'HEAD')) {
+      const redirectTarget = getDiscoveryRedirectTarget(rawUrl);
+      if (redirectTarget) {
+        (request as { usageTrafficClass?: UsageTrafficClass }).usageTrafficClass = 'crawler_probe';
+        reply.redirect(redirectTarget, 301);
+        return;
       }
     }
   });
@@ -328,6 +360,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const ip = getClientIp(request as unknown as RouteRequest);
     const referer = normalizeHeader((request.headers as any).referer ?? (request.headers as any).referrer).slice(0, 512) || null;
     const agentName = getAgentName(request.headers);
+    const trafficClass = (request as { usageTrafficClass?: UsageTrafficClass }).usageTrafficClass ?? 'product_api';
 
     if (!params.env.logNoise && isNoiseEvent({ method: request.method, route, status: reply.statusCode })) {
       return;
@@ -343,7 +376,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         userAgent,
         ip,
         referer,
-        agentName
+        agentName,
+        trafficClass
       })
       .catch((err) => {
         request.log.warn({ err }, 'usage event logging failed');
@@ -400,14 +434,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const query = parse(AdminUsageQuerySchema, (request as any).query, reply);
     if (!query) return;
     const days = query.days ?? 7;
-    const includeNoiseRaw = query.includeNoise;
-    const includeNoise =
-      includeNoiseRaw === true ||
-      includeNoiseRaw === 1 ||
-      includeNoiseRaw === '1' ||
-      (typeof includeNoiseRaw === 'string' && includeNoiseRaw.toLowerCase() === 'true');
+    const includeNoise = parseBoolish(query.includeNoise);
+    const includeCrawlerProbes = parseBoolish(query.includeCrawlerProbes);
     reply.header('Cache-Control', 'no-store');
-    return params.store.getUsageSummary(days, includeNoise);
+    return params.store.getUsageSummary(days, includeNoise, includeCrawlerProbes);
   });
 
   fastify.get('/admin/usage', async (request, reply) => {
@@ -465,6 +495,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
             <label for="noise">Include bot noise</label>
             <input id="noise" type="checkbox" />
           </div>
+          <div class="field">
+            <label for="crawler">Include crawler probes in errors</label>
+            <input id="crawler" type="checkbox" />
+          </div>
           <div class="field" style="align-self: flex-end;">
             <button id="load">Load usage</button>
           </div>
@@ -517,6 +551,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       </div>
 
       <div class="card">
+        <h2 style="margin-top:0;">Traffic classes</h2>
+        <div id="trafficClasses" class="list"></div>
+      </div>
+
+      <div class="card">
         <h2 style="margin-top:0;">Recent errors (4xx/5xx)</h2>
         <div id="errors" class="list"></div>
       </div>
@@ -524,6 +563,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     <script>
       const daysInput = document.getElementById('days');
       const noiseInput = document.getElementById('noise');
+      const crawlerInput = document.getElementById('crawler');
       const loadBtn = document.getElementById('load');
       const statusEl = document.getElementById('status');
       const errorEl = document.getElementById('error');
@@ -537,6 +577,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       const referrersEl = document.getElementById('referrers');
       const userAgentsEl = document.getElementById('userAgents');
       const agentNamesEl = document.getElementById('agentNames');
+      const trafficClassesEl = document.getElementById('trafficClasses');
       const errorsEl = document.getElementById('errors');
 
       function setStatus(text) { statusEl.textContent = text || ''; }
@@ -581,6 +622,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
             '<div><code>' + row.route + '</code></div>' +
             '<div class="muted">Time</div><div>' + new Date(row.createdAt).toLocaleString() + '</div>' +
             '<div class="muted">Agent</div><div>' + (row.agentName || '—') + '</div>' +
+            '<div class="muted">Class</div><div>' + (row.trafficClass || 'product_api') + '</div>' +
             '<div class="muted">IP</div><div>' + (row.ip || '—') + '</div>' +
             '<div class="muted">Referrer</div><div>' + (row.referer || '—') + '</div>' +
             '<div class="muted">User-Agent</div><div>' + (row.userAgent || '—') + '</div>';
@@ -593,8 +635,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         setStatus('Loading…');
         const days = Math.min(90, Math.max(1, Number(daysInput.value || 7)));
         try {
-          const includeNoise = noiseInput.checked ? '&includeNoise=1' : '';
-          const res = await fetch('/admin/usage/data?days=' + days + includeNoise);
+          const params = new URLSearchParams();
+          params.set('days', String(days));
+          if (noiseInput.checked) params.set('includeNoise', '1');
+          if (crawlerInput.checked) params.set('includeCrawlerProbes', '1');
+          const res = await fetch('/admin/usage/data?' + params.toString());
           if (!res.ok) {
             const text = await res.text();
             throw new Error(text || ('Request failed: ' + res.status));
@@ -610,6 +655,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           renderList(referrersEl, data.byReferer || [], 'referer', 'count');
           renderList(userAgentsEl, data.byUserAgent || [], 'userAgent', 'count');
           renderList(agentNamesEl, data.byAgentName || [], 'agentName', 'count');
+          renderList(trafficClassesEl, data.byTrafficClass || [], 'trafficClass', 'count');
           renderErrors(data.recentErrors || []);
           setStatus('Updated just now.');
         } catch (err) {
@@ -775,8 +821,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return { status: 'ready' };
   });
 
-  fastify.get('/.well-known/agent.json', async (request) => agentCard(getBaseUrl(params.env, request)));
-  fastify.get('/.well-known/agent-card.json', async (request) => agentCard(getBaseUrl(params.env, request)));
+  fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request) => agentCard(getBaseUrl(params.env, request)));
+  fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request) => agentCard(getBaseUrl(params.env, request)));
 
   // MCP Registry compatible: list latest servers
   fastify.get('/v0.1/servers', async (request, reply) => {

@@ -261,7 +261,11 @@ export class InMemoryStore implements RegistryStore {
     this.usageEvents.push(event);
   }
 
-  async getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary> {
+  async getUsageSummary(
+    days: number,
+    includeNoise: boolean,
+    includeCrawlerProbesInErrors = false
+  ): Promise<UsageSummary> {
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -289,6 +293,7 @@ export class InMemoryStore implements RegistryStore {
     const byReferer = new Map<string, number>();
     const byUserAgent = new Map<string, number>();
     const byAgentName = new Map<string, number>();
+    const byTrafficClass = new Map<string, number>();
     const daily = new Map<string, number>();
     const recentErrors: UsageSummary['recentErrors'] = [];
 
@@ -308,11 +313,12 @@ export class InMemoryStore implements RegistryStore {
       if (ev.referer) byReferer.set(ev.referer, (byReferer.get(ev.referer) ?? 0) + 1);
       if (ev.userAgent) byUserAgent.set(ev.userAgent, (byUserAgent.get(ev.userAgent) ?? 0) + 1);
       if (ev.agentName) byAgentName.set(ev.agentName, (byAgentName.get(ev.agentName) ?? 0) + 1);
+      byTrafficClass.set(ev.trafficClass, (byTrafficClass.get(ev.trafficClass) ?? 0) + 1);
 
       const day = ev.createdAt.toISOString().slice(0, 10);
       daily.set(day, (daily.get(day) ?? 0) + 1);
 
-      if (ev.status >= 400) {
+      if (ev.status >= 400 && (includeCrawlerProbesInErrors || ev.trafficClass !== 'crawler_probe')) {
         recentErrors.push({
           createdAt: ev.createdAt.toISOString(),
           status: ev.status,
@@ -320,7 +326,8 @@ export class InMemoryStore implements RegistryStore {
           ip: ev.ip ?? null,
           referer: ev.referer ?? null,
           userAgent: ev.userAgent ?? null,
-          agentName: ev.agentName ?? null
+          agentName: ev.agentName ?? null,
+          trafficClass: ev.trafficClass
         });
       }
     }
@@ -348,6 +355,7 @@ export class InMemoryStore implements RegistryStore {
       byReferer: topK(byReferer, 10).map((row) => ({ referer: String(row.key), count: row.count })),
       byUserAgent: topK(byUserAgent, 10).map((row) => ({ userAgent: String(row.key), count: row.count })),
       byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
+      byTrafficClass: topK(byTrafficClass, 10).map((row) => ({ trafficClass: String(row.key), count: row.count })),
       recentErrors: recentErrors.slice(0, 50),
       daily: dailyRows
     };

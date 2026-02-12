@@ -62,6 +62,7 @@ export type UsageEvent = {
   ip: string | null;
   referer: string | null;
   agentName: string | null;
+  trafficClass: 'product_api' | 'crawler_probe';
 };
 
 export type UsageSummary = {
@@ -75,6 +76,7 @@ export type UsageSummary = {
   byReferer: Array<{ referer: string; count: number }>;
   byUserAgent: Array<{ userAgent: string; count: number }>;
   byAgentName: Array<{ agentName: string; count: number }>;
+  byTrafficClass: Array<{ trafficClass: string; count: number }>;
   recentErrors: Array<{
     createdAt: string;
     status: number;
@@ -83,6 +85,7 @@ export type UsageSummary = {
     referer: string | null;
     userAgent: string | null;
     agentName: string | null;
+    trafficClass: string;
   }>;
   daily: Array<{ day: string; count: number }>;
   truncated?: boolean;
@@ -137,7 +140,7 @@ export interface RegistryStore {
   getRagExplain(name: string): Promise<RagExplain | null>;
 
   writeUsageEvent(event: UsageEvent): Promise<void>;
-  getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary>;
+  getUsageSummary(days: number, includeNoise: boolean, includeCrawlerProbesInErrors?: boolean): Promise<UsageSummary>;
 
   writeAgentPayloadEvent(event: AgentPayloadEventInput): Promise<void>;
   listAgentPayloadEvents(params: { limit: number; source?: string; kind?: string }): Promise<AgentPayloadEvent[]>;

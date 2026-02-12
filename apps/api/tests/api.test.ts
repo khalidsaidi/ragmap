@@ -100,6 +100,74 @@ test('admin agent-events is protected by basic auth', async () => {
   await app.close();
 });
 
+test('malformed well-known discovery path redirects to canonical and preserves query', async () => {
+  const store = new InMemoryStore();
+  const app = await buildApp({ env, store });
+
+  const redirected = await app.inject({
+    method: 'GET',
+    url: '/foo/bar/.well-known/agent.json?source=crawler&v=1'
+  });
+  assert.equal(redirected.statusCode, 301);
+  assert.equal(redirected.headers.location, '/.well-known/agent.json?source=crawler&v=1');
+
+  const usage = await app.inject({
+    method: 'GET',
+    url: '/admin/usage/data?days=7&includeNoise=1',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(usage.statusCode, 200);
+  const body = usage.json() as any;
+  assert.equal(
+    body.byTrafficClass.some((row: any) => row.trafficClass === 'crawler_probe' && row.count >= 1),
+    true
+  );
+  assert.equal(
+    body.byRoute.some((row: any) => row.route === '/foo/bar/.well-known/agent.json'),
+    true
+  );
+
+  await app.close();
+});
+
+test('recent errors hide crawler probes by default and can include them via toggle', async () => {
+  const store = new InMemoryStore();
+  const app = await buildApp({ env, store });
+
+  await store.writeUsageEvent({
+    createdAt: new Date(),
+    method: 'GET',
+    route: '/foo/.well-known/agent-card.json',
+    status: 404,
+    durationMs: 3,
+    userAgent: 'test-crawler/1.0',
+    ip: '127.0.0.1',
+    referer: null,
+    agentName: null,
+    trafficClass: 'crawler_probe'
+  });
+
+  const defaultRes = await app.inject({
+    method: 'GET',
+    url: '/admin/usage/data?days=7',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(defaultRes.statusCode, 200);
+  const defaultBody = defaultRes.json() as any;
+  assert.equal(defaultBody.recentErrors.some((row: any) => row.trafficClass === 'crawler_probe'), false);
+
+  const includeRes = await app.inject({
+    method: 'GET',
+    url: '/admin/usage/data?days=7&includeCrawlerProbes=1',
+    headers: { authorization: basicAuthHeader(env.adminDashUser, env.adminDashPass) }
+  });
+  assert.equal(includeRes.statusCode, 200);
+  const includeBody = includeRes.json() as any;
+  assert.equal(includeBody.recentErrors.some((row: any) => row.trafficClass === 'crawler_probe'), true);
+
+  await app.close();
+});
+
 test('v0.1 servers empty -> count 0', async () => {
   const store = new InMemoryStore();
   const app = await buildApp({ env, store });

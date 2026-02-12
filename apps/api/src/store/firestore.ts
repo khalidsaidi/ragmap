@@ -435,11 +435,16 @@ export class FirestoreStore implements RegistryStore {
       userAgent: event.userAgent ?? null,
       ip: event.ip ?? null,
       referer: event.referer ?? null,
-      agentName: event.agentName ?? null
+      agentName: event.agentName ?? null,
+      trafficClass: event.trafficClass ?? 'product_api'
     });
   }
 
-  async getUsageSummary(days: number, includeNoise: boolean): Promise<UsageSummary> {
+  async getUsageSummary(
+    days: number,
+    includeNoise: boolean,
+    includeCrawlerProbesInErrors = false
+  ): Promise<UsageSummary> {
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -467,6 +472,7 @@ export class FirestoreStore implements RegistryStore {
     const byReferer = new Map<string, number>();
     const byUserAgent = new Map<string, number>();
     const byAgentName = new Map<string, number>();
+    const byTrafficClass = new Map<string, number>();
     const daily = new Map<string, number>();
     const recentErrors: UsageSummary['recentErrors'] = [];
 
@@ -498,6 +504,8 @@ export class FirestoreStore implements RegistryStore {
         const referer = typeof data?.referer === 'string' && data.referer ? data.referer : null;
         const userAgent = typeof data?.userAgent === 'string' && data.userAgent ? data.userAgent : null;
         const agentName = typeof data?.agentName === 'string' && data.agentName ? data.agentName : null;
+        const trafficClass =
+          typeof data?.trafficClass === 'string' && data.trafficClass ? data.trafficClass : 'product_api';
 
         if (!route) continue;
         if (!includeNoise && isNoiseEvent({ method, route, status })) continue;
@@ -511,11 +519,12 @@ export class FirestoreStore implements RegistryStore {
         if (referer) byReferer.set(referer, (byReferer.get(referer) ?? 0) + 1);
         if (userAgent) byUserAgent.set(userAgent, (byUserAgent.get(userAgent) ?? 0) + 1);
         if (agentName) byAgentName.set(agentName, (byAgentName.get(agentName) ?? 0) + 1);
+        byTrafficClass.set(trafficClass, (byTrafficClass.get(trafficClass) ?? 0) + 1);
 
         const day = createdAt.toISOString().slice(0, 10);
         daily.set(day, (daily.get(day) ?? 0) + 1);
 
-        if (status >= 400 && recentErrors.length < 50) {
+        if (status >= 400 && (includeCrawlerProbesInErrors || trafficClass !== 'crawler_probe') && recentErrors.length < 50) {
           recentErrors.push({
             createdAt: createdAt.toISOString(),
             status,
@@ -523,7 +532,8 @@ export class FirestoreStore implements RegistryStore {
             ip,
             referer,
             userAgent,
-            agentName
+            agentName,
+            trafficClass
           });
         }
 
@@ -557,6 +567,7 @@ export class FirestoreStore implements RegistryStore {
       byReferer: topK(byReferer, 10).map((row) => ({ referer: String(row.key), count: row.count })),
       byUserAgent: topK(byUserAgent, 10).map((row) => ({ userAgent: String(row.key), count: row.count })),
       byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
+      byTrafficClass: topK(byTrafficClass, 10).map((row) => ({ trafficClass: String(row.key), count: row.count })),
       recentErrors,
       daily: dailyRows,
       ...(truncated ? { truncated: true } : {})
