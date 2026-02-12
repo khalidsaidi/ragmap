@@ -104,6 +104,7 @@ PROJECT_ID=ragmap-xxxxxx ./scripts/setup-github-wif.sh
 - `MCP_SERVICE` (default: `ragmap-mcp-remote`)
 - `ADMIN_DASH_USER` (default: `admin`)
 - `ADMIN_DASH_PASS_SECRET` (default: `ragmap-admin-dash-pass`)
+- `CAPTURE_AGENT_PAYLOADS` (default: `true`)
 
 4) Ensure Firebase Hosting targets exist for the project:
 
