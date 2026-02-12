@@ -24,6 +24,7 @@ Create and grant access to your Cloud Run service account, then inject as env va
 
 Suggested secrets:
 - `ragmap-ingest-token` -> `INGEST_TOKEN`
+- `ragmap-admin-dash-pass` -> `ADMIN_DASH_PASS` (for `/admin/*`)
 - `ragmap-openai-api-key` -> `OPENAI_API_KEY` (optional, embeddings)
 
 ### Cloud Run services
@@ -101,6 +102,8 @@ PROJECT_ID=ragmap-xxxxxx ./scripts/setup-github-wif.sh
 - `ARTIFACT_REPO` (default: `ragmap`)
 - `API_SERVICE` (default: `ragmap-api`)
 - `MCP_SERVICE` (default: `ragmap-mcp-remote`)
+- `ADMIN_DASH_USER` (default: `admin`)
+- `ADMIN_DASH_PASS_SECRET` (default: `ragmap-admin-dash-pass`)
 
 4) Ensure Firebase Hosting targets exist for the project:
 
