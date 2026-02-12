@@ -59,6 +59,20 @@
           }
         },
         {
+          "source": "/**/.well-known/agent.json",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/**/.well-known/agent-card.json",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
           "source": "/health{,/**}",
           "run": {
             "serviceId": "ragmap-api",
