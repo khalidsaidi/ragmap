@@ -25,7 +25,15 @@ Create and grant access to your Cloud Run service account, then inject as env va
 Suggested secrets:
 - `ragmap-ingest-token` -> `INGEST_TOKEN`
 - `ragmap-admin-dash-pass` -> `ADMIN_DASH_PASS` (for `/admin/*`)
-- `ragmap-openai-api-key` -> `OPENAI_API_KEY` (optional, embeddings)
+- `ragmap-openai-api-key` -> `OPENAI_API_KEY` (optional). When set, `EMBEDDINGS_ENABLED` defaults to true: ingest stores vectors and `/rag/search` uses semantic ranking. Set `EMBEDDINGS_ENABLED=false` to disable.
+
+**Enable semantic search in production (Cloud Run)**  
+1. Create the secret: `gcloud secrets create ragmap-openai-api-key --replication-policy=automatic` (or use an existing secret), then add your key value.  
+2. Grant the Cloud Run runtime SA access: `gcloud secrets add-iam-policy-binding ragmap-openai-api-key --member="serviceAccount:RUNTIME_SA_EMAIL" --role="roles/secretmanager.secretAccessor"`.  
+3. Update the API service to use it:  
+   `gcloud run services update ragmap-api --region=REGION --project=PROJECT_ID --set-secrets="OPENAI_API_KEY=ragmap-openai-api-key:latest" --set-env-vars="EMBEDDINGS_ENABLED=true"`.  
+4. Run a full ingest so vectors are stored: `POST /internal/ingest/run` with `{"mode":"full"}` and `X-Ingest-Token`.  
+After that, `/rag/search` returns meaning-based (semantic) ranking in addition to keyword match.
 
 ### Cloud Run services
 
@@ -54,16 +62,52 @@ This repo includes `firebase.json` rewrites similar to A2ABench:
 - Hosting target `api` rewrites `/v0.1/**`, `/rag/**`, `/docs/**`, etc to `ragmap-api`
 - Hosting target `mcp` rewrites `/mcp/**` and `/readyz` to `ragmap-mcp-remote`, while serving `/health` from static JSON
 
-### Cloud Scheduler ingestion
+### Scheduled ingestion (keep data fresh)
 
-Call the protected endpoint:
+You need to run ingest periodically so new/updated servers and reachability stay current.
+
+**Option A: Cloud Scheduler (recommended, very cheap)**  
+We use one job `ragmap-ingest` that runs **once daily** at 2:00 UTC and calls the **stable** API URL so redeploys don’t break it.
+
+- **Cost:** Cloud Scheduler free tier = first 3 jobs per month free (a “job” is the definition, not per run). One job = $0. Running once per day keeps Cloud Run invocations minimal (~30/month for ingest).
+- **Stable URL:** The job should target your stable host (e.g. `https://ragmap-api.web.app/internal/ingest/run`) so the URI doesn’t change on redeploy.
+
+Check or update the job:
 
 ```bash
-curl -X POST https://<your-api-domain>/internal/ingest/run \\
-  -H "Content-Type: application/json" \\
-  -H "X-Ingest-Token: $INGEST_TOKEN" \\
-  -d '{\"mode\":\"full\"}'
+gcloud scheduler jobs list --project=YOUR_PROJECT_ID --location=us-central1
+
+# Optional: set daily 2am UTC + stable URL (keeps existing auth headers)
+gcloud scheduler jobs update http ragmap-ingest \
+  --project=YOUR_PROJECT_ID --location=us-central1 \
+  --schedule="0 2 * * *" \
+  --uri="https://ragmap-api.web.app/internal/ingest/run"
 ```
+
+**Option B: GitHub Actions (free for public repos)**  
+Add a scheduled workflow that calls your ingest endpoint. Store `INGEST_TOKEN` in repo Secrets and use it in the workflow. No GCP Scheduler cost. See `docs/DEPLOYMENT.md` or the optional workflow below.
+
+**Option C: Cron on an existing VM**  
+If you already have a small VM (or always-on machine), add one line to crontab:
+
+```bash
+# e.g. daily at 2am
+0 2 * * * curl -sS -X POST https://YOUR_API_URL/internal/ingest/run -H "Content-Type: application/json" -H "X-Ingest-Token: $INGEST_TOKEN" -d '{"mode":"incremental"}' --max-time 600
+```
+
+Set `INGEST_TOKEN` in the environment (e.g. in the user’s profile or a small script that sources a secret file).
+
+**Manual (no schedule)**  
+Call the protected endpoint when you want a refresh:
+
+```bash
+curl -X POST https://<your-api-domain>/internal/ingest/run \
+  -H "Content-Type: application/json" \
+  -H "X-Ingest-Token: $INGEST_TOKEN" \
+  -d '{"mode":"full"}'
+```
+
+Use `mode: "incremental"` for faster, change-only runs; use `"full"` occasionally (e.g. weekly) to refresh reachability and hide deleted servers.
 
 ### Firestore indexes
 
@@ -104,6 +148,7 @@ PROJECT_ID=ragmap-xxxxxx ./scripts/setup-github-wif.sh
 - `MCP_SERVICE` (default: `ragmap-mcp-remote`)
 - `ADMIN_DASH_USER` (default: `admin`)
 - `ADMIN_DASH_PASS_SECRET` (default: `ragmap-admin-dash-pass`)
+- `OPENAI_API_KEY_SECRET` (optional): Secret Manager secret name for OpenAI API key, e.g. `ragmap-openai-api-key`. When set, deploy injects it and enables semantic search; run a full ingest after deploy.
 - `CAPTURE_AGENT_PAYLOADS` (default: `true`)
 
 4) Ensure Firebase Hosting targets exist for the project:

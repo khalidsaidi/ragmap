@@ -8,14 +8,20 @@
         "**/.*",
         "**/node_modules/**"
       ],
-      "redirects": [
-        {
-          "source": "/",
-          "destination": "/docs",
-          "type": 302
-        }
-      ],
+      "redirects": [],
       "rewrites": [
+        {
+          "source": "/browse",
+          "destination": "/browse/index.html"
+        },
+        {
+          "source": "/embed",
+          "destination": "/embed/index.html"
+        },
+        {
+          "source": "/embed/",
+          "destination": "/embed/index.html"
+        },
         {
           "source": "/v0.1/**",
           "run": {

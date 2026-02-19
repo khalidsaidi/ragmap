@@ -6,6 +6,8 @@ It indexes **RAG-capable MCP servers**, enriches them with lightweight explainab
 MapRag does **not** do RAG itself.
 It helps you choose the best *RAG tool/server* to do the retrieval.
 
+**Today:** Keyword + optional **semantic search** (when OpenAI API key is set), categories and score, **hasRemote** and transport filters. Registry-compatible API and MCP server.
+
 RAGMap is the current implementation name (repo + deployments). “MapRag” is the product concept: a map of retrieval, and a router for agents.
 
 ---
@@ -29,38 +31,16 @@ MapRag aims to answer:
 ### 1) RAG discovery
 
 - Ingests upstream MCP registries/directories (official registry today).
-- Identifies which servers are likely RAG-capable.
-- Groups them into useful categories (docs RAG, code RAG, web RAG, vector DB wrappers, etc).
+- **Implemented today (v0.1):** Keyword-based enrichment (regex on name, title, description, URLs, packages). Assigns `categories` (rag, retrieval, embeddings, vector-db, documents, search, etc.) and `ragScore` (additive). “Search” is only tagged when at least one core RAG-related category also matches (to reduce noise). No check that a server actually implements retrieval; enrichment is text-only.
+- **hasRemote:** Computed from `remotes` or streamable-http packages so you can filter to callable endpoints.
 
 ### 2) Capability-aware selection
 
-MapRag’s target state is structured selection based on capabilities such as:
-
-- **domain**: docs / code / web / mixed
-- **retrieval type**: dense / sparse / hybrid (+ reranking)
-- **freshness**: static vs continuous ingest, max lag
-- **grounding**: citations / provenance fields
-- **privacy & residency**: local-only vs remote, whether user data is stored
-- **auth**: required/optional, supported methods
-- **limits**: top_k limits, rate limits, max context
-
-**Implemented today (v0.1)**
-- A lightweight enrichment model (rule-based) that computes `categories`, `ragScore`, and `reasons`.
-- Filters you can use right now: `categories`, `minScore`, `transport`, `registryType`.
+MapRag’s target state is structured selection (domain, retrieval type, freshness, grounding, privacy, auth, limits). **Implemented today (v0.1):** Filters: `categories`, `minScore`, `transport`, `registryType`, `hasRemote`, **`reachable`** (HEAD-checked), **`citations`** (inferred from text), **`localOnly`** (stdio-only, no remote). Lightweight capability inference; no formal capability model.
 
 ### 3) Trust signals (lightweight, practical)
 
-MapRag can track signals like:
-
-- upstream official status (active/deprecated/deleted)
-- remote endpoint reachability (when applicable)
-- schema stability (changes over time)
-- latency/uptime (when measurable)
-- human/agent reports (optional)
-
-**Implemented today (v0.1)**
-- Preserves upstream official status in `_meta`.
-- Hides upstream `deleted` entries from public listings by default.
+**Implemented today (v0.1):** Upstream official status in `_meta`; upstream `deleted` entries hidden from listings. **Reachability:** on full ingest, RAGMap sends a HEAD request to each server’s streamable-http URL (rate-limited) and stores `reachable` / `lastReachableAt`; filter with `reachable=true`. No latency or schema checks.
 
 MapRag returns **explanations** with results so decisions are auditable.
 
@@ -78,7 +58,7 @@ So models/agents can call MapRag as a tool to pick retrieval servers dynamically
 
 Browse, filter, compare, and copy install/connect configs.
 
-**Status**: planned (not implemented yet).
+**Status**: implemented. **[/browse](https://ragmap-api.web.app/browse)** — search by meaning or keywords, filter by remote-only and min score, copy server name or install command (npx/URL), and copy RAGMap MCP config for Cursor or Claude.
 
 ---
 
@@ -101,15 +81,16 @@ MapRag stays out of the content path; it’s about **selection**, not generation
 Tool names are stable and versioned. Current tools:
 
 - `rag_find_servers`
-  - Input: `{ query?, categories?, minScore?, transport?, registryType?, limit? }`
+  - Input: `{ query?, categories?, minScore?, transport?, registryType?, hasRemote?, reachable?, citations?, localOnly?, limit? }`
   - Output: ranked candidates + reasons (see `_meta["io.github.khalidsaidi/ragmap"]`)
+  - Search: keyword match over server text always; when `OPENAI_API_KEY` is set, ingest stores embeddings and results use semantic ranking (cosine similarity) plus keyword.
 - `rag_get_server`
-  - Input: `{ name }`
+  - Input: `{ name }` — registry server name (e.g. `io.github.khalidsaidi/ragmap` for RAGMap)
   - Output: full server record (latest) including `_meta`
 - `rag_list_categories`
   - Output: known category list
 - `rag_explain_score`
-  - Input: `{ name }`
+  - Input: `{ name }` — registry server name (e.g. `io.github.khalidsaidi/ragmap` for RAGMap)
   - Output: score + categories + reasons for the latest version
 
 ### Example: “privacy-first docs RAG with citations”
@@ -227,7 +208,7 @@ MapRag keeps product code clean and agent artifacts isolated:
 
 - `apps/` + `packages/` = production code
 - `docs/` = durable documentation
-- `.ai/` = agent artifacts (plans/logs/scratch), mostly gitignored
+- Local agent/IDE scratch and plans are gitignored
 
 ---
 

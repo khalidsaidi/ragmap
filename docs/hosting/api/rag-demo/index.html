@@ -89,12 +89,17 @@
         <div><a href="/docs">OpenAPI</a></div>
       </header>
 
+      <p style="margin-bottom: 20px; color: var(--muted); font-size: 14px;">
+        Search by meaning or keywords. When embeddings are enabled, results are ranked by semantic similarity first, then keyword match. Use natural queries like &ldquo;RAG for documents&rdquo; or &ldquo;vector store with reranking&rdquo;.
+      </p>
+
       <section class="card">
         <div class="label">Query</div>
         <div class="row">
-          <input id="q" placeholder="e.g. qdrant embeddings pdf ingestion" />
+          <input id="q" placeholder="e.g. RAG for documents, qdrant embeddings, pdf ingestion" />
           <button id="go">Search</button>
         </div>
+        <p style="margin-top: 8px; font-size: 12px; color: var(--muted);">Optional: add <code>hasRemote=true</code> or <code>minScore=20</code> in the URL to filter.</p>
       </section>
 
       <section class="card">
@@ -103,7 +108,7 @@
       </section>
 
       <footer>
-        Endpoint: <code>/rag/search</code>
+        Endpoint: <code>/rag/search</code> · Keyword + semantic (when enabled) · Filters: <code>categories</code>, <code>minScore</code>, <code>transport</code>, <code>hasRemote</code>
       </footer>
     </main>
 

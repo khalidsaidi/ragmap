@@ -12,6 +12,8 @@ Find and filter **RAG-capable MCP servers** in seconds. This package is the loca
 - **Primary use**: MCP stdio transport for Claude Desktop, Cursor, and any MCP host.
 - **Tools**: `rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`.
 
+**For agents (zero config):** `GET https://ragmap-api.web.app/.well-known/agent.json` for discovery; use `apiEndpoints` to call the REST API or `mcpInstall` to run this package. See [AGENT-USAGE.md](../../docs/AGENT-USAGE.md) in the repo.
+
 ---
 
 ## MapRag (RAGMap)
@@ -24,7 +26,9 @@ It helps you choose the best *RAG tool/server* to do the retrieval.
 
 **Status (v0.1)**
 - Ingests the official MCP Registry (read-only) and enriches server records for retrieval use-cases.
-- Adds lightweight enrichment (`categories`, `ragScore`, `reasons`).
+- **Semantic + keyword search** when the API has embeddings enabled (OpenAI key); otherwise keyword-only.
+- Enrichment: `categories`, `ragScore`, `reasons`, **`hasRemote`** (callable over HTTP).
+- Filters: `query`, `categories`, `minScore`, `transport`, `registryType`, **`hasRemote`**.
 - Exposes two programmable interfaces: registry-compatible REST API (subregistry) + MCP servers (remote HTTP + local stdio).
 
 **Roadmap**
@@ -119,9 +123,10 @@ Notes:
 
 ### Example tool calls
 
-- Find remote (streamable-http) servers that look RAG-y: `rag_find_servers({ query: "rag", minScore: 30, transport: "streamable-http", limit: 10 })`
+- Find remote (streamable-http) servers that look RAG-y: `rag_find_servers({ query: "rag", minScore: 30, transport: "streamable-http", hasRemote: "true", limit: 10 })`
 - Find servers published via a specific registry type: `rag_find_servers({ query: "qdrant", registryType: "pypi" })`
 - List categories: `rag_list_categories({})`
+- Get RAGMap’s own record or explain its score (use the published registry name): `rag_get_server({ name: "io.github.khalidsaidi/ragmap" })`, `rag_explain_score({ name: "io.github.khalidsaidi/ragmap" })`
 
 ### Example: “privacy-first docs RAG with citations”
 
@@ -135,6 +140,7 @@ This is the kind of query MapRag is designed for. Today, you can approximate it 
     "categories": ["documents"],
     "minScore": 30,
     "transport": "stdio",
+    "hasRemote": "true",
     "limit": 5
   }
 }

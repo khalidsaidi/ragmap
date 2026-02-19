@@ -19,6 +19,7 @@ jobs:
       MCP_SERVICE: ${{ vars.MCP_SERVICE || 'ragmap-mcp-remote' }}
       ADMIN_DASH_USER: ${{ vars.ADMIN_DASH_USER || 'admin' }}
       ADMIN_DASH_PASS_SECRET: ${{ vars.ADMIN_DASH_PASS_SECRET || 'ragmap-admin-dash-pass' }}
+      OPENAI_API_KEY_SECRET: ${{ vars.OPENAI_API_KEY_SECRET }}
       CAPTURE_AGENT_PAYLOADS: ${{ vars.CAPTURE_AGENT_PAYLOADS || 'true' }}
       # Public stable URLs (Firebase Hosting by default).
       API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL || 'https://ragmap-api.web.app' }}
@@ -80,13 +81,19 @@ jobs:
       - name: Deploy Cloud Run (API)
         run: |
           set -euo pipefail
+          SECRETS="INGEST_TOKEN=ragmap-ingest-token:latest,ADMIN_DASH_PASS=${{ env.ADMIN_DASH_PASS_SECRET }}:latest"
+          EMBED="EMBEDDINGS_ENABLED=false"
+          if [ -n "${{ env.OPENAI_API_KEY_SECRET }}" ]; then
+            SECRETS="${SECRETS},OPENAI_API_KEY=${{ env.OPENAI_API_KEY_SECRET }}:latest"
+            EMBED="EMBEDDINGS_ENABLED=true"
+          fi
           gcloud run deploy "${{ env.API_SERVICE }}" \
             --project "${{ env.GCP_PROJECT_ID }}" \
             --region "${{ env.GCP_REGION }}" \
             --image "$API_IMAGE" \
             --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
-            --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=0.1.0,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,EMBEDDINGS_ENABLED=false,CAPTURE_AGENT_PAYLOADS=${{ env.CAPTURE_AGENT_PAYLOADS }},GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},ADMIN_DASH_USER=${{ env.ADMIN_DASH_USER }}" \
-            --set-secrets "INGEST_TOKEN=ragmap-ingest-token:latest,ADMIN_DASH_PASS=${{ env.ADMIN_DASH_PASS_SECRET }}:latest" \
+            --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=0.1.0,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,${EMBED},CAPTURE_AGENT_PAYLOADS=${{ env.CAPTURE_AGENT_PAYLOADS }},GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},ADMIN_DASH_USER=${{ env.ADMIN_DASH_USER }}" \
+            --set-secrets "$SECRETS" \
             --timeout=900 \
             --allow-unauthenticated
 

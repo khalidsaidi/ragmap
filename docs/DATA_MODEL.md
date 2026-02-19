@@ -3,7 +3,7 @@
 Firestore collections (recommended):
 
 - `servers/{serverId}`
-  - `name`: MCP server name (e.g. `ai.auteng/mcp`)
+  - `name`: MCP server name from the registry (e.g. `io.github.khalidsaidi/ragmap` for RAGMap, `ai.auteng/mcp`)
   - `latestVersion`: latest version string
   - `latestServer`: raw server JSON from upstream registry
   - `latestOfficial`: official upstream meta (status, publishedAt, updatedAt, isLatest)

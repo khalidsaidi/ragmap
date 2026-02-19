@@ -66,6 +66,19 @@ code=$(curl -sS -o "$search_body" -w "%{http_code}" "${API_BASE_URL}/rag/search?
 test "$code" = "200"
 jq -e '.results | type == "array"' "$search_body" >/dev/null
 
+# Search with filters (real-user flow)
+code=$(curl -sS -o "$search_body" -w "%{http_code}" "${API_BASE_URL}/rag/search?q=rag&hasRemote=true&limit=3")
+test "$code" = "200"
+jq -e '.results | type == "array"' "$search_body" >/dev/null
+
+# Browse page (static; 200 or 302; do not follow redirects - /browse/ can 302 to self on some hosting)
+browse_code=$(curl -sS -o /dev/null -w "%{http_code}" "${API_BASE_URL}/browse/")
+if [[ "$browse_code" = "200" || "$browse_code" = "302" ]]; then
+  echo "Browse page: OK ($browse_code)"
+else
+  echo "Browse page: $browse_code (deploy to get /browse)"
+fi
+
 # Ingestion endpoint must be protected (deployed config uses Secret Manager -> INGEST_TOKEN).
 ingest_code=$(curl -sS -o "$ingest_body" -w "%{http_code}" -X POST "${API_BASE_URL}/internal/ingest/run" -H "Content-Type: application/json" -d '{"mode":"incremental"}')
 test "$ingest_code" = "401"

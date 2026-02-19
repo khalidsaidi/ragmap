@@ -8,13 +8,18 @@
   <body>
     <main>
       <h1>RAGMap API</h1>
-      <p>MCP subregistry API + RAG-focused search for MCP servers.</p>
+      <p>MCP subregistry API + RAG-focused search for MCP servers. Find the right retrieval server by meaning, category, or filters (e.g. remote-only, min score).</p>
       <ul>
+        <li><a href="/browse">Browse RAG servers</a> — filter, compare, copy Cursor/Claude config</li>
+        <li><a href="/embed">Embed widget</a> — put “Search RAG MCP servers” on your site (iframe)</li>
+        <li><a href="/rag-demo">RAG Search demo</a> — try semantic + keyword search</li>
         <li><a href="/docs">Swagger UI</a></li>
         <li><a href="/api/openapi.json">OpenAPI JSON</a></li>
+        <li><a href="/health">Health</a> (includes <code>embeddings</code> when semantic search is on)</li>
         <li><a href="/privacy">Privacy Policy</a></li>
-        <li><a href="/rag-demo">RAG Demo</a></li>
+        <li><a href="https://github.com/khalidsaidi/ragmap/blob/main/docs/DISCOVERY-LINK-CONVENTION.md">Discovery link convention</a> — add <code>discoveryService</code> to your server.json</li>
       </ul>
+      <p><strong>Features:</strong> Registry-compatible <code>/v0.1/servers</code>; <code>/rag/search</code> with optional semantic ranking; <code>/rag/categories</code>; filter by <code>categories</code>, <code>minScore</code>, <code>transport</code>, <code>hasRemote</code>.</p>
     </main>
   </body>
 </html>

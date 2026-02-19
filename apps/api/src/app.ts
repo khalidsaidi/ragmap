@@ -233,20 +233,31 @@ function isNoiseEvent(entry: { method: string; route: string; status: number }) 
 function agentCard(baseUrl: string) {
   return {
     name: 'RAGMap',
-    description: 'RAG-focused MCP Registry subregistry + MCP server.',
+    description:
+      'Discover and filter RAG-capable MCP servers. Semantic + keyword search over retrieval servers. Use for Cursor, Claude, or any agent that needs to find the right retrieval MCP (by meaning, remote-only, citations, local-only).',
     url: baseUrl,
     version: '0.1.0',
     protocolVersion: '0.1',
     skills: [
-      { id: 'rag_find_servers', name: 'Find servers', description: 'Search/filter RAG-related MCP servers.' },
-      { id: 'rag_get_server', name: 'Get server', description: 'Fetch a server record by name.' },
+      { id: 'rag_find_servers', name: 'Find servers', description: 'Search/filter RAG-related MCP servers. Params: query (q), limit, hasRemote, reachable, citations, localOnly, minScore, categories.' },
+      { id: 'rag_get_server', name: 'Get server', description: 'Fetch a server record by name (latest version).' },
       { id: 'rag_list_categories', name: 'List categories', description: 'List RAG categories.' },
       { id: 'rag_explain_score', name: 'Explain score', description: 'Explain RAG scoring for a server.' }
     ],
     auth: {
       type: 'none',
       description: 'Read-only endpoints are public. Ingestion endpoint is protected by X-Ingest-Token.'
-    }
+    },
+    // So HTTP-only agents can call the API directly without installing the MCP
+    apiEndpoints: {
+      search: { method: 'GET', path: '/rag/search', params: ['q', 'limit', 'hasRemote', 'reachable', 'citations', 'localOnly', 'minScore', 'categories'] },
+      listServers: { method: 'GET', path: '/v0.1/servers', params: ['limit', 'cursor'] },
+      getServer: { method: 'GET', path: '/v0.1/servers/{name}/versions/latest' },
+      categories: { method: 'GET', path: '/rag/categories' }
+    },
+    mcpInstall: 'npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp',
+    mcpUrl: 'https://ragmap-mcp.web.app/mcp',
+    keywords: ['mcp', 'rag', 'retrieval', 'discovery', 'cursor', 'claude', 'registry', 'search']
   };
 }
 
@@ -271,7 +282,11 @@ const RagSearchQuerySchema = z.object({
   categories: z.string().optional(),
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   transport: z.enum(['stdio', 'streamable-http']).optional(),
-  registryType: z.string().optional()
+  registryType: z.string().optional(),
+  hasRemote: z.enum(['true', 'false']).optional(),
+  reachable: z.enum(['true', 'false']).optional(),
+  citations: z.enum(['true', 'false']).optional(),
+  localOnly: z.enum(['true', 'false']).optional()
 });
 
 const IngestRunBodySchema = z.object({
@@ -413,7 +428,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     openapi: {
       info: {
         title: 'RAGMap API',
-        description: 'MCP Registry-compatible subregistry API + RAG-focused search',
+        description:
+          'MCP Registry-compatible subregistry API + RAG-focused search. Agents: use GET /rag/search?q=... to find retrieval MCP servers by meaning; or install the MCP (npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp) for tool-based discovery. Discovery: GET /.well-known/agent.json',
         version: params.env.serviceVersion
       }
     }
@@ -427,6 +443,89 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   });
 
   fastify.get('/api/openapi.json', async () => fastify.swagger());
+
+  // Public usage stats (aggregates only, no PII) — so you can see "is it used" without admin login
+  fastify.get('/api/stats', async (_request, reply) => {
+    reply.header('Cache-Control', 'public, max-age=60');
+    const summary = await params.store.getUsageSummary(7, false, false);
+    return {
+      days: summary.days,
+      since: summary.since,
+      total: summary.total,
+      last24h: summary.last24h,
+      byRoute: summary.byRoute,
+      daily: summary.daily,
+      byTrafficClass: summary.byTrafficClass,
+      truncated: summary.truncated ?? false
+    };
+  });
+
+  // Public usage graph page: fetches /api/stats and draws a simple bar chart
+  fastify.get('/api/usage-graph', async (_request, reply) => {
+    reply.header('Cache-Control', 'public, max-age=60');
+    reply.type('text/html').send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAGMap usage</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 20px; background: #0f172a; color: #e2e8f0; }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    .meta { font-size: 0.875rem; color: #94a3b8; margin-bottom: 20px; }
+    .card { background: #1e293b; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 8px; }
+    .stat { font-size: 1.5rem; font-weight: 700; }
+    .label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+    .chart { display: flex; flex-direction: column; gap: 8px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; font-size: 0.875rem; }
+    .bar-label { min-width: 140px; }
+    .bar-track { flex: 1; height: 20px; background: #334155; border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #22c55e); border-radius: 6px; }
+    .bar-n { min-width: 48px; text-align: right; color: #94a3b8; }
+    .error { color: #f87171; }
+    a { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <h1>RAGMap usage (last 7 days)</h1>
+  <div class="meta">Fetched from <a href="/api/stats">/api/stats</a> · <a href="/admin/usage">Admin usage</a> (login)</div>
+  <div id="root">Loading…</div>
+  <script>
+    (function(){
+      fetch('/api/stats').then(r => r.json()).then(function(d) {
+        var root = document.getElementById('root');
+        if (d.total === 0) {
+          root.innerHTML = '<p class="card">No usage in the last ' + d.days + ' days. Either nothing is calling the API or events are not being recorded.</p>';
+          return;
+        }
+        var maxDaily = Math.max(1, Math.max.apply(null, (d.daily || []).map(function(x){ return x.count; })));
+        var maxRoute = Math.max(1, Math.max.apply(null, (d.byRoute || []).map(function(x){ return x.count; })));
+        var html = '';
+        html += '<div class="card"><div class="row"><div><div class="label">Total requests</div><div class="stat">' + d.total + '</div></div>';
+        html += '<div><div class="label">Last 24h</div><div class="stat">' + d.last24h + '</div></div>';
+        html += '<div><div class="label">Since</div><div class="stat">' + (d.since || '').slice(0,10) + '</div></div></div></div>';
+        html += '<div class="card"><h2 style="margin:0 0 12px;font-size:1rem;">Daily</h2><div class="chart">';
+        (d.daily || []).forEach(function(r) {
+          var pct = (100 * r.count / maxDaily).toFixed(0);
+          html += '<div class="bar-row"><span class="bar-label">' + r.day + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="bar-n">' + r.count + '</span></div>';
+        });
+        html += '</div></div>';
+        html += '<div class="card"><h2 style="margin:0 0 12px;font-size:1rem;">Top routes</h2><div class="chart">';
+        (d.byRoute || []).forEach(function(r) {
+          var pct = (100 * r.count / maxRoute).toFixed(0);
+          html += '<div class="bar-row"><span class="bar-label">' + r.route + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="bar-n">' + r.count + '</span></div>';
+        });
+        html += '</div></div>';
+        root.innerHTML = html;
+      }).catch(function(e) {
+        document.getElementById('root').innerHTML = '<p class="card error">Failed to load stats: ' + e.message + '</p>';
+      });
+    })();
+  </script>
+</body>
+</html>`);
+  });
 
   // Admin dashboard (Basic Auth protected)
   fastify.get('/admin/usage/data', async (request, reply) => {
@@ -812,6 +911,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     service: 'ragmap-api',
     version: params.env.serviceVersion,
     storage: params.store.kind,
+    embeddings: params.env.embeddingsEnabled,
     ts: new Date().toISOString()
   }));
 
@@ -910,11 +1010,23 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       ? query.categories.split(',').map((c) => c.trim()).filter(Boolean)
       : undefined;
     const registryType = (query.registryType ?? '').trim() || undefined;
+    const hasRemote =
+      query.hasRemote === 'true' ? true : query.hasRemote === 'false' ? false : undefined;
+    const reachable =
+      query.reachable === 'true' ? true : query.reachable === 'false' ? false : undefined;
+    const citations =
+      query.citations === 'true' ? true : query.citations === 'false' ? false : undefined;
+    const localOnly =
+      query.localOnly === 'true' ? true : query.localOnly === 'false' ? false : undefined;
     const filters: RagFilters = RagFiltersSchema.parse({
       categories,
       minScore: query.minScore,
       transport: query.transport,
-      registryType
+      registryType,
+      hasRemote,
+      reachable,
+      citations,
+      localOnly
     });
 
     let queryEmbedding: number[] | null = null;
@@ -931,13 +1043,19 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       query: q,
       results: results.map((hit) => {
         const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+        const serverAny = hit.entry.server as any;
         return {
           name: hit.entry.server.name,
           version: hit.entry.server.version,
-          title: (hit.entry.server as any).title ?? null,
+          title: serverAny.title ?? null,
           description: hit.entry.server.description ?? null,
           categories: ragmap.categories ?? [],
           ragScore: ragmap.ragScore ?? 0,
+          hasRemote: ragmap.hasRemote ?? false,
+          reachable: ragmap.reachable ?? false,
+          citations: ragmap.citations ?? false,
+          localOnly: ragmap.localOnly ?? false,
+          discoveryService: typeof serverAny.discoveryService === 'string' ? serverAny.discoveryService : null,
           kind: hit.kind,
           score: hit.score,
           server: hit.entry.server

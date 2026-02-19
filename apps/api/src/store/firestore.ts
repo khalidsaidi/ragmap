@@ -39,12 +39,22 @@ function parseIsoToDate(value: string | undefined | null) {
 }
 
 function buildEntry(doc: any): RegistryServerEntry {
+  const ragmap = doc.ragmap ?? null;
+  const reachability = doc.reachability;
+  const ragmapWithReach =
+    ragmap && reachability !== undefined
+      ? {
+          ...ragmap,
+          reachable: reachability?.ok ?? false,
+          lastReachableAt: reachability?.lastCheckedAt
+        }
+      : ragmap;
   return {
     server: doc.server as any,
     _meta: buildMeta({
       official: doc.official ?? null,
       publisherProvided: doc.publisherProvided ?? undefined,
-      ragmap: doc.ragmap ?? null
+      ragmap: ragmapWithReach
     })
   };
 }
@@ -255,7 +265,8 @@ export class FirestoreStore implements RegistryStore {
           server: latestServer,
           official: data.latestOfficial ?? null,
           publisherProvided: data.latestPublisherProvided ?? null,
-          ragmap: data.latestRagmap ?? null
+          ragmap: data.latestRagmap ?? null,
+          reachability: data.reachability
         });
         results.push(entry);
 
@@ -305,7 +316,8 @@ export class FirestoreStore implements RegistryStore {
         server: data.latestServer,
         official: data.latestOfficial ?? null,
         publisherProvided: data.latestPublisherProvided ?? null,
-        ragmap: data.latestRagmap ?? null
+        ragmap: data.latestRagmap ?? null,
+        reachability: data.reachability
       });
     }
 
@@ -360,7 +372,7 @@ export class FirestoreStore implements RegistryStore {
       let q = col
         .where('hidden', '==', false)
         .orderBy('name')
-        .select('name', 'latestServer', 'latestOfficial', 'latestPublisherProvided', 'latestRagmap')
+        .select('name', 'latestServer', 'latestOfficial', 'latestPublisherProvided', 'latestRagmap', 'reachability')
         .limit(500);
       if (last) q = q.startAfter(last);
       const snap = await q.get();
@@ -373,7 +385,8 @@ export class FirestoreStore implements RegistryStore {
           server: data.latestServer,
           official: data.latestOfficial ?? null,
           publisherProvided: data.latestPublisherProvided ?? null,
-          ragmap: data.latestRagmap ?? null
+          ragmap: data.latestRagmap ?? null,
+          reachability: data.reachability
         });
         items.push({
           entry,
@@ -423,6 +436,20 @@ export class FirestoreStore implements RegistryStore {
       categories: Array.isArray(ragmap.categories) ? ragmap.categories : [],
       reasons: Array.isArray(ragmap.reasons) ? ragmap.reasons : []
     };
+  }
+
+  async setReachability(serverName: string, ok: boolean, lastCheckedAt: Date): Promise<void> {
+    const serverId = encodeServerId(serverName);
+    await this.serversCol().doc(serverId).set(
+      {
+        reachability: {
+          ok,
+          lastCheckedAt: lastCheckedAt.toISOString()
+        }
+      },
+      { merge: true }
+    );
+    this.clearCaches();
   }
 
   async writeUsageEvent(event: UsageEvent): Promise<void> {

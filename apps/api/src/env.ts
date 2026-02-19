@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 export type Env = {
   nodeEnv: string;
   port: number;
@@ -72,10 +75,41 @@ export function loadEnv(): Env {
   );
   const agentEventToken = process.env.AGENT_EVENT_TOKEN ?? '';
 
-  const embeddingsEnabled = parseBool(process.env.EMBEDDINGS_ENABLED, false);
+  let openaiApiKey = (process.env.OPENAI_API_KEY ?? '').trim();
+  if (!openaiApiKey) {
+    const candidates = [
+      path.join(process.cwd(), '.ai', '.secret'),
+      path.join(process.cwd(), '..', '..', '.ai', '.secret')
+    ];
+    for (const p of candidates) {
+      try {
+        if (fs.existsSync(p)) {
+          const raw = fs.readFileSync(p, 'utf8');
+          for (const line of raw.split(/\r?\n/)) {
+            const t = line.trim();
+            if (t.startsWith('openapi_key:')) {
+              openaiApiKey = t.slice('openapi_key:'.length).trim();
+              break;
+            }
+            if (t.startsWith('OPENAI_API_KEY=')) {
+              openaiApiKey = t.slice('OPENAI_API_KEY='.length).trim();
+              break;
+            }
+            if (t && !t.startsWith('#')) {
+              openaiApiKey = t;
+              break;
+            }
+          }
+          if (openaiApiKey) break;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }
   const embeddingsProvider = 'openai' as const;
-  const openaiApiKey = process.env.OPENAI_API_KEY ?? '';
   const openaiEmbeddingsModel = process.env.OPENAI_EMBEDDINGS_MODEL ?? 'text-embedding-3-small';
+  const embeddingsEnabled = parseBool(process.env.EMBEDDINGS_ENABLED, openaiApiKey.length > 0);
 
   return {
     nodeEnv,

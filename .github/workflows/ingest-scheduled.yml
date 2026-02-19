@@ -1,0 +1,24 @@
+# Optional: run ingest on a schedule (e.g. daily) without Cloud Scheduler.
+# Free for public repos. Add repo secrets: INGEST_TOKEN, API_BASE_URL (e.g. https://ragmap-api.web.app)
+name: ingest-scheduled
+
+on:
+  schedule:
+    # Run daily at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger incremental ingest
+        run: |
+          curl -sS -X POST "${{ secrets.API_BASE_URL }}/internal/ingest/run" \
+            -H "Content-Type: application/json" \
+            -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
+            -d '{"mode":"incremental"}' \
+            --max-time 600 \
+            -w "\nHTTP %{http_code}\n" \
+            -o /tmp/out.json
+          cat /tmp/out.json

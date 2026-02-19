@@ -105,6 +105,22 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
     }
     if (!ok) return false;
   }
+  if (filters.hasRemote === true) {
+    const hasRemote = enrichment?.hasRemote === true;
+    if (!hasRemote) return false;
+  }
+  if (filters.hasRemote === false) {
+    if (enrichment?.hasRemote === true) return false;
+  }
+  if (filters.reachable === true) {
+    if (enrichment?.reachable !== true) return false;
+  }
+  if (filters.citations === true) {
+    if (enrichment?.citations !== true) return false;
+  }
+  if (filters.localOnly === true) {
+    if (enrichment?.localOnly !== true) return false;
+  }
   return true;
 }
 

@@ -49,6 +49,8 @@ const RULES: Array<{
   score: number;
   pattern: RegExp;
   keyword: string;
+  /** Only add if at least one "core" category already matched (reduces false positives) */
+  requireCore?: boolean;
 }> = [
   { category: 'rag', score: 30, keyword: 'rag', pattern: /\brag\b|retrieval[- ]augmented/i },
   { category: 'retrieval', score: 15, keyword: 'retrieval', pattern: /\bretriev(al|e)\b|semantic search/i },
@@ -62,8 +64,22 @@ const RULES: Array<{
   { category: 'reranking', score: 12, keyword: 'rerank', pattern: /\brerank(er|ing)?\b/i },
   { category: 'documents', score: 10, keyword: 'documents', pattern: /\bpdf\b|docx|markdown|documents?\b/i },
   { category: 'ingestion', score: 10, keyword: 'ingestion', pattern: /\bingest(ion|ing)?\b|etl|connector/i },
-  { category: 'search', score: 8, keyword: 'search', pattern: /\bsearch\b|query\b/i }
+  { category: 'search', score: 8, keyword: 'search', pattern: /\bsearch\b|query\b/i, requireCore: true }
 ];
+
+const CORE_CATEGORIES = new Set(['rag', 'retrieval', 'embeddings', 'vector-db', 'qdrant', 'pinecone', 'weaviate', 'milvus', 'chroma', 'reranking', 'documents', 'ingestion']);
+
+function hasRemoteEndpoint(server: RegistryServer): boolean {
+  const remotes = (server as any)?.remotes;
+  if (Array.isArray(remotes) && remotes.some((r: any) => r?.url)) return true;
+  const packages = (server as any)?.packages;
+  if (Array.isArray(packages)) {
+    for (const p of packages) {
+      if (p?.transport?.type === 'streamable-http' && p?.transport?.url) return true;
+    }
+  }
+  return false;
+}
 
 export function enrichRag(server: RegistryServer): RagmapEnrichment {
   const text = buildSearchText(server);
@@ -73,20 +89,28 @@ export function enrichRag(server: RegistryServer): RagmapEnrichment {
 
   let score = 0;
   for (const rule of RULES) {
-    if (rule.pattern.test(text)) {
-      categories.push(rule.category);
-      keywords.push(rule.keyword);
-      reasons.push(`matched:${rule.category}`);
-      score += rule.score;
+    if (!rule.pattern.test(text)) continue;
+    if (rule.requireCore) {
+      const hasCore = categories.some((c) => CORE_CATEGORIES.has(c));
+      if (!hasCore) continue;
     }
+    categories.push(rule.category);
+    keywords.push(rule.keyword);
+    reasons.push(`matched:${rule.category}`);
+    score += rule.score;
   }
 
   const capped = Math.max(0, Math.min(100, score));
+  const hasRemote = hasRemoteEndpoint(server);
+  const citationsMatch = /\bcitation(s)?\b|cite(s|d)?\s+(source|reference)|source\s+attribution|grounding\b|provenance\b/i.test(text);
   return {
     categories: uniq(categories),
     ragScore: capped,
     reasons: uniq(reasons).slice(0, 12),
     keywords: uniq(keywords).slice(0, 24),
+    hasRemote,
+    localOnly: !hasRemote,
+    citations: citationsMatch,
     embeddingTextHash: sha256(text)
   };
 }

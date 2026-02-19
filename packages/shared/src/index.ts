@@ -57,6 +57,11 @@ export const RagmapEnrichmentSchema = z
     ragScore: z.number().int().min(0).max(100),
     reasons: z.array(z.string()).default([]),
     keywords: z.array(z.string()).default([]),
+    hasRemote: z.boolean().optional(),
+    citations: z.boolean().optional(),
+    localOnly: z.boolean().optional(),
+    reachable: z.boolean().optional(),
+    lastReachableAt: z.string().optional(),
     embedding: z
       .object({
         model: z.string(),
@@ -76,7 +81,11 @@ export const RagFiltersSchema = z
     categories: z.array(z.string()).optional(),
     minScore: z.number().int().min(0).max(100).optional(),
     transport: z.enum(['stdio', 'streamable-http']).optional(),
-    registryType: z.string().optional()
+    registryType: z.string().optional(),
+    hasRemote: z.boolean().optional(),
+    reachable: z.boolean().optional(),
+    citations: z.boolean().optional(),
+    localOnly: z.boolean().optional()
   })
   .passthrough();
 

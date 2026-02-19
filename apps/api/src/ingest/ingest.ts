@@ -5,6 +5,44 @@ import { fetchUpstreamPage } from './upstream.js';
 import type { IngestMode, RegistryStore } from '../store/types.js';
 import { META_OFFICIAL_KEY, META_PUBLISHER_KEY } from '@ragmap/shared';
 
+const REACHABILITY_TIMEOUT_MS = 5000;
+const REACHABILITY_DELAY_MS = 800;
+const REACHABILITY_MAX_PER_RUN = 150;
+
+function getStreamableHttpUrl(server: any): string | null {
+  const remotes = server?.remotes;
+  if (Array.isArray(remotes)) {
+    for (const r of remotes) {
+      if (r?.type === 'streamable-http' && typeof r?.url === 'string') return r.url;
+    }
+  }
+  const packages = server?.packages;
+  if (Array.isArray(packages)) {
+    for (const p of packages) {
+      if (p?.transport?.type === 'streamable-http' && typeof p?.transport?.url === 'string')
+        return p.transport.url;
+    }
+  }
+  return null;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function headWithTimeout(url: string, timeoutMs: number): Promise<boolean> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 export type IngestStats = {
   mode: IngestMode;
   runId: string;
@@ -13,6 +51,7 @@ export type IngestStats = {
   fetched: number;
   upserted: number;
   hidden: number;
+  reachabilityChecked?: number;
   durationMs: number;
 };
 
@@ -93,6 +132,26 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
     hidden = await params.store.hideServersNotSeen(runId);
   }
 
+  let reachabilityChecked = 0;
+  if (params.mode === 'full' && params.store.setReachability) {
+    const toCheck: { name: string; url: string }[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await params.store.listLatestServers({ limit: 200, cursor });
+      for (const s of page.servers) {
+        const url = getStreamableHttpUrl(s.server);
+        if (url) toCheck.push({ name: s.server.name, url });
+      }
+      cursor = page.nextCursor;
+    } while (cursor);
+    for (const { name, url } of toCheck.slice(0, REACHABILITY_MAX_PER_RUN)) {
+      const ok = await headWithTimeout(url, REACHABILITY_TIMEOUT_MS);
+      await params.store.setReachability(name, ok, new Date());
+      reachabilityChecked += 1;
+      await sleep(REACHABILITY_DELAY_MS);
+    }
+  }
+
   const finishedAt = new Date();
   await params.store.setLastSuccessfulIngestAt(finishedAt);
 
@@ -104,6 +163,7 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
     fetched,
     upserted,
     hidden,
+    reachabilityChecked,
     durationMs: finishedAt.getTime() - startedAt.getTime()
   };
 }

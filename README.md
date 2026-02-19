@@ -13,6 +13,8 @@ It helps agents and humans answer: *which retrieval MCP server should I use for 
 
 RAGMap does **not** do retrieval itself. It indexes and enriches retrieval-capable servers, then routes you to the right tool/server.
 
+**Features:** Registry-compatible API; **semantic + keyword search** (when `OPENAI_API_KEY` is set, e.g. from env or your deployment’s secret manager); categories and `ragScore`; filter by **`hasRemote`**, **`reachable`** (HEAD-checked), **`citations`**, **`localOnly`**, `transport`, `minScore`, `categories`. **Human browse UI** at [ragmap-api.web.app/browse](https://ragmap-api.web.app/browse) — search, filter, copy Cursor/Claude config. MCP tools: `rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`.
+
 Full overview: `docs/OVERVIEW.md`
 
 ## Architecture
@@ -88,7 +90,6 @@ flowchart TB
 - `packages/mcp-local`: Local MCP server (stdio)
 - `packages/shared`: Zod schemas + shared types
 - `docs`: docs + Firebase Hosting static assets
-- `.ai`: agent artifacts (gitignored runs)
 
 ## Local dev
 
@@ -98,6 +99,8 @@ corepack enable
 pnpm -r install
 pnpm -r dev
 ```
+
+Optional: set `OPENAI_API_KEY` in `.env` (see `.env.example`) to enable **semantic search** locally; `GET /health` will show `"embeddings": true`.
 
 API: `http://localhost:3000`
 MCP remote: `http://localhost:4000/mcp`
@@ -133,13 +136,16 @@ pnpm -C packages/mcp-local dev
 
 ## Key endpoints
 
-- `GET /health`
+- `GET /embed` — embeddable “Search RAG MCP servers” widget (iframe; query params: `q`, `limit`)
+- `GET /health` (includes `embeddings: true|false` when semantic search is on/off)
 - `GET /readyz`
 - `GET /v0.1/servers`
 - `GET /v0.1/servers/:serverName/versions`
 - `GET /v0.1/servers/:serverName/versions/:version` (supports `latest`)
 - `GET /rag/search`
 - `GET /rag/categories`
+- `GET /api/stats` (public usage aggregates; no PII)
+- `GET /api/usage-graph` (HTML chart of usage)
 - `POST /internal/ingest/run` (protected)
 
 `GET /rag/search` query params:
@@ -148,6 +154,10 @@ pnpm -C packages/mcp-local dev
 - `minScore` (0-100)
 - `transport` (`stdio` or `streamable-http`)
 - `registryType` (string)
+- `hasRemote` (`true` or `false` — only servers with a remote endpoint)
+- `reachable` (`true` — only servers whose streamable-http URL passed a HEAD check)
+- `citations` (`true` — only servers that mention citations/grounding in metadata)
+- `localOnly` (`true` — only stdio, no remote)
 
 ## Smoke tests
 
@@ -158,6 +168,8 @@ MCP_URL=https://ragmap-mcp.web.app/mcp ./scripts/smoke-mcp.sh
 
 ## Docs
 
+- `docs/DISCOVERY-LINK-CONVENTION.md` — optional `discoveryService` in server.json so clients can show “Discover more”
+- `docs/AGENT-USAGE.md` — **for agents:** discovery, REST API, MCP install (no human intervention)
 - `docs/DEPLOYMENT.md`
 - `docs/OVERVIEW.md`
 - `docs/DATA_MODEL.md`

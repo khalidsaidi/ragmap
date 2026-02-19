@@ -1,17 +1,33 @@
-# Env
+# Env and secrets
 .env
+.env.*
+!.env.example
 **/*.local
+**/.secret
+*.pem
+*.key
 
-# Agent workspace
-.ai/logs/
-.ai/scratch/
-.ai/runs/
-.ai/artifacts/
-.ai/audit/
-.ai/archive/
-.ai/cache/
-.ai/tmp/
-.ai/.secret*
+# Agent workspace and extra docs (not pertinent to repo)
+.ai/
+
+# One-off submission helpers (keep local only, do not commit)
+docs/FORM-FILL-COPY-PASTE.txt
+scripts/open-form-tabs.js
+
+# Internal / maintainer-only (not for public repo)
+docs/CRITICAL-USER-ASSESSMENT.md
+docs/LAUNCH.md
+docs/WHERE-TO-ADD-RAGMAP.md
+docs/OSS-INTEGRATION.md
+docs/ONE-STEP-LOGIN.md
+scripts/report-ragmap-state.sh
+apps/api/scripts/usage-graph.ts
+
+# MCP publisher tokens (do not commit)
+**/.mcpregistry_*
+
+# Chrome profile for form script (login state)
+.chrome-forms-profile/
 
 # Node
 node_modules/
@@ -23,8 +39,11 @@ node_modules/
 **/dist/
 **/build/
 
-# Logs
+# Logs and OS
 npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
 
 # Firebase
 .firebase/
@@ -33,3 +52,7 @@ firebase-debug.*.log
 
 # Editor
 .cursor/
+
+# MCP publisher binary (install via scripts/install-mcp-publisher.sh)
+bin/mcp-publisher
+bin/mcp-publisher.exe

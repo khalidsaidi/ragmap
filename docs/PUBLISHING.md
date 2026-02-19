@@ -17,9 +17,7 @@ Prereq:
 ## Pre-publish checklist
 
 1. Confirm CI is green on `main` (typecheck + tests + deployed smoke tests).
-2. Make sure you are not publishing secrets:
-   - `.env` is ignored
-   - `.ai/.secret` is ignored
+2. Make sure you are not publishing secrets (e.g. `.env` and other gitignored files).
 3. Build + sanity-check the tarball locally:
 
 ```bash

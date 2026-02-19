@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browse RAG servers · RAGMap</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ee;
+        --ink: #121212;
+        --muted: #5b5b5b;
+        --accent: #1f6feb;
+        --card: #ffffff;
+        --border: #e2ddd6;
+        --green: #0d7d43;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+      main { max-width: 900px; margin: 24px auto 48px; padding: 0 20px; }
+      header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+      h1 { font-size: 24px; margin: 0; font-weight: 600; }
+      .tag { background: var(--accent); color: white; padding: 4px 10px; border-radius: 999px; font-size: 11px; }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+      .filters input[type="search"] { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; width: min(280px, 100%); font-size: 14px; }
+      .filters label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+      .filters label input { margin: 0; }
+      .filters select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; }
+      .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+      .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+      .card .meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+      .card .meta span { margin-right: 10px; }
+      .card .meta .remote { color: var(--green); }
+      .card .meta .reachable { color: var(--green); }
+      .card .meta .citations { color: #6b21a8; }
+      .card .meta .local { color: var(--muted); }
+      .card .meta .discovery { color: #6b21a8; }
+      .card .desc { font-size: 13px; line-height: 1.45; color: var(--ink); margin-bottom: 10px; }
+      .card .cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+      .card .cat { background: var(--bg); padding: 2px 8px; border-radius: 6px; font-size: 11px; color: var(--muted); }
+      .card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .card button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); font-size: 12px; cursor: pointer; }
+      .card button:hover { background: var(--bg); }
+      .card button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+      .card button.primary:hover { opacity: 0.92; }
+      .empty { color: var(--muted); padding: 24px; text-align: center; }
+      .top-cta { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; }
+      .top-cta strong { display: block; margin-bottom: 6px; }
+      .top-cta button { margin-top: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: white; cursor: pointer; font-size: 12px; }
+      .top-cta button:hover { opacity: 0.92; }
+      footer { font-size: 12px; color: var(--muted); margin-top: 24px; }
+      @keyframes fadeOut { to { opacity: 0; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <span class="tag">Browse</span>
+          <h1>RAG servers</h1>
+        </div>
+        <div><a href="/">API</a> · <a href="/rag-demo">Search demo</a> · <a href="/docs">OpenAPI</a></div>
+      </header>
+
+      <div class="top-cta">
+        <strong>Use RAGMap in Cursor or Claude</strong>
+        <span>Recommended: live URL (no install). Or use npx for a local process.</span>
+        <div><button type="button" id="copy-ragmap-live">Copy live URL config</button>
+        <button type="button" id="copy-ragmap-cursor">Copy Cursor (npx)</button>
+        <button type="button" id="copy-ragmap-claude">Copy Claude (npx)</button>
+        <button type="button" id="copy-ragmap-npx">Copy npx command</button></div>
+      </div>
+
+      <div class="filters">
+        <input type="search" id="q" placeholder="Search by meaning or keywords…" value="rag" />
+        <label><input type="checkbox" id="hasRemote" /> Remote only</label>
+        <label><input type="checkbox" id="reachable" /> Reachable only</label>
+        <label><input type="checkbox" id="citations" /> Citations</label>
+        <label><input type="checkbox" id="localOnly" /> Local only</label>
+        <label>Min score <input type="number" id="minScore" min="0" max="100" value="" placeholder="0" style="width:56px" /></label>
+        <button type="button" id="go">Search</button>
+      </div>
+
+      <div id="results"></div>
+      <footer>Fetched from <code>/rag/search</code>. Semantic + keyword when embeddings are on.</footer>
+    </main>
+    <script>
+      const API = '';
+      function buildUrl() {
+        const u = new URL(API + '/rag/search', window.location.origin);
+        u.searchParams.set('q', document.getElementById('q').value.trim() || 'rag');
+        u.searchParams.set('limit', '24');
+        if (document.getElementById('hasRemote').checked) u.searchParams.set('hasRemote', 'true');
+        if (document.getElementById('reachable').checked) u.searchParams.set('reachable', 'true');
+        if (document.getElementById('citations').checked) u.searchParams.set('citations', 'true');
+        if (document.getElementById('localOnly').checked) u.searchParams.set('localOnly', 'true');
+        const min = document.getElementById('minScore').value.trim();
+        if (min !== '') u.searchParams.set('minScore', min);
+        return u.toString();
+      }
+      function copyText(text, label) {
+        navigator.clipboard.writeText(text).then(() => showCopied(label || 'Copied!'), () => {});
+      }
+      function showCopied(msg) {
+        const el = document.createElement('span');
+        el.className = 'copy-feedback';
+        el.textContent = msg;
+        el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:13px;z-index:9999;animation:fadeOut 0.2s ease 1.3s forwards;';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
+      }
+      function installLine(server) {
+        const pkg = server.packages && server.packages[0];
+        if (!pkg) return null;
+        const rt = pkg.runtime;
+        if (rt && rt.name === 'npx' && pkg.name) return 'npx -y ' + pkg.name + (pkg.version ? '@' + pkg.version : '') + ' ' + (rt.path || '');
+        if (pkg.transport && pkg.transport.type === 'streamable-http' && pkg.transport.url) return pkg.transport.url;
+        return null;
+      }
+      const cursorRagmap = `// Add to Cursor MCP (e.g. .cursor/mcp.json)
+{
+  "mcpServers": {
+    "ragmap": {
+      "command": "npx",
+      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest", "ragmap-mcp"],
+      "env": { "RAGMAP_API_BASE_URL": "https://ragmap-api.web.app" }
+    }
+  }
+}`;
+      const claudeRagmap = `{
+  "mcpServers": {
+    "ragmap": {
+      "command": "npx",
+      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest", "ragmap-mcp"],
+      "env": { "MCP_AGENT_NAME": "claude-desktop", "RAGMAP_API_BASE_URL": "https://ragmap-api.web.app" }
+    }
+  }
+}`;
+      const liveRagmap = `{
+  "mcpServers": {
+    "ragmap": {
+      "url": "https://ragmap-mcp.web.app/mcp"
+    }
+  }
+}`;
+      const npxRagmap = 'npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp';
+      document.getElementById('copy-ragmap-cursor').onclick = () => copyText(cursorRagmap, 'Cursor (npx) copied');
+      document.getElementById('copy-ragmap-claude').onclick = () => copyText(claudeRagmap, 'Claude (npx) copied');
+      document.getElementById('copy-ragmap-live').onclick = () => copyText(liveRagmap, 'Live URL config copied');
+      document.getElementById('copy-ragmap-npx').onclick = () => copyText(npxRagmap, 'npx command copied');
+
+      function esc(s) { if (s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+      let lastResults = [];
+      function render(results) {
+        lastResults = results;
+        const el = document.getElementById('results');
+        if (!results.length) { el.innerHTML = '<div class="empty">No servers found. Try a broader query or lower min score.</div>'; return; }
+        el.innerHTML = results.map((r, i) => {
+          const desc = (r.description || '').slice(0, 200) + ((r.description || '').length > 200 ? '…' : '');
+          const install = installLine(r.server);
+          let actions = '<button type="button" class="copy-name primary" data-idx="' + i + '">Copy name</button>';
+          if (install) actions += ' <button type="button" class="copy-install" data-idx="' + i + '">Copy install</button>';
+          const badges = [];
+          if (r.hasRemote) badges.push('<span class="remote">remote</span>');
+          if (r.reachable) badges.push('<span class="reachable">reachable</span>');
+          if (r.citations) badges.push('<span class="citations">citations</span>');
+          if (r.localOnly) badges.push('<span class="local">local only</span>');
+          if (r.discoveryService) badges.push('<span class="discovery">Discovery</span>');
+          return '<div class="card"><h3>' + esc(r.title || r.name) + '</h3>' +
+            '<div class="meta">' +
+            '<span>' + esc(r.name) + '</span>' +
+            '<span>score ' + (r.ragScore ?? 0) + '</span>' +
+            badges.join('') +
+            '</div>' +
+            (desc ? '<div class="desc">' + esc(desc) + '</div>' : '') +
+            (r.categories && r.categories.length ? '<div class="cats">' + r.categories.map(c => '<span class="cat">' + esc(c) + '</span>').join('') + '</div>' : '') +
+            '<div class="actions">' + actions + '</div></div>';
+        }).join('');
+        el.querySelectorAll('.copy-name').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; if (r) copyText(r.name || '', 'Name copied'); }));
+        el.querySelectorAll('.copy-install').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; const line = r && installLine(r.server); if (line) copyText(line, 'Install copied'); }));
+      }
+      function run() {
+        document.getElementById('results').innerHTML = '<div class="empty">Loading…</div>';
+        fetch(buildUrl(), { headers: { accept: 'application/json' } })
+          .then(res => res.json())
+          .then(data => render(data.results || []))
+          .catch(() => { document.getElementById('results').innerHTML = '<div class="empty">Request failed.</div>'; });
+      }
+      document.getElementById('go').onclick = run;
+      document.getElementById('q').onkeydown = e => { if (e.key === 'Enter') run(); };
+      run();
+    </script>
+  </body>
+</html>

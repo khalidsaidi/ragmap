@@ -36,17 +36,25 @@ server.registerTool(
       minScore: z.number().int().min(0).max(100).optional(),
       transport: z.enum(['stdio', 'streamable-http']).optional(),
       registryType: z.string().min(1).optional(),
+      hasRemote: z.boolean().optional(),
+      reachable: z.boolean().optional(),
+      citations: z.boolean().optional(),
+      localOnly: z.boolean().optional(),
       limit: z.number().int().min(1).max(50).optional()
     }
   },
-  async ({ query, categories, minScore, transport, registryType, limit }) => {
+  async ({ query, categories, minScore, transport, registryType, hasRemote, reachable, citations, localOnly, limit }) => {
     const response = await apiGet('/rag/search', {
       q: query ?? 'rag',
       limit: String(limit ?? 10),
       ...(categories && categories.length ? { categories: categories.join(',') } : {}),
       ...(minScore != null ? { minScore: String(minScore) } : {}),
       ...(transport ? { transport } : {}),
-      ...(registryType ? { registryType } : {})
+      ...(registryType ? { registryType } : {}),
+      ...(hasRemote !== undefined ? { hasRemote: String(hasRemote) } : {}),
+      ...(reachable !== undefined ? { reachable: String(reachable) } : {}),
+      ...(citations !== undefined ? { citations: String(citations) } : {}),
+      ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {})
     });
     if (!response.ok) return { content: [{ type: 'text', text: JSON.stringify({ results: [] }) }] };
     const data = (await response.json()) as any;
@@ -58,7 +66,7 @@ server.registerTool(
   'rag_get_server',
   {
     title: 'Get server',
-    description: 'Fetch a server record by name (latest version).',
+    description: 'Fetch a server record by registry name (latest version). Use the exact name from the registry, e.g. io.github.khalidsaidi/ragmap for RAGMap.',
     inputSchema: { name: z.string().min(1) }
   },
   async ({ name }) => {
@@ -88,7 +96,7 @@ server.registerTool(
   'rag_explain_score',
   {
     title: 'Explain score',
-    description: 'Explain RAGMap scoring for a server.',
+    description: 'Explain RAGMap scoring for a server. Use the registry server name, e.g. io.github.khalidsaidi/ragmap for RAGMap.',
     inputSchema: { name: z.string().min(1) }
   },
   async ({ name }) => {
