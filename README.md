@@ -178,3 +178,4 @@ MCP_URL=https://ragmap-api.web.app/mcp ./scripts/smoke-mcp.sh
 - `docs/PRIVACY.md`
 - `docs/PUBLISHING.md`
 - `docs/GLAMA-CHECKLIST.md`
+- `docs/GLAMA-DOCKERFILE.md`

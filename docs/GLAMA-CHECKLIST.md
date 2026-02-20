@@ -28,9 +28,33 @@ After claim, tool detection and installation eligibility should become available
 
 From the server page, click `Sync now` in the admin controls.
 
+## Admin Dockerfile
+
+- Page: `https://glama.ai/mcp/servers/@khalidsaidi/ragmap/admin/dockerfile`
+- This endpoint requires authenticated maintainer access.
+- Pre-filled values: `docs/GLAMA-DOCKERFILE.md`.
+
 ## Related servers to add
 
-Add these in Glama "Related servers":
+Use the related-servers page:
+
+- `https://glama.ai/mcp/servers/@khalidsaidi/ragmap/related-servers`
+
+Already submitted suggestions (by UID):
+
+1. `j0xogqgoak` (`andnp/ragdocs-mcp`)
+2. `bh04byu77a` (`heltonteixeira/ragdocs`)
+3. `g4jkr5rjt5` (`sanderkooger/mcp-server-ragdocs`)
+4. `co522bhy31` (`rahulretnan/mcp-ragdocs`)
+5. `f4hsrjhmq9` (`hannesrudolph/mcp-ragdocs`)
+6. `kuoeczkg9v` (`jumasheff/mcp-ragdoc-fork`)
+7. `q4uywrflxx` (`qpd-v/mcp-ragdocs`)
+
+Re-submit helper:
+
+- `./scripts/glama-suggest-related.sh`
+
+Legacy shortlist links:
 
 1. `https://glama.ai/mcp/servers/@kazuph/mcp-docs-rag`
 2. `https://glama.ai/mcp/servers/@MIDS-Lab/mcp-ragdocs`
