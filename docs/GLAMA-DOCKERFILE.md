@@ -73,3 +73,6 @@ Pinned commit SHA:
 
 - This page requires authenticated maintainer access.
 - Anonymous form submission is redirected to sign-up.
+- Validated on 2026-02-20 with local `docker build` + `docker run`:
+  - Build completed successfully with Node 24 + Python 3.13.
+  - MCP endpoint responded on `/mcp` with successful `initialize`, `tools/list`, and `tools/call`.
