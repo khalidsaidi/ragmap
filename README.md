@@ -1,5 +1,7 @@
 # RAGMap (RAG MCP Registry Finder)
 
+[![Glama](https://glama.ai/mcp/servers/@khalidsaidi/ragmap/badge)](https://glama.ai/mcp/servers/@khalidsaidi/ragmap)
+
 RAGMap is a lightweight MCP Registry-compatible subregistry + MCP server focused on **RAG-related MCP servers**.
 
 It:
@@ -175,3 +177,4 @@ MCP_URL=https://ragmap-api.web.app/mcp ./scripts/smoke-mcp.sh
 - `docs/DATA_MODEL.md`
 - `docs/PRIVACY.md`
 - `docs/PUBLISHING.md`
+- `docs/GLAMA-CHECKLIST.md`

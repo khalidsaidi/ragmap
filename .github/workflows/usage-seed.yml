@@ -1,0 +1,23 @@
+name: usage-seed
+
+on:
+  schedule:
+    # Run every 6 hours to keep recent public traffic.
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    env:
+      API_BASE_URL: https://ragmap-api.web.app
+      MCP_URL: https://ragmap-api.web.app/mcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Seed public API usage
+        run: ./scripts/smoke-public.sh
+      - name: Seed MCP usage
+        run: ./scripts/smoke-mcp.sh
