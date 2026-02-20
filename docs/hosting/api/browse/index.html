@@ -4,6 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Browse RAG servers · RAGMap</title>
+    <meta name="description" content="Browse and filter RAG-capable MCP servers. Copy Cursor or Claude config, try semantic search." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ragmap-api.web.app/browse" />
+    <meta property="og:title" content="Browse RAG servers · RAGMap" />
+    <meta property="og:description" content="Browse and filter RAG-capable MCP servers. Copy Cursor or Claude config." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Browse RAG servers · RAGMap" />
+    <meta name="twitter:description" content="Browse and filter RAG-capable MCP servers. Copy Cursor or Claude config." />
     <style>
       :root {
         color-scheme: light;
@@ -124,7 +132,7 @@
   "mcpServers": {
     "ragmap": {
       "command": "npx",
-      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest", "ragmap-mcp"],
+      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest"],
       "env": { "RAGMAP_API_BASE_URL": "https://ragmap-api.web.app" }
     }
   }
@@ -133,7 +141,7 @@
   "mcpServers": {
     "ragmap": {
       "command": "npx",
-      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest", "ragmap-mcp"],
+      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest"],
       "env": { "MCP_AGENT_NAME": "claude-desktop", "RAGMAP_API_BASE_URL": "https://ragmap-api.web.app" }
     }
   }
@@ -141,11 +149,11 @@
       const liveRagmap = `{
   "mcpServers": {
     "ragmap": {
-      "url": "https://ragmap-mcp.web.app/mcp"
+      "url": "https://ragmap-api.web.app/mcp"
     }
   }
 }`;
-      const npxRagmap = 'npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp';
+      const npxRagmap = 'npx -y @khalidsaidi/ragmap-mcp@latest';
       document.getElementById('copy-ragmap-cursor').onclick = () => copyText(cursorRagmap, 'Cursor (npx) copied');
       document.getElementById('copy-ragmap-claude').onclick = () => copyText(claudeRagmap, 'Claude (npx) copied');
       document.getElementById('copy-ragmap-live').onclick = () => copyText(liveRagmap, 'Live URL config copied');

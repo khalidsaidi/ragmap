@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MCP_URL="${MCP_URL:-https://ragmap-mcp.web.app/mcp}"
+MCP_URL="${MCP_URL:-https://ragmap-api.web.app/mcp}"
 
 init_out="$(mktemp)"
 tools_out="$(mktemp)"

@@ -255,8 +255,8 @@ function agentCard(baseUrl: string) {
       getServer: { method: 'GET', path: '/v0.1/servers/{name}/versions/latest' },
       categories: { method: 'GET', path: '/rag/categories' }
     },
-    mcpInstall: 'npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp',
-    mcpUrl: 'https://ragmap-mcp.web.app/mcp',
+    mcpInstall: 'npx -y @khalidsaidi/ragmap-mcp@latest',
+    mcpUrl: `${baseUrl}/mcp`,
     keywords: ['mcp', 'rag', 'retrieval', 'discovery', 'cursor', 'claude', 'registry', 'search']
   };
 }
@@ -429,7 +429,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       info: {
         title: 'RAGMap API',
         description:
-          'MCP Registry-compatible subregistry API + RAG-focused search. Agents: use GET /rag/search?q=... to find retrieval MCP servers by meaning; or install the MCP (npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp) for tool-based discovery. Discovery: GET /.well-known/agent.json',
+          'MCP Registry-compatible subregistry API + RAG-focused search. Agents: use GET /rag/search?q=... to find retrieval MCP servers by meaning; or install the MCP (npx -y @khalidsaidi/ragmap-mcp@latest) for tool-based discovery. Discovery: GET /.well-known/agent.json',
         version: params.env.serviceVersion
       }
     }
@@ -924,6 +924,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request) => agentCard(getBaseUrl(params.env, request)));
   fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request) => agentCard(getBaseUrl(params.env, request)));
 
+  fastify.get('/favicon.ico', async (_req, reply) => reply.code(204).send());
+  fastify.get('/.well-known/mcp', async (request, reply) => {
+    const base = getBaseUrl(params.env, request);
+    return reply.type('application/json').send({ url: `${base}/.well-known/agent.json` });
+  });
   // MCP Registry compatible: list latest servers
   fastify.get('/v0.1/servers', async (request, reply) => {
     const query = parse(ListServersQuerySchema, (request as any).query, reply);
@@ -954,11 +959,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get('/v0.1/servers/*', async (request, reply) => {
     const splat = (request.params as any)['*'] as string | undefined;
     const raw = (splat ?? '').replace(/^\/+/, '').replace(/\/+$/, '');
-    if (!raw) return reply.code(404).send({ error: 'Not found' });
+    if (!raw) return reply.code(404).send({ error: 'Not found', message: 'Server name required' });
 
     const parts = raw.split('/').filter(Boolean);
     const versionsIdx = parts.lastIndexOf('versions');
-    if (versionsIdx < 1) return reply.code(404).send({ error: 'Not found' });
+    if (versionsIdx < 1) return reply.code(404).send({ error: 'Not found', message: 'Invalid path; use /v0.1/servers/{name}/versions or .../versions/latest' });
 
     const serverNameRaw = parts.slice(0, versionsIdx).join('/');
     const serverName = decodeURIComponent(serverNameRaw);
@@ -966,14 +971,14 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
     if (rest.length === 0) {
       const servers = await params.store.listServerVersions(serverName);
-      if (servers.length === 0) return reply.code(404).send({ error: 'Not found' });
+      if (servers.length === 0) return reply.code(404).send({ error: 'Not found', message: 'Server not in registry or not indexed' });
       return { servers, metadata: { count: servers.length } };
     }
 
-    if (rest.length !== 1) return reply.code(404).send({ error: 'Not found' });
+    if (rest.length !== 1) return reply.code(404).send({ error: 'Not found', message: 'Invalid path' });
     const version = rest[0];
     const entry = await params.store.getServerVersion(serverName, version === 'latest' ? 'latest' : version);
-    if (!entry) return reply.code(404).send({ error: 'Not found' });
+    if (!entry) return reply.code(404).send({ error: 'Not found', message: 'Server or version not in registry' });
     return entry;
   });
 
@@ -987,16 +992,16 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get('/rag/servers/*', async (request, reply) => {
     const splat = (request.params as any)['*'] as string | undefined;
     const raw = (splat ?? '').replace(/^\/+/, '').replace(/\/+$/, '');
-    if (!raw) return reply.code(404).send({ error: 'Not found' });
+    if (!raw) return reply.code(404).send({ error: 'Not found', message: 'Path must be /rag/servers/{name}/explain' });
 
     const parts = raw.split('/').filter(Boolean);
-    if (parts.length < 2) return reply.code(404).send({ error: 'Not found' });
-    if (parts[parts.length - 1] !== 'explain') return reply.code(404).send({ error: 'Not found' });
+    if (parts.length < 2) return reply.code(404).send({ error: 'Not found', message: 'Invalid path' });
+    if (parts[parts.length - 1] !== 'explain') return reply.code(404).send({ error: 'Not found', message: 'Path must end with /explain' });
 
     const serverNameRaw = parts.slice(0, -1).join('/');
     const serverName = decodeURIComponent(serverNameRaw);
     const explain = await params.store.getRagExplain(serverName);
-    if (!explain) return reply.code(404).send({ error: 'Not found' });
+    if (!explain) return reply.code(404).send({ error: 'Not found', message: 'Server not in registry or not indexed' });
     return explain;
   });
 
@@ -1065,7 +1070,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     };
   });
 
-  // Internal ingestion (protected)
+  // Internal ingestion (protected by token). Not exposed on public Hosting; call Cloud Run URL directly.
   fastify.post('/internal/ingest/run', async (request, reply) => {
     if (!params.env.ingestToken) return reply.code(500).send({ error: 'INGEST_TOKEN is not configured' });
     const token = (request.headers['x-ingest-token'] as string | undefined) ?? '';

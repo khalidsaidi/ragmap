@@ -17,8 +17,9 @@ Prereq:
 ## Pre-publish checklist
 
 1. Confirm CI is green on `main` (typecheck + tests + deployed smoke tests).
-2. Make sure you are not publishing secrets (e.g. `.env` and other gitignored files).
-3. Build + sanity-check the tarball locally:
+2. **Registry discovery:** `packages/mcp-local/server.json` must include **`remotes`** with your streamable HTTP URL so the MCP Registry (and any directory that uses it) can list and health-check the server. Without `remotes`, connectors/directories have no URL to use.
+3. Make sure you are not publishing secrets (e.g. `.env` and other gitignored files).
+4. Build + sanity-check the tarball locally:
 
 ```bash
 pnpm -C packages/mcp-local build
@@ -28,9 +29,18 @@ tar -tzf /tmp/ragmap-pack/*.tgz
 
 ## Publish (manual)
 
+**npm:**
 ```bash
 pnpm -C packages/mcp-local publish
 ```
+
+**MCP Registry (so directories can discover the streamable URL):** From `packages/mcp-local`, run the official publisher so the registry has `server.json` including `remotes`:
+```bash
+cd packages/mcp-local
+../bin/mcp-publisher login github   # if needed
+../bin/mcp-publisher publish
+```
+Verify: `curl -sS 'https://registry.modelcontextprotocol.io/v0.1/servers/io.github.khalidsaidi%2Fragmap/versions/latest' | jq '.server.remotes'` should show the streamable-http URL.
 
 Notes:
 - `packages/mcp-local/package.json` sets `publishConfig.access=public`.

@@ -48,7 +48,7 @@ Full overview: `https://github.com/khalidsaidi/ragmap/blob/main/docs/OVERVIEW.md
 
 ```bash
 MCP_AGENT_NAME=local-test \
-npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+npx -y @khalidsaidi/ragmap-mcp@latest
 ```
 
 By default it uses the hosted API base `https://ragmap-api.web.app`.
@@ -57,7 +57,7 @@ For local dev:
 
 ```bash
 RAGMAP_API_BASE_URL=http://localhost:3000 \
-npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+npx -y @khalidsaidi/ragmap-mcp@latest
 ```
 
 ## Install (optional)
@@ -76,7 +76,7 @@ printf '%s\n' \
 '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"0.1","capabilities":{},"clientInfo":{"name":"quick","version":"0.0.1"}}}' \
 '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
 '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"rag_find_servers","arguments":{"query":"rag","limit":3}}}' \
-| npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+| npx -y @khalidsaidi/ragmap-mcp@latest
 ```
 
 ---
@@ -88,7 +88,7 @@ printf '%s\n' \
   "mcpServers": {
     "ragmap": {
       "command": "npx",
-      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest", "ragmap-mcp"],
+      "args": ["-y", "@khalidsaidi/ragmap-mcp@latest"],
       "env": {
         "MCP_AGENT_NAME": "claude-desktop",
         "RAGMAP_API_BASE_URL": "https://ragmap-api.web.app"
@@ -105,7 +105,7 @@ printf '%s\n' \
 If you prefer MCP over streamable HTTP (no local install), use the hosted endpoint:
 
 ```bash
-claude mcp add --transport http ragmap https://ragmap-mcp.web.app/mcp
+claude mcp add --transport http ragmap https://ragmap-api.web.app/mcp
 ```
 
 ---
@@ -174,5 +174,5 @@ This is the kind of query MapRag is designed for. Today, you can approximate it 
 
 - Docs/OpenAPI: `https://ragmap-api.web.app/docs`
 - Agent card: `https://ragmap-api.web.app/.well-known/agent.json`
-- MCP remote (HTTP): `https://ragmap-mcp.web.app/mcp`
+- MCP remote (HTTP): `https://ragmap-api.web.app/mcp`
 - Repo: `https://github.com/khalidsaidi/ragmap`

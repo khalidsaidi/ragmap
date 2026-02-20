@@ -125,7 +125,7 @@ claude mcp add --transport http ragmap https://<your-mcp-domain>/mcp
 Local (stdio, npm):
 
 ```bash
-npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+npx -y @khalidsaidi/ragmap-mcp@latest
 ```
 
 Local (stdio):
@@ -163,7 +163,7 @@ pnpm -C packages/mcp-local dev
 
 ```bash
 API_BASE_URL=https://ragmap-api.web.app ./scripts/smoke-public.sh
-MCP_URL=https://ragmap-mcp.web.app/mcp ./scripts/smoke-mcp.sh
+MCP_URL=https://ragmap-api.web.app/mcp ./scripts/smoke-mcp.sh
 ```
 
 ## Docs

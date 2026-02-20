@@ -33,7 +33,7 @@ Accept: application/json
 Install once, then use tools from your agent runtime:
 
 ```bash
-npx -y @khalidsaidi/ragmap-mcp@latest ragmap-mcp
+npx -y @khalidsaidi/ragmap-mcp@latest
 ```
 
 Env (optional): `RAGMAP_API_BASE_URL` (default: https://ragmap-api.web.app), `MCP_AGENT_NAME` (for usage attribution).

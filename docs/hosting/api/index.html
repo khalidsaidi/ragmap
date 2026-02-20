@@ -4,22 +4,38 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>RAGMap API</title>
+    <meta name="description" content="MCP subregistry API + RAG-focused search for MCP servers. Find retrieval servers by meaning, category, or filters." />
+    <link rel="canonical" href="https://ragmap-api.web.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ragmap-api.web.app/" />
+    <meta property="og:title" content="RAGMap — RAG-focused MCP subregistry" />
+    <meta property="og:description" content="Find the right retrieval MCP server by meaning, category, or filters. Registry-compatible API + semantic search." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RAGMap — RAG-focused MCP subregistry" />
+    <meta name="twitter:description" content="Find retrieval MCP servers by meaning or keywords. API + MCP tools for Cursor, Claude, and agents." />
   </head>
   <body>
     <main>
       <h1>RAGMap API</h1>
       <p>MCP subregistry API + RAG-focused search for MCP servers. Find the right retrieval server by meaning, category, or filters (e.g. remote-only, min score).</p>
+      <section style="margin:1.5em 0;padding:1em;background:#f0f7ff;border-radius:8px;border:1px solid #c5d9f0;">
+        <h2 style="margin-top:0;font-size:1.1em;">How to connect</h2>
+        <p><strong>Cursor / Claude (MCP):</strong> Add this server — <code>npx -y @khalidsaidi/ragmap-mcp@latest</code></p>
+        <p><strong>Streamable HTTP (no install):</strong> <code>https://ragmap-api.web.app/mcp</code></p>
+        <p><a href="/browse">Browse servers</a> · <a href="/.well-known/agent.json">Agent card (JSON)</a></p>
+      </section>
       <ul>
         <li><a href="/browse">Browse RAG servers</a> — filter, compare, copy Cursor/Claude config</li>
         <li><a href="/embed">Embed widget</a> — put “Search RAG MCP servers” on your site (iframe)</li>
         <li><a href="/rag-demo">RAG Search demo</a> — try semantic + keyword search</li>
         <li><a href="/docs">Swagger UI</a></li>
         <li><a href="/api/openapi.json">OpenAPI JSON</a></li>
-        <li><a href="/health">Health</a> (includes <code>embeddings</code> when semantic search is on)</li>
+        <li><a href="/health">Health / Status</a> — <code>embeddings</code> when semantic search is on</li>
         <li><a href="/privacy">Privacy Policy</a></li>
         <li><a href="https://github.com/khalidsaidi/ragmap/blob/main/docs/DISCOVERY-LINK-CONVENTION.md">Discovery link convention</a> — add <code>discoveryService</code> to your server.json</li>
       </ul>
       <p><strong>Features:</strong> Registry-compatible <code>/v0.1/servers</code>; <code>/rag/search</code> with optional semantic ranking; <code>/rag/categories</code>; filter by <code>categories</code>, <code>minScore</code>, <code>transport</code>, <code>hasRemote</code>.</p>
+      <p style="margin-top:24px;font-size:13px;color:#5b5b5b"><a href="/health">Status</a> · <a href="https://github.com/khalidsaidi/ragmap">GitHub</a></p>
     </main>
   </body>
 </html>

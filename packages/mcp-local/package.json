@@ -1,7 +1,7 @@
 {
   "name": "@khalidsaidi/ragmap-mcp",
   "version": "0.1.3",
-  "description": "RAGMap MCP server (local) - find and filter RAG-capable MCP servers via the RAGMap subregistry API.",
+  "description": "Find and filter RAG-capable MCP servers by meaning or keywords. Local stdio MCP bridge to the RAGMap subregistry (semantic search, filters, explainable scores).",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -18,7 +18,8 @@
     "subregistry",
     "json-rpc",
     "stdio",
-    "firestore",
+    "semantic-search",
+    "mcp-registry",
     "discovery"
   ],
   "license": "MIT",

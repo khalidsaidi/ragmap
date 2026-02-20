@@ -181,6 +181,9 @@ async function main() {
     }
 
     const accept = Array.isArray(req.headers.accept) ? req.headers.accept.join(',') : req.headers.accept ?? '';
+    if (accept && !accept.includes('text/event-stream')) {
+      req.headers.accept = accept.trim() + ', text/event-stream';
+    }
     const wantsEventStream = accept.includes('text/event-stream');
     const hasMcpHeaders =
       'mcp-protocol-version' in req.headers ||

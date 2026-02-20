@@ -23,7 +23,7 @@ jobs:
       CAPTURE_AGENT_PAYLOADS: ${{ vars.CAPTURE_AGENT_PAYLOADS || 'true' }}
       # Public stable URLs (Firebase Hosting by default).
       API_PUBLIC_URL: ${{ vars.API_PUBLIC_URL || 'https://ragmap-api.web.app' }}
-      MCP_PUBLIC_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-mcp.web.app/mcp' }}
+      MCP_PUBLIC_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-api.web.app/mcp' }}
       RUNTIME_SA_EMAIL: ragmap-runtime@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       BUILD_SA_EMAIL: ragmap-build@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
     steps:

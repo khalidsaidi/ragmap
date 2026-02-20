@@ -67,41 +67,41 @@ This repo includes `firebase.json` rewrites similar to A2ABench:
 You need to run ingest periodically so new/updated servers and reachability stay current.
 
 **Option A: Cloud Scheduler (recommended, very cheap)**  
-We use one job `ragmap-ingest` that runs **once daily** at 2:00 UTC and calls the **stable** API URL so redeploys don’t break it.
+Run one job `ragmap-ingest` once daily at 2:00 UTC; point it at your **Cloud Run service URL** (not the public Hosting URL) so only your job can hit ingest.
 
 - **Cost:** Cloud Scheduler free tier = first 3 jobs per month free (a “job” is the definition, not per run). One job = $0. Running once per day keeps Cloud Run invocations minimal (~30/month for ingest).
-- **Stable URL:** The job should target your stable host (e.g. `https://ragmap-api.web.app/internal/ingest/run`) so the URI doesn’t change on redeploy.
+- **URL:** Use your **Cloud Run service URL** (e.g. `https://ragmap-api-XXXXX-uc.a.run.app/internal/ingest/run`), not the public Hosting URL. The `/internal/*` routes are not exposed on the public site. Get it: `gcloud run services describe ragmap-api --region=us-central1 --format='value(status.url)'`.
 
 Check or update the job:
 
 ```bash
 gcloud scheduler jobs list --project=YOUR_PROJECT_ID --location=us-central1
 
-# Optional: set daily 2am UTC + stable URL (keeps existing auth headers)
+# Set RUN_URL to your Cloud Run URL first: RUN_URL=$(gcloud run services describe ragmap-api --project=YOUR_PROJECT_ID --region=us-central1 --format='value(status.url)')
 gcloud scheduler jobs update http ragmap-ingest \
   --project=YOUR_PROJECT_ID --location=us-central1 \
   --schedule="0 2 * * *" \
-  --uri="https://ragmap-api.web.app/internal/ingest/run"
+  --uri="${RUN_URL}/internal/ingest/run"
 ```
 
 **Option B: GitHub Actions (free for public repos)**  
-Add a scheduled workflow that calls your ingest endpoint. Store `INGEST_TOKEN` in repo Secrets and use it in the workflow. No GCP Scheduler cost. See `docs/DEPLOYMENT.md` or the optional workflow below.
+Add a scheduled workflow that calls your **Cloud Run service URL** (not the public Hosting URL) for ingest. Store `INGEST_TOKEN` and the Run URL in repo Secrets. No GCP Scheduler cost. See the optional workflow below.
 
 **Option C: Cron on an existing VM**  
 If you already have a small VM (or always-on machine), add one line to crontab:
 
 ```bash
 # e.g. daily at 2am
-0 2 * * * curl -sS -X POST https://YOUR_API_URL/internal/ingest/run -H "Content-Type: application/json" -H "X-Ingest-Token: $INGEST_TOKEN" -d '{"mode":"incremental"}' --max-time 600
+0 2 * * * curl -sS -X POST "$RUN_URL/internal/ingest/run" -H "Content-Type: application/json" -H "X-Ingest-Token: $INGEST_TOKEN" -d '{"mode":"incremental"}' --max-time 600
 ```
 
-Set `INGEST_TOKEN` in the environment (e.g. in the user’s profile or a small script that sources a secret file).
+Set `INGEST_TOKEN` and `RUN_URL` (your Cloud Run service URL) in the environment.
 
 **Manual (no schedule)**  
-Call the protected endpoint when you want a refresh:
+Call the Cloud Run service URL when you want a refresh:
 
 ```bash
-curl -X POST https://<your-api-domain>/internal/ingest/run \
+curl -X POST "https://YOUR-CLOUD-RUN-URL/internal/ingest/run" \
   -H "Content-Type: application/json" \
   -H "X-Ingest-Token: $INGEST_TOKEN" \
   -d '{"mode":"full"}'

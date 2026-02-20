@@ -37,13 +37,6 @@
           }
         },
         {
-          "source": "/internal/**",
-          "run": {
-            "serviceId": "ragmap-api",
-            "region": "us-central1"
-          }
-        },
-        {
           "source": "/admin/**",
           "run": {
             "serviceId": "ragmap-api",
@@ -89,6 +82,20 @@
           "source": "/readyz{,/**}",
           "run": {
             "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/mcp",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/mcp/**",
+          "run": {
+            "serviceId": "ragmap-mcp-remote",
             "region": "us-central1"
           }
         }

@@ -23,7 +23,7 @@ jobs:
       - run: pnpm -r test
       - name: MCP smoke test (deployed)
         env:
-          MCP_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-mcp.web.app/mcp' }}
+          MCP_URL: ${{ vars.MCP_PUBLIC_URL || 'https://ragmap-api.web.app/mcp' }}
         run: ./scripts/smoke-mcp.sh
       - name: Public API smoke test (deployed)
         env:
