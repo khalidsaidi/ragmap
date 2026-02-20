@@ -179,3 +179,4 @@ MCP_URL=https://ragmap-api.web.app/mcp ./scripts/smoke-mcp.sh
 - `docs/PUBLISHING.md`
 - `docs/GLAMA-CHECKLIST.md`
 - `docs/GLAMA-DOCKERFILE.md`
+- `scripts/glama-score-status.sh` — print public Glama score flags (inspectable/release/usage)

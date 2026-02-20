@@ -4,6 +4,11 @@ Use this on:
 
 - `https://glama.ai/mcp/servers/@khalidsaidi/ragmap/admin/dockerfile`
 
+Important:
+
+- This page does not accept a pasted Dockerfile.
+- It accepts build-spec fields and generates Dockerfile content automatically.
+
 ## Ready values
 
 Node.js version:
@@ -73,7 +78,8 @@ Pinned commit SHA:
 ## Notes
 
 - This page requires authenticated maintainer access.
-- Anonymous form submission is redirected to sign-up.
+- If not signed in as maintainer, Glama redirects to sign-up.
+- Flow after `Deploy`: wait for successful test -> `Make Release` -> publish in `.../admin/dockerfile/releases`.
 - Validated on 2026-02-20 with local `docker build` + `docker run`:
   - Build completed successfully with Node 24 + Python 3.13.
   - MCP endpoint responded on `/mcp` with successful `initialize`, `tools/list`, and `tools/call`.
