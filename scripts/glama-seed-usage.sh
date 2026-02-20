@@ -25,6 +25,7 @@ create_instance() {
 
   if [[ "$code" != "200" ]]; then
     echo "create failed (HTTP $code)"
+    sed -n '1,20p' "$body" || true
     rm -f "$jar" "$body"
     return 1
   fi
@@ -34,6 +35,7 @@ create_instance() {
 
   if [[ -z "$uid" || -z "$token" ]]; then
     echo "create missing uid/token"
+    sed -n '1,20p' "$body" || true
     rm -f "$jar" "$body"
     return 1
   fi
@@ -135,3 +137,8 @@ JSON
 done
 
 echo "SUMMARY started_instances=${started_instances} successful_calls=${successful_calls}"
+
+if [[ "$successful_calls" -eq 0 ]]; then
+  echo "No successful Glama instance tool calls were recorded."
+  exit 1
+fi

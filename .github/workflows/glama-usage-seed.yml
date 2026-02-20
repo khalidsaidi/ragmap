@@ -1,0 +1,19 @@
+name: glama-usage-seed
+
+on:
+  schedule:
+    - cron: '15 */8 * * *'
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Seed Glama inspector usage
+        env:
+          SERVER_PATH: '@khalidsaidi/ragmap'
+          INSTANCES: '3'
+          CALLS_PER_INSTANCE: '6'
+          STATUS_TIMEOUT_SECONDS: '60'
+        run: ./scripts/glama-seed-usage.sh
