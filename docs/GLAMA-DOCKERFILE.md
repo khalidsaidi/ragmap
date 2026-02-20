@@ -28,6 +28,7 @@ CMD arguments (JSON array):
 
 ```json
 [
+  "--stateless",
   "node",
   "packages/mcp-local/dist/cli.js"
 ]
@@ -76,3 +77,4 @@ Pinned commit SHA:
 - Validated on 2026-02-20 with local `docker build` + `docker run`:
   - Build completed successfully with Node 24 + Python 3.13.
   - MCP endpoint responded on `/mcp` with successful `initialize`, `tools/list`, and `tools/call`.
+- `--stateless` is recommended for better compatibility with raw/manual HTTP clients because it removes session-header requirements between calls.
