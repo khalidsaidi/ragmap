@@ -2,7 +2,7 @@ name: glama-usage-seed
 
 on:
   schedule:
-    - cron: '15 */8 * * *'
+    - cron: '17 */2 * * *'
   workflow_dispatch:
 
 jobs:
