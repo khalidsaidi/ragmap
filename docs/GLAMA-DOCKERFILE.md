@@ -62,6 +62,12 @@ Environment variables JSON schema:
 }
 ```
 
+Do not include `INGEST_TOKEN` or `OPENAI_API_KEY` in this schema.
+
+- This Glama Dockerfile config is for the MCP server process (`packages/mcp-local/dist/cli.js`).
+- That process only uses `RAGMAP_API_BASE_URL`, `MCP_AGENT_NAME`, and `SERVICE_VERSION`.
+- `INGEST_TOKEN` / `OPENAI_API_KEY` belong to the API deployment, not the MCP runtime.
+
 Placeholder parameters:
 
 ```json

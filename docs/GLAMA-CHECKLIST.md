@@ -30,6 +30,8 @@ This checklist is for:
 1. If needed, claim the server from `.../score` (`Claim this server`).
 2. Open `https://glama.ai/mcp/servers/@khalidsaidi/ragmap/admin/dockerfile` while signed in as the maintainer.
 3. Enter the prepared values from `docs/GLAMA-DOCKERFILE.md` and click `Deploy`.
+   - Use only MCP runtime env vars (`RAGMAP_API_BASE_URL`, `MCP_AGENT_NAME`, `SERVICE_VERSION`).
+   - Do not use API-only secrets (`INGEST_TOKEN`, `OPENAI_API_KEY`) in Glama's MCP Dockerfile form.
 4. Wait for a successful build test, then click `Make Release`.
 5. Publish the release from `.../admin/dockerfile/releases`.
 6. Recheck `.../score` (this enables inspectability/tool detection and resolves `No release`).
