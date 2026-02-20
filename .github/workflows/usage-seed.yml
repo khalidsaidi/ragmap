@@ -14,10 +14,52 @@ jobs:
       MCP_URL: https://ragmap-api.web.app/mcp
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
       - name: Seed public API usage
-        run: ./scripts/smoke-public.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          endpoints=(
+            "/health"
+            "/readyz"
+            "/rag/categories"
+            "/rag/search?q=rag&limit=5"
+            "/rag/search?q=vector&hasRemote=true&limit=3"
+            "/v0.1/servers?limit=3"
+            "/api/stats"
+            "/browse/"
+          )
+          for ep in "${endpoints[@]}"; do
+            code="$(curl -sS -o /tmp/out.json -w "%{http_code}" --retry 3 --retry-all-errors --max-time 30 "${API_BASE_URL}${ep}" || true)"
+            echo "${API_BASE_URL}${ep} -> ${code}"
+            if [[ "$code" =~ ^2|^3 ]]; then
+              ok=$((ok + 1))
+            fi
+          done
+          if [[ "$ok" -eq 0 ]]; then
+            echo "No successful public API requests" >&2
+            exit 1
+          fi
       - name: Seed MCP usage
-        run: ./scripts/smoke-mcp.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          init='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"usage-seed","version":"0.1.0"}}}'
+          tools='{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+          call='{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"rag_find_servers","arguments":{"query":"rag","limit":3}}}'
+          for payload in "$init" "$tools" "$call"; do
+            code="$(curl -sS -o /tmp/mcp.json -w "%{http_code}" --retry 3 --retry-all-errors --max-time 45 \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json, text/event-stream" \
+              -X POST "$MCP_URL" \
+              -d "$payload" || true)"
+            echo "${MCP_URL} -> ${code}"
+            if [[ "$code" = "200" ]]; then
+              ok=$((ok + 1))
+            fi
+          done
+          if [[ "$ok" -eq 0 ]]; then
+            echo "No successful MCP requests" >&2
+            exit 1
+          fi
