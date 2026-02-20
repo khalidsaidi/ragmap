@@ -15,6 +15,26 @@ It helps agents and humans answer: *which retrieval MCP server should I use for 
 
 RAGMap does **not** do retrieval itself. It indexes and enriches retrieval-capable servers, then routes you to the right tool/server.
 
+## What you get after install (plain English)
+
+- You get **discovery/routing tools** (`rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`).
+- RAGMap helps you find the best retrieval server for your task and constraints.
+- Your agent then connects to that chosen server to do the actual retrieval.
+
+RAGMap does **not**:
+
+- Ingest your private documents automatically.
+- Host your personal vector database.
+- Replace your end-to-end RAG pipeline.
+
+If you need retrieval over your own data, use a retrieval server from RAGMap results (or your own server) that supports your ingest/index flow.
+
+## Freshness and ingest
+
+- Hosted RAGMap updates its index on a schedule. Newly published/changed servers may appear with some delay.
+- Most users do **not** run ingest themselves when using the hosted service.
+- If you need tighter freshness control or private indexing behavior, self-host and run your own ingest schedule (`docs/DEPLOYMENT.md`).
+
 **Features:** Registry-compatible API; **semantic + keyword search** (when `OPENAI_API_KEY` is set, e.g. from env or your deployment’s secret manager); categories and `ragScore`; filter by **`hasRemote`**, **`reachable`** (HEAD-checked), **`citations`**, **`localOnly`**, `transport`, `minScore`, `categories`. **Human browse UI** at [ragmap-api.web.app/browse](https://ragmap-api.web.app/browse) — search, filter, copy Cursor/Claude config. MCP tools: `rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`.
 
 Full overview: `docs/OVERVIEW.md`
@@ -149,6 +169,8 @@ pnpm -C packages/mcp-local dev
 - `GET /api/stats` (public usage aggregates; no PII)
 - `GET /api/usage-graph` (HTML chart of usage)
 - `POST /internal/ingest/run` (protected)
+
+For hosted `ragmap-api.web.app`, `/internal/*` routes are not exposed publicly.
 
 `GET /rag/search` query params:
 - `q` (string)

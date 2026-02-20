@@ -2,6 +2,14 @@
 
 For AI agents (Cursor, Claude, custom MCP clients) that need to discover RAG-capable MCP servers without human intervention.
 
+## Plain-English expectations
+
+- Installing RAGMap MCP gives discovery/routing tools, not a data ingestion system.
+- RAGMap helps pick a retrieval server; the chosen retrieval server does the real retrieval work.
+- RAGMap does not ingest your local/private corpus, does not host your vector DB, and does not replace your full RAG stack.
+- Hosted index updates on a schedule, so very new registry changes can lag.
+- If you need private or stricter-freshness indexing, self-host and run ingest yourself (`docs/DEPLOYMENT.md`).
+
 ## Discovery
 
 - **Agent card (machine-readable):** `GET https://ragmap-api.web.app/.well-known/agent.json`  
