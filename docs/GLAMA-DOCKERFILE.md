@@ -23,7 +23,6 @@ Build steps (JSON array):
 
 ```json
 [
-  "corepack enable",
   "pnpm install --filter @khalidsaidi/ragmap-mcp...",
   "pnpm --filter @khalidsaidi/ragmap-mcp build"
 ]
@@ -80,6 +79,7 @@ Placeholder parameters:
 Pinned commit SHA:
 
 - Leave empty, or set to the current short SHA from `git rev-parse --short HEAD`.
+- If you pin a commit, Glama logs will show a `detached HEAD` message during `git checkout`; this is expected.
 
 ## Notes
 
