@@ -79,9 +79,14 @@ else
   echo "Browse page: $browse_code (deploy to get /browse)"
 fi
 
-# Ingestion endpoint must be protected (deployed config uses Secret Manager -> INGEST_TOKEN).
+# Ingestion endpoint must not be publicly callable from Hosting:
+# - 401 means route is reachable but protected by token.
+# - 404 means /internal/* is intentionally not exposed on Hosting.
 ingest_code=$(curl -sS -o "$ingest_body" -w "%{http_code}" -X POST "${API_BASE_URL}/internal/ingest/run" -H "Content-Type: application/json" -d '{"mode":"incremental"}')
-test "$ingest_code" = "401"
+if [[ "$ingest_code" != "401" && "$ingest_code" != "404" ]]; then
+  echo "Unexpected ingest endpoint status: $ingest_code" >&2
+  cat "$ingest_body" >&2 || true
+  exit 1
+fi
 
 echo "smoke-public: OK"
-
