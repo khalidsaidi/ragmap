@@ -74,32 +74,6 @@ export class InMemoryStore implements RegistryStore {
     this.lastIngestAt = at;
   }
 
-  async setReachability(
-    serverName: string,
-    ok: boolean,
-    checkedAt: Date,
-    details?: { status?: number; method?: 'HEAD' | 'GET' }
-  ) {
-    const srv = this.servers.get(serverName);
-    if (!srv || srv.hidden) return;
-    const latest = srv.versions.get(srv.latestVersion);
-    if (!latest || latest.hidden) return;
-
-    const ragmap = latest.ragmap ?? {
-      categories: [],
-      ragScore: 0,
-      reasons: [],
-      keywords: []
-    };
-    latest.ragmap = {
-      ...ragmap,
-      reachable: ok,
-      reachableCheckedAt: checkedAt.toISOString(),
-      reachableStatus: details?.status,
-      reachableMethod: details?.method
-    };
-  }
-
   async markServerSeen(runId: string, name: string, at: Date) {
     const existing = this.servers.get(name);
     if (existing) {

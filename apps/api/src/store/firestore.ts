@@ -138,31 +138,6 @@ export class FirestoreStore implements RegistryStore {
     return this.firestore.collection('meta').doc('ingest');
   }
 
-  private normalizeLatestRagmap(data: any): RagmapEnrichment | null {
-    const base = data?.latestRagmap && typeof data.latestRagmap === 'object' ? data.latestRagmap : null;
-    const dottedReachable = data?.['latestRagmap.reachable'];
-    const dottedCheckedAt = data?.['latestRagmap.reachableCheckedAt'];
-    const dottedStatus = data?.['latestRagmap.reachableStatus'];
-    const dottedMethod = data?.['latestRagmap.reachableMethod'];
-
-    if (
-      dottedReachable === undefined &&
-      dottedCheckedAt === undefined &&
-      dottedStatus === undefined &&
-      dottedMethod === undefined
-    ) {
-      return base as RagmapEnrichment | null;
-    }
-
-    return {
-      ...(base ?? { categories: [], ragScore: 0, reasons: [], keywords: [] }),
-      ...(typeof dottedReachable === 'boolean' ? { reachable: dottedReachable } : {}),
-      ...(typeof dottedCheckedAt === 'string' ? { reachableCheckedAt: dottedCheckedAt } : {}),
-      ...(typeof dottedStatus === 'number' ? { reachableStatus: dottedStatus } : {}),
-      ...(dottedMethod === 'HEAD' || dottedMethod === 'GET' ? { reachableMethod: dottedMethod } : {})
-    } as RagmapEnrichment;
-  }
-
   async healthCheck(): Promise<StoreHealth> {
     try {
       await this.metaDoc().get();
@@ -191,25 +166,6 @@ export class FirestoreStore implements RegistryStore {
 
   async setLastSuccessfulIngestAt(at: Date) {
     await this.metaDoc().set({ lastSuccessfulIngestAt: Timestamp.fromDate(at) }, { merge: true });
-  }
-
-  async setReachability(
-    serverName: string,
-    ok: boolean,
-    checkedAt: Date,
-    details?: { status?: number; method?: 'HEAD' | 'GET' }
-  ) {
-    this.clearCaches();
-    const serverId = encodeServerId(serverName);
-    const update: Record<string, unknown> = {
-      latestRagmap: {
-        reachable: ok,
-        reachableCheckedAt: checkedAt.toISOString(),
-        reachableStatus: details?.status ?? null,
-        reachableMethod: details?.method ?? null
-      }
-    };
-    await this.serversCol().doc(serverId).set(update, { merge: true });
   }
 
   async markServerSeen(runId: string, name: string, at: Date) {
@@ -392,7 +348,6 @@ export class FirestoreStore implements RegistryStore {
       if (!srvSnap.exists) return null;
       const data = srvSnap.data() as any;
       if (!data || data.hidden === true || !data.latestServer) return null;
-      const latestRagmap = this.normalizeLatestRagmap(data);
       return buildEntry({
         server: data.latestServer,
         official: data.latestOfficial ?? null,
@@ -462,7 +417,6 @@ export class FirestoreStore implements RegistryStore {
         last = doc;
         const data = doc.data() as any;
         if (!data?.latestServer) continue;
-        const latestRagmap = this.normalizeLatestRagmap(data);
         const entry = buildEntry({
           server: data.latestServer,
           official: data.latestOfficial ?? null,
