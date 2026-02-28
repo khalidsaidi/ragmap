@@ -257,6 +257,27 @@ export class InMemoryStore implements RegistryStore {
     };
   }
 
+  async setReachability(
+    serverName: string,
+    ok: boolean,
+    lastCheckedAt: Date,
+    details?: { status?: number; method?: 'HEAD' | 'GET' }
+  ) {
+    const srv = this.servers.get(serverName);
+    if (!srv || srv.hidden) return;
+    const latest = srv.versions.get(srv.latestVersion);
+    if (!latest || latest.hidden) return;
+    const base = latest.ragmap ?? { categories: [], ragScore: 0, reasons: [], keywords: [] };
+    latest.ragmap = {
+      ...base,
+      reachable: ok,
+      lastReachableAt: lastCheckedAt.toISOString(),
+      reachableCheckedAt: lastCheckedAt.toISOString(),
+      ...(details?.status != null ? { reachableStatus: details.status } : {}),
+      ...(details?.method ? { reachableMethod: details.method } : {})
+    } as RagmapEnrichment;
+  }
+
   async writeUsageEvent(event: UsageEvent) {
     this.usageEvents.push(event);
   }

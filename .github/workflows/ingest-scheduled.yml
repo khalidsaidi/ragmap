@@ -1,5 +1,5 @@
 # Optional: run ingest on a schedule (e.g. daily) without Cloud Scheduler.
-# Free for public repos. Add repo secrets: INGEST_TOKEN, API_BASE_URL (e.g. https://ragmap-api.web.app)
+# Free for public repos. Add repo secrets: INGEST_TOKEN, API_BASE_URL (Cloud Run URL, not web.app)
 name: ingest-scheduled
 
 on:

@@ -87,6 +87,13 @@ gcloud scheduler jobs update http ragmap-ingest \
 **Option B: GitHub Actions (free for public repos)**  
 Add a scheduled workflow that calls your **Cloud Run service URL** (not the public Hosting URL) for ingest. Store `INGEST_TOKEN` and the Run URL in repo Secrets. No GCP Scheduler cost. See the optional workflow below.
 
+For repository workflows that call `/internal/*` routes:
+- `API_BASE_URL` must be the Cloud Run service URL (example: `https://ragmap-api-xxxxx-uc.a.run.app`)
+- Do not set `API_BASE_URL` to `https://ragmap-api.web.app` because Hosting does not expose `/internal/*`
+- `INGEST_TOKEN` must match the API's `INGEST_TOKEN` env var
+
+This applies to both scheduled ingest (`/internal/ingest/run`) and scheduled reachability refresh (`/internal/reachability/run`).
+
 **Option C: Cron on an existing VM**  
 If you already have a small VM (or always-on machine), add one line to crontab:
 

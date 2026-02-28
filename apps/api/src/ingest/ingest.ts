@@ -5,11 +5,11 @@ import { fetchUpstreamPage } from './upstream.js';
 import type { IngestMode, RegistryStore } from '../store/types.js';
 import { META_OFFICIAL_KEY, META_PUBLISHER_KEY } from '@ragmap/shared';
 
-const REACHABILITY_TIMEOUT_MS = 5000;
-const REACHABILITY_DELAY_MS = 800;
-const REACHABILITY_MAX_PER_RUN = 150;
+export const REACHABILITY_TIMEOUT_MS = 5000;
+export const REACHABILITY_DELAY_MS = 800;
+export const REACHABILITY_MAX_PER_RUN = 150;
 
-function getStreamableHttpUrl(server: any): string | null {
+export function getStreamableHttpUrl(server: any): string | null {
   const remotes = server?.remotes;
   if (Array.isArray(remotes)) {
     for (const r of remotes) {
@@ -30,16 +30,65 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function headWithTimeout(url: string, timeoutMs: number): Promise<boolean> {
+export type ReachabilityProbeResult = {
+  ok: boolean;
+  status?: number;
+  method?: 'HEAD' | 'GET';
+};
+
+function isReachableStatus(status: number): boolean {
+  if (status >= 200 && status <= 399) return true;
+  if (status === 401 || status === 403 || status === 405 || status === 429) return true;
+  if (status === 404 || status === 410) return false;
+  if (status >= 500 && status <= 599) return false;
+  return false;
+}
+
+async function requestStatus(
+  url: string,
+  method: 'HEAD' | 'GET',
+  timeoutMs: number
+): Promise<{ status?: number; method: 'HEAD' | 'GET'; threw: boolean }> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
-    return res.ok;
+    const res = await fetch(url, {
+      method,
+      signal: controller.signal,
+      redirect: 'manual'
+    });
+    return { status: res.status, method, threw: false };
   } catch {
-    return false;
+    return { status: undefined, method, threw: true };
   } finally {
     clearTimeout(t);
+  }
+}
+
+export async function probeReachable(url: string, timeoutMs: number): Promise<ReachabilityProbeResult> {
+  const head = await requestStatus(url, 'HEAD', timeoutMs);
+  if (!head.threw && head.status != null && head.status !== 405) {
+    return { ok: isReachableStatus(head.status), status: head.status, method: 'HEAD' };
+  }
+
+  const get = await requestStatus(url, 'GET', timeoutMs);
+  if (!get.threw && get.status != null) {
+    return { ok: isReachableStatus(get.status), status: get.status, method: 'GET' };
+  }
+
+  if (!head.threw && head.status != null) {
+    return { ok: isReachableStatus(head.status), status: head.status, method: 'HEAD' };
+  }
+
+  return { ok: false };
+}
+
+export function shuffleInPlace<T>(items: T[]): void {
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = items[i];
+    items[i] = items[j];
+    items[j] = tmp;
   }
 }
 
@@ -144,9 +193,13 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
       }
       cursor = page.nextCursor;
     } while (cursor);
+    shuffleInPlace(toCheck);
     for (const { name, url } of toCheck.slice(0, REACHABILITY_MAX_PER_RUN)) {
-      const ok = await headWithTimeout(url, REACHABILITY_TIMEOUT_MS);
-      await params.store.setReachability(name, ok, new Date());
+      const probe = await probeReachable(url, REACHABILITY_TIMEOUT_MS);
+      await params.store.setReachability(name, probe.ok, new Date(), {
+        status: probe.status,
+        method: probe.method
+      });
       reachabilityChecked += 1;
       await sleep(REACHABILITY_DELAY_MS);
     }

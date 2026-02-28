@@ -54,9 +54,39 @@ export type RagSearchHit = {
   score: number;
 };
 
+export function inferHasRemoteFromServer(server: any): boolean {
+  const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+  for (const remote of remotes) {
+    if (typeof remote?.url === 'string' && remote.url) return true;
+  }
+
+  const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+  for (const pkg of packages) {
+    const transport = pkg?.transport;
+    if (!transport || typeof transport !== 'object') continue;
+    if (transport.type !== 'streamable-http') continue;
+    if (
+      (typeof transport.url === 'string' && transport.url) ||
+      (typeof transport.endpoint === 'string' && transport.endpoint) ||
+      (typeof pkg?.url === 'string' && pkg.url)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (!filters) return true;
   const enrichment: RagmapEnrichment | null | undefined = item.enrichment ?? null;
+  const inferredHasRemote =
+    typeof enrichment?.hasRemote === 'boolean'
+      ? enrichment.hasRemote
+      : inferHasRemoteFromServer(item.entry.server as any);
+  const inferredLocalOnly =
+    typeof enrichment?.localOnly === 'boolean' ? enrichment.localOnly : !inferredHasRemote;
+
   if (filters.minScore != null) {
     const score = enrichment?.ragScore ?? 0;
     if (score < filters.minScore) return false;
@@ -106,11 +136,10 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
     if (!ok) return false;
   }
   if (filters.hasRemote === true) {
-    const hasRemote = enrichment?.hasRemote === true;
-    if (!hasRemote) return false;
+    if (!inferredHasRemote) return false;
   }
   if (filters.hasRemote === false) {
-    if (enrichment?.hasRemote === true) return false;
+    if (inferredHasRemote) return false;
   }
   if (filters.reachable === true) {
     if (enrichment?.reachable !== true) return false;
@@ -119,7 +148,7 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
     if (enrichment?.citations !== true) return false;
   }
   if (filters.localOnly === true) {
-    if (enrichment?.localOnly !== true) return false;
+    if (!inferredLocalOnly) return false;
   }
   return true;
 }

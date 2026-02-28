@@ -139,7 +139,12 @@ export interface RegistryStore {
   searchRag(params: RagSearchParams): Promise<RagSearchResult>;
   getRagExplain(name: string): Promise<RagExplain | null>;
 
-  setReachability?(serverName: string, ok: boolean, lastCheckedAt: Date): Promise<void>;
+  setReachability?(
+    serverName: string,
+    ok: boolean,
+    lastCheckedAt: Date,
+    details?: { status?: number; method?: 'HEAD' | 'GET' }
+  ): Promise<void>;
 
   writeUsageEvent(event: UsageEvent): Promise<void>;
   getUsageSummary(days: number, includeNoise: boolean, includeCrawlerProbesInErrors?: boolean): Promise<UsageSummary>;
