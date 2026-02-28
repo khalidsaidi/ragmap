@@ -122,6 +122,23 @@ export class FirestoreStore implements RegistryStore {
     await this.metaDoc().set({ lastSuccessfulIngestAt: Timestamp.fromDate(at) }, { merge: true });
   }
 
+  async setReachability(
+    serverName: string,
+    ok: boolean,
+    checkedAt: Date,
+    details?: { status?: number; method?: 'HEAD' | 'GET' }
+  ) {
+    this.clearCaches();
+    const serverId = encodeServerId(serverName);
+    const update: Record<string, unknown> = {
+      'latestRagmap.reachable': ok,
+      'latestRagmap.reachableCheckedAt': checkedAt.toISOString(),
+      'latestRagmap.reachableStatus': details?.status ?? null,
+      'latestRagmap.reachableMethod': details?.method ?? null
+    };
+    await this.serversCol().doc(serverId).set(update, { merge: true });
+  }
+
   async markServerSeen(runId: string, name: string, at: Date) {
     const id = encodeServerId(name);
     await this.serversCol().doc(id).set(

@@ -1,9 +1,32 @@
 import type { Env } from '../env.js';
 import { embedText } from '../rag/embedding.js';
-import { buildSearchText, enrichRag } from '../rag/enrich.js';
+import { buildSearchText, enrichRag, listStreamableHttpUrls } from '../rag/enrich.js';
 import { fetchUpstreamPage } from './upstream.js';
-import type { IngestMode, RegistryStore } from '../store/types.js';
+import type { IngestMode, ReachabilityMethod, RegistryStore } from '../store/types.js';
 import { META_OFFICIAL_KEY, META_PUBLISHER_KEY } from '@ragmap/shared';
+
+const REACHABILITY_TIMEOUT_MS = 5_000;
+const REACHABILITY_DELAY_MS = 40;
+export const REACHABILITY_MAX_PER_RUN = 150;
+
+type ReachabilityCandidate = {
+  serverName: string;
+  url: string;
+};
+
+export type ReachabilityProbeResult = {
+  ok: boolean;
+  status?: number;
+  method?: ReachabilityMethod;
+};
+
+export type ReachabilityRunStats = {
+  candidates: number;
+  checked: number;
+  reachable: number;
+  unreachable: number;
+  limit: number;
+};
 
 export type IngestStats = {
   mode: IngestMode;
@@ -13,8 +36,114 @@ export type IngestStats = {
   fetched: number;
   upserted: number;
   hidden: number;
+  reachabilityCandidates: number;
+  reachabilityChecked: number;
+  reachabilityReachable: number;
+  reachabilityUnreachable: number;
   durationMs: number;
 };
+
+function isReachableStatus(status: number) {
+  if (status >= 200 && status <= 399) return true;
+  if (status === 401 || status === 403 || status === 405 || status === 429) return true;
+  if (status === 404 || status === 410) return false;
+  if (status >= 500 && status <= 599) return false;
+  return false;
+}
+
+function shuffleInPlace<T>(values: T[]) {
+  for (let i = values.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = values[i];
+    values[i] = values[j];
+    values[j] = tmp;
+  }
+}
+
+async function fetchWithTimeout(url: string, method: ReachabilityMethod, timeoutMs: number) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      method,
+      redirect: 'manual',
+      signal: controller.signal,
+      headers: { accept: '*/*' }
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function probeReachable(url: string, timeoutMs = REACHABILITY_TIMEOUT_MS): Promise<ReachabilityProbeResult> {
+  try {
+    const head = await fetchWithTimeout(url, 'HEAD', timeoutMs);
+    if (head.status === 405) {
+      try {
+        const get = await fetchWithTimeout(url, 'GET', timeoutMs);
+        return { ok: isReachableStatus(get.status), status: get.status, method: 'GET' };
+      } catch {
+        return { ok: false };
+      }
+    }
+    return { ok: isReachableStatus(head.status), status: head.status, method: 'HEAD' };
+  } catch {
+    try {
+      const get = await fetchWithTimeout(url, 'GET', timeoutMs);
+      return { ok: isReachableStatus(get.status), status: get.status, method: 'GET' };
+    } catch {
+      return { ok: false };
+    }
+  }
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function runReachabilityChecks(params: {
+  store: RegistryStore;
+  candidates: ReachabilityCandidate[];
+  limit?: number;
+  timeoutMs?: number;
+  delayMs?: number;
+}): Promise<ReachabilityRunStats> {
+  const deduped = new Map<string, ReachabilityCandidate>();
+  for (const candidate of params.candidates) {
+    if (!candidate.serverName || !candidate.url) continue;
+    if (!deduped.has(candidate.serverName)) deduped.set(candidate.serverName, candidate);
+  }
+
+  const pool = Array.from(deduped.values());
+  shuffleInPlace(pool);
+  const limit = Math.max(1, Math.min(params.limit ?? REACHABILITY_MAX_PER_RUN, REACHABILITY_MAX_PER_RUN));
+  const timeoutMs = Math.max(500, params.timeoutMs ?? REACHABILITY_TIMEOUT_MS);
+  const delayMs = Math.max(0, params.delayMs ?? REACHABILITY_DELAY_MS);
+  const selected = pool.slice(0, limit);
+
+  let checked = 0;
+  let reachable = 0;
+
+  for (const candidate of selected) {
+    const probe = await probeReachable(candidate.url, timeoutMs);
+    const checkedAt = new Date();
+    await params.store.setReachability(candidate.serverName, probe.ok, checkedAt, {
+      status: probe.status,
+      method: probe.method
+    });
+    checked += 1;
+    if (probe.ok) reachable += 1;
+    if (delayMs > 0 && checked < selected.length) await sleep(delayMs);
+  }
+
+  return {
+    candidates: pool.length,
+    checked,
+    reachable,
+    unreachable: Math.max(0, checked - reachable),
+    limit
+  };
+}
 
 export async function runIngest(params: { env: Env; store: RegistryStore; mode: IngestMode }): Promise<IngestStats> {
   const startedAt = new Date();
@@ -26,6 +155,7 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
   let cursor: string | null = null;
   let fetched = 0;
   let upserted = 0;
+  const reachabilityCandidates: ReachabilityCandidate[] = [];
 
   for (;;) {
     const page = await fetchUpstreamPage({
@@ -81,6 +211,12 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
         ragmap,
         hidden
       });
+      if (!hidden) {
+        const urls = listStreamableHttpUrls(server);
+        if (urls.length > 0) {
+          reachabilityCandidates.push({ serverName: server.name, url: urls[0] });
+        }
+      }
       upserted += 1;
     }
 
@@ -93,6 +229,21 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
     hidden = await params.store.hideServersNotSeen(runId);
   }
 
+  const reachability =
+    params.mode === 'full'
+      ? await runReachabilityChecks({
+          store: params.store,
+          candidates: reachabilityCandidates,
+          limit: REACHABILITY_MAX_PER_RUN
+        })
+      : {
+          candidates: reachabilityCandidates.length,
+          checked: 0,
+          reachable: 0,
+          unreachable: 0,
+          limit: REACHABILITY_MAX_PER_RUN
+        };
+
   const finishedAt = new Date();
   await params.store.setLastSuccessfulIngestAt(finishedAt);
 
@@ -104,6 +255,10 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
     fetched,
     upserted,
     hidden,
+    reachabilityCandidates: reachability.candidates,
+    reachabilityChecked: reachability.checked,
+    reachabilityReachable: reachability.reachable,
+    reachabilityUnreachable: reachability.unreachable,
     durationMs: finishedAt.getTime() - startedAt.getTime()
   };
 }

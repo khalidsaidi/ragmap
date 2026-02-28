@@ -148,6 +148,10 @@ pnpm -C packages/mcp-local dev
 - `minScore` (0-100)
 - `transport` (`stdio` or `streamable-http`)
 - `registryType` (string)
+- `hasRemote` (`true`/`false`)
+- `reachable` (`true`/`false`)
+- `citations` (`true`/`false`)
+- `localOnly` (`true`/`false`)
 
 ## Smoke tests
 

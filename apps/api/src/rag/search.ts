@@ -54,9 +54,36 @@ export type RagSearchHit = {
   score: number;
 };
 
+function inferHasRemoteFromServer(server: any) {
+  const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+  for (const remote of remotes) {
+    if (typeof remote?.url === 'string' && remote.url) return true;
+  }
+
+  const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+  for (const pkg of packages) {
+    const t = pkg?.transport;
+    if (!t || typeof t !== 'object') continue;
+    if (t.type !== 'streamable-http') continue;
+    const hasUrl =
+      (typeof t.url === 'string' && t.url) ||
+      (typeof t.endpoint === 'string' && t.endpoint) ||
+      (typeof pkg?.url === 'string' && pkg.url);
+    if (hasUrl) return true;
+  }
+
+  return false;
+}
+
 function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (!filters) return true;
   const enrichment: RagmapEnrichment | null | undefined = item.enrichment ?? null;
+  const server: any = item.entry.server as any;
+  const hasRemote = typeof enrichment?.hasRemote === 'boolean' ? enrichment.hasRemote : inferHasRemoteFromServer(server);
+  const localOnly = typeof enrichment?.localOnly === 'boolean' ? enrichment.localOnly : !hasRemote;
+  const citations = Boolean(enrichment?.citations);
+  const reachable = enrichment?.reachable === true;
+
   if (filters.minScore != null) {
     const score = enrichment?.ragScore ?? 0;
     if (score < filters.minScore) return false;
@@ -69,7 +96,6 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   }
   if (filters.transport) {
     const need = filters.transport;
-    const server: any = item.entry.server as any;
     const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
     const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
 
@@ -93,7 +119,6 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   }
   if (filters.registryType) {
     const need = filters.registryType.toLowerCase();
-    const server: any = item.entry.server as any;
     const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
     let ok = false;
     for (const pkg of packages) {
@@ -105,6 +130,10 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
     }
     if (!ok) return false;
   }
+  if (filters.hasRemote != null && hasRemote !== filters.hasRemote) return false;
+  if (filters.localOnly != null && localOnly !== filters.localOnly) return false;
+  if (filters.citations != null && citations !== filters.citations) return false;
+  if (filters.reachable != null && reachable !== filters.reachable) return false;
   return true;
 }
 

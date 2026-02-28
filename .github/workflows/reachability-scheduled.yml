@@ -1,0 +1,24 @@
+name: reachability-scheduled
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh-reachability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reachability refresh
+        env:
+          # Must be the Cloud Run API URL (e.g. https://ragmap-api-xxxxx-uc.a.run.app),
+          # not the Firebase Hosting domain.
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          INGEST_TOKEN: ${{ secrets.INGEST_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -fsS -X POST "${API_BASE_URL}/internal/reachability/run" \
+            -H "Content-Type: application/json" \
+            -H "X-Ingest-Token: ${INGEST_TOKEN}" \
+            -d '{"limit":150}'
+

@@ -9,6 +9,7 @@ import type { RegistryStore } from './store/types.js';
 import { META_RAGMAP_KEY, RagFiltersSchema, type RagFilters } from '@ragmap/shared';
 import { runIngest } from './ingest/ingest.js';
 import { embedText } from './rag/embedding.js';
+import { runReachabilityRefresh } from './reachability/run.js';
 
 type RouteRequest = {
   routerPath?: string;
@@ -55,6 +56,18 @@ function parseBoolish(value: unknown) {
   if (value === true || value === 1 || value === '1') return true;
   if (typeof value === 'string' && value.toLowerCase() === 'true') return true;
   return false;
+}
+
+function parseOptionalBoolish(value: unknown): boolean | undefined {
+  if (value == null || value === '') return undefined;
+  if (value === true || value === 1 || value === '1') return true;
+  if (value === false || value === 0 || value === '0') return false;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return undefined;
 }
 
 function getDiscoveryRedirectTarget(rawUrl: string) {
@@ -271,11 +284,19 @@ const RagSearchQuerySchema = z.object({
   categories: z.string().optional(),
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   transport: z.enum(['stdio', 'streamable-http']).optional(),
-  registryType: z.string().optional()
+  registryType: z.string().optional(),
+  hasRemote: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  reachable: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  citations: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  localOnly: z.union([z.string(), z.number(), z.boolean()]).optional()
 });
 
 const IngestRunBodySchema = z.object({
   mode: z.enum(['full', 'incremental']).optional()
+});
+
+const ReachabilityRunBodySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(150).optional()
 });
 
 const AdminUsageQuerySchema = z.object({
@@ -427,6 +448,46 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   });
 
   fastify.get('/api/openapi.json', async () => fastify.swagger());
+
+  // Public usage snapshots (auth-free, aggregated only).
+  fastify.get('/api/stats', async (request, reply) => {
+    const query = parse(AdminUsageQuerySchema, (request as any).query, reply);
+    if (!query) return;
+    const days = query.days ?? 7;
+    const includeNoise = parseBoolish(query.includeNoise);
+    const includeCrawlerProbes = parseBoolish(query.includeCrawlerProbes);
+    const summary = await params.store.getUsageSummary(days, includeNoise, includeCrawlerProbes);
+    reply.header('Cache-Control', 'no-store');
+    return {
+      days: summary.days,
+      since: summary.since,
+      total: summary.total,
+      last24h: summary.last24h,
+      byRoute: summary.byRoute,
+      byStatus: summary.byStatus,
+      byAgentName: summary.byAgentName,
+      byTrafficClass: summary.byTrafficClass,
+      daily: summary.daily,
+      ...(summary.truncated ? { truncated: true } : {})
+    };
+  });
+
+  fastify.get('/api/usage-graph', async (request, reply) => {
+    const query = parse(AdminUsageQuerySchema, (request as any).query, reply);
+    if (!query) return;
+    const days = query.days ?? 7;
+    const includeNoise = parseBoolish(query.includeNoise);
+    const includeCrawlerProbes = parseBoolish(query.includeCrawlerProbes);
+    const summary = await params.store.getUsageSummary(days, includeNoise, includeCrawlerProbes);
+    reply.header('Cache-Control', 'no-store');
+    return {
+      days: summary.days,
+      since: summary.since,
+      total: summary.total,
+      last24h: summary.last24h,
+      daily: summary.daily
+    };
+  });
 
   // Admin dashboard (Basic Auth protected)
   fastify.get('/admin/usage/data', async (request, reply) => {
@@ -910,11 +971,19 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       ? query.categories.split(',').map((c) => c.trim()).filter(Boolean)
       : undefined;
     const registryType = (query.registryType ?? '').trim() || undefined;
+    const hasRemote = parseOptionalBoolish(query.hasRemote);
+    const reachable = parseOptionalBoolish(query.reachable);
+    const citations = parseOptionalBoolish(query.citations);
+    const localOnly = parseOptionalBoolish(query.localOnly);
     const filters: RagFilters = RagFiltersSchema.parse({
       categories,
       minScore: query.minScore,
       transport: query.transport,
-      registryType
+      registryType,
+      hasRemote,
+      reachable,
+      citations,
+      localOnly
     });
 
     let queryEmbedding: number[] | null = null;
@@ -931,6 +1000,9 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       query: q,
       results: results.map((hit) => {
         const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+        const hasRemoteOut = ragmap.hasRemote === true;
+        const reachableOut = ragmap.reachable === true;
+        const citationsOut = ragmap.citations === true;
         return {
           name: hit.entry.server.name,
           version: hit.entry.server.version,
@@ -938,6 +1010,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           description: hit.entry.server.description ?? null,
           categories: ragmap.categories ?? [],
           ragScore: ragmap.ragScore ?? 0,
+          hasRemote: hasRemoteOut,
+          reachable: reachableOut,
+          localOnly: ragmap.localOnly === true || !hasRemoteOut,
+          citations: citationsOut,
           kind: hit.kind,
           score: hit.score,
           server: hit.entry.server
@@ -957,6 +1033,18 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     if (!body) return;
     const mode = body.mode ?? 'incremental';
     const stats = await runIngest({ env: params.env, store: params.store, mode });
+    return stats;
+  });
+
+  // Internal reachability refresh only (protected)
+  fastify.post('/internal/reachability/run', async (request, reply) => {
+    if (!params.env.ingestToken) return reply.code(500).send({ error: 'INGEST_TOKEN is not configured' });
+    const token = (request.headers['x-ingest-token'] as string | undefined) ?? '';
+    if (!token || token !== params.env.ingestToken) return reply.code(401).send({ error: 'Unauthorized' });
+
+    const body = parse(ReachabilityRunBodySchema, (request as any).body, reply);
+    if (!body) return;
+    const stats = await runReachabilityRefresh({ store: params.store, limit: body.limit ?? 150 });
     return stats;
   });
 

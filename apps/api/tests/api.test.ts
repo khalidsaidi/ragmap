@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
 import { buildApp } from '../src/app.js';
 import type { Env } from '../src/env.js';
 import { InMemoryStore } from '../src/store/inmemory.js';
@@ -246,4 +247,85 @@ test('rag search does not match substring inside words (rag vs storage)', async 
   assert.equal(body.results.length, 0);
 
   await app.close();
+});
+
+test('public api stats is available without auth', async () => {
+  const store = new InMemoryStore();
+  await store.writeUsageEvent({
+    createdAt: new Date(),
+    method: 'GET',
+    route: '/rag/search',
+    status: 200,
+    durationMs: 5,
+    userAgent: 'unit-test',
+    ip: null,
+    referer: null,
+    agentName: null,
+    trafficClass: 'product_api'
+  });
+  const app = await buildApp({ env, store });
+
+  const res = await app.inject({ method: 'GET', url: '/api/stats?days=7' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(Array.isArray(body.byRoute), true);
+  assert.equal(body.byRoute.some((row: any) => row.route === '/rag/search'), true);
+
+  await app.close();
+});
+
+test('internal reachability run marks 401 endpoints reachable and searchable', async () => {
+  const upstream = createServer((req, res) => {
+    if (req.url === '/mcp') {
+      res.statusCode = 401;
+      res.end();
+      return;
+    }
+    res.statusCode = 404;
+    res.end();
+  });
+  await new Promise<void>((resolve) => upstream.listen(0, '127.0.0.1', () => resolve()));
+  const address = upstream.address();
+  if (!address || typeof address === 'string') throw new Error('failed to bind test server');
+  const endpoint = `http://127.0.0.1:${address.port}/mcp`;
+
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/rag-remote-auth',
+      version: '0.1.0',
+      description: 'rag server with auth',
+      remotes: [{ type: 'streamable-http', url: endpoint }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 50, reasons: ['test'], keywords: ['rag'], hasRemote: true, localOnly: false },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const runRes = await app.inject({
+    method: 'POST',
+    url: '/internal/reachability/run',
+    headers: { 'x-ingest-token': env.ingestToken },
+    payload: { limit: 150 }
+  });
+  assert.equal(runRes.statusCode, 200);
+  const runBody = runRes.json() as any;
+  assert.equal(runBody.checked >= 1, true);
+  assert.equal(runBody.reachable >= 1, true);
+
+  const searchRes = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=rag&hasRemote=true&reachable=true&limit=5'
+  });
+  assert.equal(searchRes.statusCode, 200);
+  const body = searchRes.json() as any;
+  assert.equal(body.metadata.count >= 1, true);
+  assert.equal(body.results[0].reachable, true);
+  assert.equal(body.results[0].hasRemote, true);
+
+  await app.close();
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
 });

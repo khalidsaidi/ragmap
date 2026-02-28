@@ -65,6 +65,10 @@ curl -X POST https://<your-api-domain>/internal/ingest/run \\
   -d '{\"mode\":\"full\"}'
 ```
 
+Important:
+- For `/internal/*` routes, use the Cloud Run service URL (for example `https://ragmap-api-xxxxx-uc.a.run.app`), not the Firebase Hosting URL.
+- If you trigger internal ingestion/reachability from GitHub Actions, set `API_BASE_URL` to that Cloud Run URL.
+
 ### Firestore indexes
 
 Firestore requires a composite index for listing servers (query on `servers` with `hidden == false` ordered by `name`).
