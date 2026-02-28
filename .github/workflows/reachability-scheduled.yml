@@ -1,0 +1,21 @@
+name: reachability-scheduled
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  reachability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reachability refresh
+        run: |
+          curl -sS -X POST "${{ secrets.API_BASE_URL }}/internal/reachability/run" \
+            -H "Content-Type: application/json" \
+            -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
+            -d '{"limit":150}' \
+            --max-time 600 \
+            -w "\nHTTP %{http_code}\n" \
+            -o /tmp/out.json
+          cat /tmp/out.json

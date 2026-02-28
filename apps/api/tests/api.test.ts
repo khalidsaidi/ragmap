@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import http from 'node:http';
 import { buildApp } from '../src/app.js';
 import type { Env } from '../src/env.js';
 import { InMemoryStore } from '../src/store/inmemory.js';
@@ -244,6 +245,96 @@ test('rag search does not match substring inside words (rag vs storage)', async 
   assert.equal(res.statusCode, 200);
   const body = res.json();
   assert.equal(body.results.length, 0);
+
+  await app.close();
+});
+
+test('internal reachability run marks 401 endpoints reachable and searchable', async () => {
+  const upstream = http.createServer((req, res) => {
+    if (req.url === '/mcp') {
+      res.statusCode = 401;
+      res.end('auth required');
+      return;
+    }
+    res.statusCode = 404;
+    res.end('not found');
+  });
+  await new Promise<void>((resolve, reject) => upstream.listen(0, '127.0.0.1', (err?: Error) => (err ? reject(err) : resolve())));
+  const address = upstream.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  const remoteUrl = `http://127.0.0.1:${port}/mcp`;
+
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/reachability-401',
+      version: '0.1.0',
+      description: 'rag remote endpoint',
+      remotes: [{ type: 'streamable-http', url: remoteUrl }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 60, reasons: ['test'], keywords: ['rag'] },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+
+  const run = await app.inject({
+    method: 'POST',
+    url: '/internal/reachability/run',
+    headers: {
+      'content-type': 'application/json',
+      'x-ingest-token': env.ingestToken
+    },
+    payload: { limit: 10 }
+  });
+  assert.equal(run.statusCode, 200);
+  const stats = run.json() as any;
+  assert.equal(stats.checked >= 1, true);
+  assert.equal(stats.reachable >= 1, true);
+
+  const search = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=rag&hasRemote=true&reachable=true&limit=5'
+  });
+  assert.equal(search.statusCode, 200);
+  const body = search.json() as any;
+  assert.equal(body.metadata.count >= 1, true);
+  assert.equal(body.results[0].reachable, true);
+
+  await app.close();
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
+});
+
+test('rag search hasRemote response flag matches hasRemote filter even without enrichment booleans', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/remote-no-enrichment-boolean',
+      version: '0.1.0',
+      description: 'remote server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/mcp' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 40, reasons: ['test'], keywords: ['enrichment'] },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=enrichment&hasRemote=true&limit=5'
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.metadata.count >= 1, true);
+  assert.equal(body.results[0].name, 'example/remote-no-enrichment-boolean');
+  assert.equal(body.results[0].hasRemote, true);
+  assert.equal(body.results[0].localOnly, false);
 
   await app.close();
 });

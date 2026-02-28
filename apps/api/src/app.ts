@@ -8,7 +8,9 @@ import type { Env } from './env.js';
 import type { RegistryStore } from './store/types.js';
 import { META_RAGMAP_KEY, RagFiltersSchema, type RagFilters } from '@ragmap/shared';
 import { runIngest } from './ingest/ingest.js';
+import { runReachabilityRefresh } from './reachability/run.js';
 import { embedText } from './rag/embedding.js';
+import { inferHasRemoteFromServer } from './rag/search.js';
 
 type RouteRequest = {
   routerPath?: string;
@@ -136,6 +138,19 @@ async function requireAdminDashboard(env: Env, request: { headers: Record<string
   if (!creds || creds.user !== env.adminDashUser || creds.pass !== env.adminDashPass) {
     reply.header('WWW-Authenticate', 'Basic realm="RAGMap Admin"');
     reply.code(401).send('Unauthorized');
+    return false;
+  }
+  return true;
+}
+
+function requireIngestToken(env: Env, request: { headers: Record<string, string | string[] | undefined> }, reply: any) {
+  if (!env.ingestToken) {
+    reply.code(500).send({ error: 'INGEST_TOKEN is not configured' });
+    return false;
+  }
+  const token = (request.headers['x-ingest-token'] as string | undefined) ?? '';
+  if (!token || token !== env.ingestToken) {
+    reply.code(401).send({ error: 'Unauthorized' });
     return false;
   }
   return true;
@@ -291,6 +306,10 @@ const RagSearchQuerySchema = z.object({
 
 const IngestRunBodySchema = z.object({
   mode: z.enum(['full', 'incremental']).optional()
+});
+
+const ReachabilityRunBodySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(500).optional()
 });
 
 const AdminUsageQuerySchema = z.object({
@@ -1049,6 +1068,12 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       results: results.map((hit) => {
         const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
         const serverAny = hit.entry.server as any;
+        const hasRemoteOut =
+          typeof ragmap.hasRemote === 'boolean'
+            ? ragmap.hasRemote
+            : inferHasRemoteFromServer(hit.entry.server as any);
+        const localOnlyOut =
+          typeof ragmap.localOnly === 'boolean' ? ragmap.localOnly : !hasRemoteOut;
         return {
           name: hit.entry.server.name,
           version: hit.entry.server.version,
@@ -1056,10 +1081,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           description: hit.entry.server.description ?? null,
           categories: ragmap.categories ?? [],
           ragScore: ragmap.ragScore ?? 0,
-          hasRemote: ragmap.hasRemote ?? false,
+          hasRemote: hasRemoteOut,
           reachable: ragmap.reachable ?? false,
           citations: ragmap.citations ?? false,
-          localOnly: ragmap.localOnly ?? false,
+          localOnly: localOnlyOut,
           discoveryService: typeof serverAny.discoveryService === 'string' ? serverAny.discoveryService : null,
           kind: hit.kind,
           score: hit.score,
@@ -1072,14 +1097,25 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   // Internal ingestion (protected by token). Not exposed on public Hosting; call Cloud Run URL directly.
   fastify.post('/internal/ingest/run', async (request, reply) => {
-    if (!params.env.ingestToken) return reply.code(500).send({ error: 'INGEST_TOKEN is not configured' });
-    const token = (request.headers['x-ingest-token'] as string | undefined) ?? '';
-    if (!token || token !== params.env.ingestToken) return reply.code(401).send({ error: 'Unauthorized' });
+    if (!requireIngestToken(params.env, request, reply)) return;
 
     const body = parse(IngestRunBodySchema, (request as any).body, reply);
     if (!body) return;
     const mode = body.mode ?? 'incremental';
     const stats = await runIngest({ env: params.env, store: params.store, mode });
+    return stats;
+  });
+
+  // Internal reachability-only refresh (protected by token). No ingest fetch or embeddings.
+  fastify.post('/internal/reachability/run', async (request, reply) => {
+    if (!requireIngestToken(params.env, request, reply)) return;
+
+    const body = parse(ReachabilityRunBodySchema, (request as any).body ?? {}, reply);
+    if (!body) return;
+    const stats = await runReachabilityRefresh({
+      store: params.store,
+      limit: body.limit ?? 150
+    });
     return stats;
   });
 

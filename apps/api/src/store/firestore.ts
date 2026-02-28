@@ -38,17 +38,53 @@ function parseIsoToDate(value: string | undefined | null) {
   return new Date(`${base}.${ms}Z`);
 }
 
+function mergeReachabilityIntoRagmap(
+  ragmap: RagmapEnrichment | null,
+  reachability: any
+): RagmapEnrichment | null {
+  if (!reachability || typeof reachability !== 'object') return ragmap;
+  const base = ragmap ?? ({ categories: [], ragScore: 0, reasons: [], keywords: [] } as RagmapEnrichment);
+  const checkedAt = typeof reachability.lastCheckedAt === 'string' ? reachability.lastCheckedAt : undefined;
+  return {
+    ...base,
+    ...(typeof base.reachable === 'boolean' ? {} : { reachable: Boolean(reachability.ok) }),
+    ...(base.lastReachableAt ? {} : checkedAt ? { lastReachableAt: checkedAt } : {}),
+    ...(checkedAt ? { reachableCheckedAt: checkedAt } : {})
+  } as RagmapEnrichment;
+}
+
+function normalizeLatestRagmap(data: any): RagmapEnrichment | null {
+  const base = data?.latestRagmap && typeof data.latestRagmap === 'object'
+    ? (data.latestRagmap as RagmapEnrichment)
+    : null;
+  const dottedReachable = data?.['latestRagmap.reachable'];
+  const dottedCheckedAt = data?.['latestRagmap.reachableCheckedAt'];
+  const dottedStatus = data?.['latestRagmap.reachableStatus'];
+  const dottedMethod = data?.['latestRagmap.reachableMethod'];
+
+  const hasDottedFallback =
+    dottedReachable !== undefined ||
+    dottedCheckedAt !== undefined ||
+    dottedStatus !== undefined ||
+    dottedMethod !== undefined;
+
+  if (!hasDottedFallback) {
+    return mergeReachabilityIntoRagmap(base, data?.reachability);
+  }
+
+  const merged = {
+    ...(base ?? { categories: [], ragScore: 0, reasons: [], keywords: [] }),
+    ...(typeof dottedReachable === 'boolean' ? { reachable: dottedReachable } : {}),
+    ...(typeof dottedCheckedAt === 'string' ? { reachableCheckedAt: dottedCheckedAt, lastReachableAt: dottedCheckedAt } : {}),
+    ...(typeof dottedStatus === 'number' ? { reachableStatus: dottedStatus } : {}),
+    ...(dottedMethod === 'HEAD' || dottedMethod === 'GET' ? { reachableMethod: dottedMethod } : {})
+  } as RagmapEnrichment;
+
+  return mergeReachabilityIntoRagmap(merged, data?.reachability);
+}
+
 function buildEntry(doc: any): RegistryServerEntry {
-  const ragmap = doc.ragmap ?? null;
-  const reachability = doc.reachability;
-  const ragmapWithReach =
-    ragmap && reachability !== undefined
-      ? {
-          ...ragmap,
-          reachable: reachability?.ok ?? false,
-          lastReachableAt: reachability?.lastCheckedAt
-        }
-      : ragmap;
+  const ragmapWithReach = mergeReachabilityIntoRagmap(doc.ragmap ?? null, doc.reachability);
   return {
     server: doc.server as any,
     _meta: buildMeta({
@@ -265,7 +301,7 @@ export class FirestoreStore implements RegistryStore {
           server: latestServer,
           official: data.latestOfficial ?? null,
           publisherProvided: data.latestPublisherProvided ?? null,
-          ragmap: data.latestRagmap ?? null,
+          ragmap: normalizeLatestRagmap(data),
           reachability: data.reachability
         });
         results.push(entry);
@@ -316,7 +352,7 @@ export class FirestoreStore implements RegistryStore {
         server: data.latestServer,
         official: data.latestOfficial ?? null,
         publisherProvided: data.latestPublisherProvided ?? null,
-        ragmap: data.latestRagmap ?? null,
+        ragmap: normalizeLatestRagmap(data),
         reachability: data.reachability
       });
     }
@@ -385,12 +421,12 @@ export class FirestoreStore implements RegistryStore {
           server: data.latestServer,
           official: data.latestOfficial ?? null,
           publisherProvided: data.latestPublisherProvided ?? null,
-          ragmap: data.latestRagmap ?? null,
+          ragmap: normalizeLatestRagmap(data),
           reachability: data.reachability
         });
         items.push({
           entry,
-          enrichment: data.latestRagmap ?? null,
+          enrichment: normalizeLatestRagmap(data),
           searchText: buildSearchText(data.latestServer)
         });
       }
@@ -438,13 +474,26 @@ export class FirestoreStore implements RegistryStore {
     };
   }
 
-  async setReachability(serverName: string, ok: boolean, lastCheckedAt: Date): Promise<void> {
+  async setReachability(
+    serverName: string,
+    ok: boolean,
+    lastCheckedAt: Date,
+    details?: { status?: number; method?: 'HEAD' | 'GET' }
+  ): Promise<void> {
     const serverId = encodeServerId(serverName);
+    const checkedAtIso = lastCheckedAt.toISOString();
     await this.serversCol().doc(serverId).set(
       {
         reachability: {
           ok,
-          lastCheckedAt: lastCheckedAt.toISOString()
+          lastCheckedAt: checkedAtIso
+        },
+        latestRagmap: {
+          reachable: ok,
+          lastReachableAt: checkedAtIso,
+          reachableCheckedAt: checkedAtIso,
+          reachableStatus: details?.status ?? null,
+          reachableMethod: details?.method ?? null
         }
       },
       { merge: true }
