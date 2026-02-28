@@ -203,6 +203,9 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
       reachabilityChecked += 1;
       await sleep(REACHABILITY_DELAY_MS);
     }
+    if (params.store.setLastReachabilityRunAt) {
+      await params.store.setLastReachabilityRunAt(new Date());
+    }
   }
 
   const finishedAt = new Date();

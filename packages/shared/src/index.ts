@@ -3,6 +3,8 @@ import { z } from 'zod';
 export const META_OFFICIAL_KEY = 'io.modelcontextprotocol.registry/official';
 export const META_PUBLISHER_KEY = 'io.modelcontextprotocol.registry/publisher-provided';
 export const META_RAGMAP_KEY = 'io.github.khalidsaidi/ragmap';
+export const ServerKindSchema = z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']);
+export type ServerKind = z.infer<typeof ServerKindSchema>;
 
 export const OfficialMetaSchema = z
   .object({
@@ -60,6 +62,7 @@ export const RagmapEnrichmentSchema = z
     hasRemote: z.boolean().optional(),
     citations: z.boolean().optional(),
     localOnly: z.boolean().optional(),
+    serverKind: ServerKindSchema.optional(),
     reachable: z.boolean().optional(),
     lastReachableAt: z.string().optional(),
     embedding: z
@@ -85,7 +88,8 @@ export const RagFiltersSchema = z
     hasRemote: z.boolean().optional(),
     reachable: z.boolean().optional(),
     citations: z.boolean().optional(),
-    localOnly: z.boolean().optional()
+    localOnly: z.boolean().optional(),
+    serverKind: ServerKindSchema.optional()
   })
   .passthrough();
 

@@ -1,6 +1,6 @@
 import { buildSearchText } from '../rag/enrich.js';
 import type { RagFilters, RagmapEnrichment, RegistryServerEntry, RegistryServer } from '@ragmap/shared';
-import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
+import { ragSearchKeyword, ragSearchSemantic, ragSearchTop, type RagSearchItem } from '../rag/search.js';
 import { buildMeta, type AgentPayloadEvent, type AgentPayloadEventInput, type IngestMode, type RegistryStore, type UsageEvent, type UsageSummary } from './types.js';
 
 type VersionRow = {
@@ -54,6 +54,7 @@ export class InMemoryStore implements RegistryStore {
   kind = 'inmemory' as const;
   private servers = new Map<string, ServerRow>();
   private lastIngestAt: Date | null = null;
+  private lastReachabilityRunAt: Date | null = null;
   private usageEvents: UsageEvent[] = [];
   private agentPayloadEvents: AgentPayloadEventInput[] = [];
 
@@ -72,6 +73,14 @@ export class InMemoryStore implements RegistryStore {
 
   async setLastSuccessfulIngestAt(at: Date) {
     this.lastIngestAt = at;
+  }
+
+  async getLastReachabilityRunAt() {
+    return this.lastReachabilityRunAt;
+  }
+
+  async setLastReachabilityRunAt(at: Date) {
+    this.lastReachabilityRunAt = at;
   }
 
   async markServerSeen(runId: string, name: string, at: Date) {
@@ -241,6 +250,11 @@ export class InMemoryStore implements RegistryStore {
       if (merged.length >= params.limit) break;
     }
     return merged.slice(0, params.limit);
+  }
+
+  async searchRagTop(params: { limit: number; filters?: RagFilters }) {
+    const items = this.buildSearchItems(params.filters);
+    return ragSearchTop(items, params.limit, params.filters);
   }
 
   async getRagExplain(name: string) {

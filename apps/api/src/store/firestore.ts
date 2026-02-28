@@ -2,7 +2,7 @@ import { Firestore, Timestamp } from '@google-cloud/firestore';
 import type { RagFilters, RagmapEnrichment, RegistryServer, RegistryServerEntry } from '@ragmap/shared';
 import { META_RAGMAP_KEY } from '@ragmap/shared';
 import { buildSearchText } from '../rag/enrich.js';
-import { ragSearchKeyword, ragSearchSemantic, type RagSearchItem } from '../rag/search.js';
+import { ragSearchKeyword, ragSearchSemantic, ragSearchTop, type RagSearchItem } from '../rag/search.js';
 import type { Env } from '../env.js';
 import { buildMeta } from './types.js';
 import type {
@@ -166,6 +166,20 @@ export class FirestoreStore implements RegistryStore {
 
   async setLastSuccessfulIngestAt(at: Date) {
     await this.metaDoc().set({ lastSuccessfulIngestAt: Timestamp.fromDate(at) }, { merge: true });
+  }
+
+  async getLastReachabilityRunAt() {
+    const snap = await this.metaDoc().get();
+    const data = snap.data() as any;
+    const ts = data?.lastReachabilityRunAt;
+    if (!ts) return null;
+    if (ts instanceof Timestamp) return ts.toDate();
+    if (typeof ts === 'string') return parseIsoToDate(ts);
+    return null;
+  }
+
+  async setLastReachabilityRunAt(at: Date) {
+    await this.metaDoc().set({ lastReachabilityRunAt: Timestamp.fromDate(at) }, { merge: true });
   }
 
   async markServerSeen(runId: string, name: string, at: Date) {
@@ -458,6 +472,11 @@ export class FirestoreStore implements RegistryStore {
       if (merged.length >= params.limit) break;
     }
     return merged.slice(0, params.limit);
+  }
+
+  async searchRagTop(params: { limit: number; filters?: RagFilters }): Promise<RagSearchResult> {
+    const items = await this.loadSearchItems(params.filters);
+    return ragSearchTop(items, params.limit, params.filters);
   }
 
   async getRagExplain(name: string): Promise<RagExplain | null> {

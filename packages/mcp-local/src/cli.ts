@@ -40,10 +40,11 @@ server.registerTool(
       reachable: z.boolean().optional(),
       citations: z.boolean().optional(),
       localOnly: z.boolean().optional(),
+      serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional(),
       limit: z.number().int().min(1).max(50).optional()
     }
   },
-  async ({ query, categories, minScore, transport, registryType, hasRemote, reachable, citations, localOnly, limit }) => {
+  async ({ query, categories, minScore, transport, registryType, hasRemote, reachable, citations, localOnly, serverKind, limit }) => {
     const response = await apiGet('/rag/search', {
       q: query ?? 'rag',
       limit: String(limit ?? 10),
@@ -54,7 +55,39 @@ server.registerTool(
       ...(hasRemote !== undefined ? { hasRemote: String(hasRemote) } : {}),
       ...(reachable !== undefined ? { reachable: String(reachable) } : {}),
       ...(citations !== undefined ? { citations: String(citations) } : {}),
-      ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {})
+      ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {}),
+      ...(serverKind ? { serverKind } : {})
+    });
+    if (!response.ok) return { content: [{ type: 'text', text: JSON.stringify({ results: [] }) }] };
+    const data = (await response.json()) as any;
+    return { content: [{ type: 'text', text: JSON.stringify(data) }] };
+  }
+);
+
+server.registerTool(
+  'rag_top_servers',
+  {
+    title: 'Top recommended servers',
+    description: 'Get top recommended retriever MCP servers with smart defaults.',
+    inputSchema: {
+      categories: z.array(z.string()).optional(),
+      minScore: z.number().int().min(0).max(100).optional(),
+      hasRemote: z.boolean().optional(),
+      reachable: z.boolean().optional(),
+      localOnly: z.boolean().optional(),
+      serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional(),
+      limit: z.number().int().min(1).max(50).optional()
+    }
+  },
+  async ({ categories, minScore, hasRemote, reachable, localOnly, serverKind, limit }) => {
+    const response = await apiGet('/rag/top', {
+      limit: String(limit ?? 25),
+      ...(categories && categories.length ? { categories: categories.join(',') } : {}),
+      ...(minScore != null ? { minScore: String(minScore) } : {}),
+      ...(hasRemote !== undefined ? { hasRemote: String(hasRemote) } : {}),
+      ...(reachable !== undefined ? { reachable: String(reachable) } : {}),
+      ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {}),
+      ...(serverKind ? { serverKind } : {})
     });
     if (!response.ok) return { content: [{ type: 'text', text: JSON.stringify({ results: [] }) }] };
     const data = (await response.json()) as any;
@@ -101,6 +134,21 @@ server.registerTool(
   },
   async ({ name }) => {
     const response = await apiGet(`/rag/servers/${encodeURIComponent(name)}/explain`);
+    if (!response.ok) return { isError: true, content: [{ type: 'text', text: JSON.stringify({ error: 'Not found' }) }] };
+    const data = (await response.json()) as any;
+    return { content: [{ type: 'text', text: JSON.stringify(data) }] };
+  }
+);
+
+server.registerTool(
+  'rag_get_install_config',
+  {
+    title: 'Get install config',
+    description: 'Get copy-ready Claude Desktop and generic MCP host config for a server.',
+    inputSchema: { name: z.string().min(1) }
+  },
+  async ({ name }) => {
+    const response = await apiGet('/rag/install', { name });
     if (!response.ok) return { isError: true, content: [{ type: 'text', text: JSON.stringify({ error: 'Not found' }) }] };
     const data = (await response.json()) as any;
     return { content: [{ type: 'text', text: JSON.stringify(data) }] };

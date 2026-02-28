@@ -119,6 +119,8 @@ export interface RegistryStore {
   beginIngestRun(mode: IngestMode): Promise<{ runId: string; startedAt: Date }>;
   getLastSuccessfulIngestAt(): Promise<Date | null>;
   setLastSuccessfulIngestAt(at: Date): Promise<void>;
+  getLastReachabilityRunAt?(): Promise<Date | null>;
+  setLastReachabilityRunAt?(at: Date): Promise<void>;
   markServerSeen(runId: string, name: string, at: Date): Promise<void>;
   upsertServerVersion(input: {
     runId: string;
@@ -137,6 +139,7 @@ export interface RegistryStore {
 
   listCategories(): Promise<string[]>;
   searchRag(params: RagSearchParams): Promise<RagSearchResult>;
+  searchRagTop(params: { limit: number; filters?: RagFilters }): Promise<RagSearchResult>;
   getRagExplain(name: string): Promise<RagExplain | null>;
 
   setReachability?(

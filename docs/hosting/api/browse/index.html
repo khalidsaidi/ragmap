@@ -58,6 +58,8 @@
       .top-cta strong { display: block; margin-bottom: 6px; }
       .top-cta button { margin-top: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: white; cursor: pointer; font-size: 12px; }
       .top-cta button:hover { opacity: 0.92; }
+      .stats { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+      .stats b { color: var(--ink); }
       footer { font-size: 12px; color: var(--muted); margin-top: 24px; }
       @keyframes fadeOut { to { opacity: 0; } }
     </style>
@@ -81,29 +83,33 @@
         <button type="button" id="copy-ragmap-npx">Copy npx command</button></div>
       </div>
 
+      <div class="stats" id="stats">Loading stats…</div>
+
       <div class="filters">
-        <input type="search" id="q" placeholder="Search by meaning or keywords…" value="rag" />
-        <label><input type="checkbox" id="hasRemote" /> Remote only</label>
-        <label><input type="checkbox" id="reachable" /> Reachable only</label>
-        <label><input type="checkbox" id="citations" /> Citations</label>
-        <label><input type="checkbox" id="localOnly" /> Local only</label>
-        <label>Min score <input type="number" id="minScore" min="0" max="100" value="" placeholder="0" style="width:56px" /></label>
+        <input type="search" id="q" placeholder="Optional search query (leave empty for Top picks)" value="" />
+        <label><input type="checkbox" id="hasRemote" /> Remote</label>
+        <label><input type="checkbox" id="reachable" /> Reachable</label>
+        <label><input type="checkbox" id="localOnly" /> Local-only</label>
+        <label><input type="checkbox" id="retrievers" checked /> Retrievers</label>
+        <label>Min score <input type="number" id="minScore" min="0" max="100" value="" placeholder="10" style="width:56px" /></label>
         <button type="button" id="go">Search</button>
       </div>
 
       <div id="results"></div>
-      <footer>Fetched from <code>/rag/search</code>. Semantic + keyword when embeddings are on.</footer>
+      <footer>Defaults to <code>/rag/top</code> when query is empty; uses <code>/rag/search</code> when query is provided.</footer>
     </main>
     <script>
       const API = '';
       function buildUrl() {
-        const u = new URL(API + '/rag/search', window.location.origin);
-        u.searchParams.set('q', document.getElementById('q').value.trim() || 'rag');
+        const query = document.getElementById('q').value.trim();
+        const endpoint = query ? '/rag/search' : '/rag/top';
+        const u = new URL(API + endpoint, window.location.origin);
+        if (query) u.searchParams.set('q', query);
         u.searchParams.set('limit', '24');
         if (document.getElementById('hasRemote').checked) u.searchParams.set('hasRemote', 'true');
         if (document.getElementById('reachable').checked) u.searchParams.set('reachable', 'true');
-        if (document.getElementById('citations').checked) u.searchParams.set('citations', 'true');
         if (document.getElementById('localOnly').checked) u.searchParams.set('localOnly', 'true');
+        if (document.getElementById('retrievers').checked) u.searchParams.set('serverKind', 'retriever');
         const min = document.getElementById('minScore').value.trim();
         if (min !== '') u.searchParams.set('minScore', min);
         return u.toString();
@@ -170,6 +176,7 @@
           const install = installLine(r.server);
           let actions = '<button type="button" class="copy-name primary" data-idx="' + i + '">Copy name</button>';
           if (install) actions += ' <button type="button" class="copy-install" data-idx="' + i + '">Copy install</button>';
+          actions += ' <button type="button" class="copy-config" data-idx="' + i + '">Copy config</button>';
           const badges = [];
           if (r.hasRemote) badges.push('<span class="remote">remote</span>');
           if (r.reachable) badges.push('<span class="reachable">reachable</span>');
@@ -188,6 +195,31 @@
         }).join('');
         el.querySelectorAll('.copy-name').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; if (r) copyText(r.name || '', 'Name copied'); }));
         el.querySelectorAll('.copy-install').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; const line = r && installLine(r.server); if (line) copyText(line, 'Install copied'); }));
+        el.querySelectorAll('.copy-config').forEach(b => b.addEventListener('click', () => {
+          const r = lastResults[parseInt(b.dataset.idx, 10)];
+          if (!r || !r.name) return;
+          fetch('/rag/install?name=' + encodeURIComponent(r.name), { headers: { accept: 'application/json' } })
+            .then(res => res.ok ? res.json() : Promise.reject(new Error('install config unavailable')))
+            .then(data => {
+              const text = (data && data.genericMcpHostConfig && data.genericMcpHostConfig.json) || '';
+              if (!text) throw new Error('install config unavailable');
+              copyText(text, 'Config copied');
+            })
+            .catch(() => showCopied('Config unavailable'));
+        }));
+      }
+      function loadStats() {
+        fetch('/rag/stats', { headers: { accept: 'application/json' } })
+          .then(res => res.ok ? res.json() : Promise.reject(new Error('stats unavailable')))
+          .then(data => {
+            const el = document.getElementById('stats');
+            el.innerHTML = '<span>Total <b>' + (data.totalLatestServers ?? 0) + '</b></span>' +
+              '<span>RAG>=1 <b>' + (data.countRagScoreGte1 ?? 0) + '</b></span>' +
+              '<span>RAG>=25 <b>' + (data.countRagScoreGte25 ?? 0) + '</b></span>' +
+              '<span>Ingest <b>' + (data.lastSuccessfulIngestAt ? data.lastSuccessfulIngestAt.slice(0,19).replace("T"," ") + 'Z' : 'n/a') + '</b></span>' +
+              '<span>Reachability <b>' + (data.lastReachabilityRunAt ? data.lastReachabilityRunAt.slice(0,19).replace("T"," ") + 'Z' : 'n/a') + '</b></span>';
+          })
+          .catch(() => { document.getElementById('stats').textContent = 'Stats unavailable'; });
       }
       function run() {
         document.getElementById('results').innerHTML = '<div class="empty">Loading…</div>';
@@ -198,6 +230,7 @@
       }
       document.getElementById('go').onclick = run;
       document.getElementById('q').onkeydown = e => { if (e.key === 'Enter') run(); };
+      loadStats();
       run();
     </script>
   </body>
