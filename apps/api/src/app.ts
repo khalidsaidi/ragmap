@@ -1383,6 +1383,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const body = parse(ReachabilityRunBodySchema, (request as any).body ?? {}, reply);
     if (!body) return;
     const stats = await runReachabilityRefresh({
+      env: params.env,
       store: params.store,
       limit: body.limit ?? 150
     });

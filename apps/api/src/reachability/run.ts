@@ -6,6 +6,7 @@ import {
   REACHABILITY_TIMEOUT_MS,
   shuffleInPlace
 } from '../ingest/ingest.js';
+import type { Env } from '../env.js';
 import type { RegistryStore } from '../store/types.js';
 
 function sleep(ms: number): Promise<void> {
@@ -23,6 +24,7 @@ export type ReachabilityRunStats = {
 };
 
 export async function runReachabilityRefresh(params: {
+  env: Pick<Env, 'reachabilityPolicy'>;
   store: RegistryStore;
   limit?: number;
 }): Promise<ReachabilityRunStats> {
@@ -59,7 +61,11 @@ export async function runReachabilityRefresh(params: {
   let checked = 0;
   let reachable = 0;
   for (const item of selected) {
-    const probe = await probeReachable(item.url, REACHABILITY_TIMEOUT_MS);
+    const probe = await probeReachable(
+      item.url,
+      REACHABILITY_TIMEOUT_MS,
+      params.env.reachabilityPolicy
+    );
     if (probe.ok) reachable += 1;
     await params.store.setReachability(item.name, probe.ok, new Date(), {
       status: probe.status,

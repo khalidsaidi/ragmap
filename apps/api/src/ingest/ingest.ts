@@ -1,4 +1,4 @@
-import type { Env } from '../env.js';
+import type { Env, ReachabilityPolicy } from '../env.js';
 import { embedText } from '../rag/embedding.js';
 import { buildSearchText, enrichRag } from '../rag/enrich.js';
 import { fetchUpstreamPage } from './upstream.js';
@@ -36,7 +36,10 @@ export type ReachabilityProbeResult = {
   method?: 'HEAD' | 'GET';
 };
 
-function isReachableStatus(status: number): boolean {
+export function isReachableStatus(status: number, policy: ReachabilityPolicy): boolean {
+  if (policy === 'loose') {
+    return status < 500 && status !== 404 && status !== 410;
+  }
   if (status >= 200 && status <= 399) return true;
   if (status === 401 || status === 403 || status === 405 || status === 429) return true;
   if (status === 404 || status === 410) return false;
@@ -65,19 +68,23 @@ async function requestStatus(
   }
 }
 
-export async function probeReachable(url: string, timeoutMs: number): Promise<ReachabilityProbeResult> {
+export async function probeReachable(
+  url: string,
+  timeoutMs: number,
+  policy: ReachabilityPolicy
+): Promise<ReachabilityProbeResult> {
   const head = await requestStatus(url, 'HEAD', timeoutMs);
   if (!head.threw && head.status != null && head.status !== 405) {
-    return { ok: isReachableStatus(head.status), status: head.status, method: 'HEAD' };
+    return { ok: isReachableStatus(head.status, policy), status: head.status, method: 'HEAD' };
   }
 
   const get = await requestStatus(url, 'GET', timeoutMs);
   if (!get.threw && get.status != null) {
-    return { ok: isReachableStatus(get.status), status: get.status, method: 'GET' };
+    return { ok: isReachableStatus(get.status, policy), status: get.status, method: 'GET' };
   }
 
   if (!head.threw && head.status != null) {
-    return { ok: isReachableStatus(head.status), status: head.status, method: 'HEAD' };
+    return { ok: isReachableStatus(head.status, policy), status: head.status, method: 'HEAD' };
   }
 
   return { ok: false };
@@ -195,7 +202,11 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
     } while (cursor);
     shuffleInPlace(toCheck);
     for (const { name, url } of toCheck.slice(0, REACHABILITY_MAX_PER_RUN)) {
-      const probe = await probeReachable(url, REACHABILITY_TIMEOUT_MS);
+      const probe = await probeReachable(
+        url,
+        REACHABILITY_TIMEOUT_MS,
+        params.env.reachabilityPolicy
+      );
       await params.store.setReachability(name, probe.ok, new Date(), {
         status: probe.status,
         method: probe.method

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import { buildApp } from '../src/app.js';
 import type { Env } from '../src/env.js';
+import { isReachableStatus } from '../src/ingest/ingest.js';
 import { InMemoryStore } from '../src/store/inmemory.js';
 
 const env: Env = {
@@ -20,6 +21,7 @@ const env: Env = {
   registryBaseUrl: 'https://registry.modelcontextprotocol.io',
   ingestToken: 'test-token',
   ingestPageLimit: 2,
+  reachabilityPolicy: 'strict',
   captureAgentPayloads: false,
   agentPayloadTtlHours: 24,
   agentPayloadMaxEvents: 1000,
@@ -35,6 +37,25 @@ function basicAuthHeader(user: string, pass: string) {
   const encoded = Buffer.from(`${user}:${pass}`, 'utf8').toString('base64');
   return `Basic ${encoded}`;
 }
+
+test('isReachableStatus supports strict and loose policies', () => {
+  assert.equal(isReachableStatus(200, 'strict'), true);
+  assert.equal(isReachableStatus(302, 'strict'), true);
+  assert.equal(isReachableStatus(401, 'strict'), true);
+  assert.equal(isReachableStatus(403, 'strict'), true);
+  assert.equal(isReachableStatus(405, 'strict'), true);
+  assert.equal(isReachableStatus(429, 'strict'), true);
+  assert.equal(isReachableStatus(404, 'strict'), false);
+  assert.equal(isReachableStatus(410, 'strict'), false);
+  assert.equal(isReachableStatus(500, 'strict'), false);
+
+  assert.equal(isReachableStatus(400, 'loose'), true);
+  assert.equal(isReachableStatus(422, 'loose'), true);
+  assert.equal(isReachableStatus(429, 'loose'), true);
+  assert.equal(isReachableStatus(404, 'loose'), false);
+  assert.equal(isReachableStatus(410, 'loose'), false);
+  assert.equal(isReachableStatus(500, 'loose'), false);
+});
 
 test('health endpoint', async () => {
   const store = new InMemoryStore();
@@ -305,6 +326,79 @@ test('internal reachability run marks 401 endpoints reachable and searchable', a
   assert.equal(body.results[0].reachable, true);
 
   await app.close();
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
+});
+
+test('internal reachability run respects strict vs loose policy', async () => {
+  const upstream = http.createServer((req, res) => {
+    if (req.url === '/mcp') {
+      res.statusCode = 422;
+      res.end('unprocessable');
+      return;
+    }
+    res.statusCode = 404;
+    res.end('not found');
+  });
+  await new Promise<void>((resolve, reject) =>
+    upstream.listen(0, '127.0.0.1', (err?: Error) => (err ? reject(err) : resolve()))
+  );
+  const address = upstream.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  const remoteUrl = `http://127.0.0.1:${port}/mcp`;
+
+  async function runForPolicy(policy: Env['reachabilityPolicy'], expectedReachable: boolean) {
+    const store = new InMemoryStore();
+    await store.upsertServerVersion({
+      runId: 'run_test',
+      at: new Date(),
+      server: {
+        name: `example/reachability-422-${policy}`,
+        version: '0.1.0',
+        description: 'rag remote endpoint',
+        remotes: [{ type: 'streamable-http', url: remoteUrl }]
+      },
+      official: {
+        isLatest: true,
+        updatedAt: new Date().toISOString(),
+        publishedAt: new Date().toISOString()
+      },
+      ragmap: { categories: ['rag'], ragScore: 60, reasons: ['test'], keywords: ['rag'] },
+      hidden: false
+    });
+
+    const app = await buildApp({
+      env: { ...env, reachabilityPolicy: policy },
+      store
+    });
+
+    const run = await app.inject({
+      method: 'POST',
+      url: '/internal/reachability/run',
+      headers: {
+        'content-type': 'application/json',
+        'x-ingest-token': env.ingestToken
+      },
+      payload: { limit: 1 }
+    });
+    assert.equal(run.statusCode, 200);
+    const stats = run.json() as any;
+    assert.equal(stats.checked, 1);
+    assert.equal(stats.reachable, expectedReachable ? 1 : 0);
+
+    const reachableOnly = await app.inject({
+      method: 'GET',
+      url: '/rag/search?q=rag&hasRemote=true&reachable=true&limit=5'
+    });
+    assert.equal(reachableOnly.statusCode, 200);
+    const body = reachableOnly.json() as any;
+    assert.equal(body.metadata.count, expectedReachable ? 1 : 0);
+
+    await app.close();
+  }
+
+  await runForPolicy('strict', false);
+  await runForPolicy('loose', true);
+
   await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
 });
 
