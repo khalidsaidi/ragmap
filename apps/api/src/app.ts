@@ -59,6 +59,39 @@ function parseBoolish(value: unknown) {
   return false;
 }
 
+function parseOptionalBoolish(value: unknown): boolean | undefined {
+  if (value == null || value === '') return undefined;
+  if (value === true || value === 1 || value === '1') return true;
+  if (value === false || value === 0 || value === '0') return false;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return undefined;
+}
+
+function inferHasRemoteFromServer(server: any) {
+  const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+  for (const remote of remotes) {
+    if (typeof remote?.url === 'string' && remote.url) return true;
+  }
+
+  const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+  for (const pkg of packages) {
+    const t = pkg?.transport;
+    if (!t || typeof t !== 'object') continue;
+    if (t.type !== 'streamable-http') continue;
+    const hasUrl =
+      (typeof t.url === 'string' && t.url) ||
+      (typeof t.endpoint === 'string' && t.endpoint) ||
+      (typeof pkg?.url === 'string' && pkg.url);
+    if (hasUrl) return true;
+  }
+
+  return false;
+}
+
 function getDiscoveryRedirectTarget(rawUrl: string) {
   let parsed: URL;
   try {

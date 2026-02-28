@@ -99,7 +99,6 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   }
   if (filters.transport) {
     const need = filters.transport;
-    const server: any = item.entry.server as any;
     const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
     const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
 
@@ -123,7 +122,6 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   }
   if (filters.registryType) {
     const need = filters.registryType.toLowerCase();
-    const server: any = item.entry.server as any;
     const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
     let ok = false;
     for (const pkg of packages) {

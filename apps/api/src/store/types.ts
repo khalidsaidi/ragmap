@@ -2,6 +2,7 @@ import type { OfficialMeta, RagFilters, RagmapEnrichment, RegistryServerEntry } 
 import { META_OFFICIAL_KEY, META_PUBLISHER_KEY, META_RAGMAP_KEY } from '@ragmap/shared';
 
 export type IngestMode = 'full' | 'incremental';
+export type ReachabilityMethod = 'HEAD' | 'GET';
 
 export function buildMeta(params: {
   official: OfficialMeta | null;
@@ -119,6 +120,12 @@ export interface RegistryStore {
   beginIngestRun(mode: IngestMode): Promise<{ runId: string; startedAt: Date }>;
   getLastSuccessfulIngestAt(): Promise<Date | null>;
   setLastSuccessfulIngestAt(at: Date): Promise<void>;
+  setReachability(
+    serverName: string,
+    ok: boolean,
+    checkedAt: Date,
+    details?: { status?: number; method?: ReachabilityMethod }
+  ): Promise<void>;
   markServerSeen(runId: string, name: string, at: Date): Promise<void>;
   upsertServerVersion(input: {
     runId: string;

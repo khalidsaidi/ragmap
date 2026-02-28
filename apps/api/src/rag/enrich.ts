@@ -5,6 +5,60 @@ function uniq(values: string[]) {
   return Array.from(new Set(values));
 }
 
+function toHttpUrl(value: unknown) {
+  if (typeof value !== 'string' || !value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function listStreamableHttpUrls(server: RegistryServer) {
+  const urls = new Set<string>();
+
+  const remotes = (server as any)?.remotes;
+  if (Array.isArray(remotes)) {
+    for (const remote of remotes) {
+      if (!remote || typeof remote !== 'object') continue;
+      if ((remote as any).type !== 'streamable-http') continue;
+      const url = toHttpUrl((remote as any).url);
+      if (url) urls.add(url);
+    }
+  }
+
+  const packages = (server as any)?.packages;
+  if (Array.isArray(packages)) {
+    for (const pkg of packages) {
+      if (!pkg || typeof pkg !== 'object') continue;
+      const transport = (pkg as any)?.transport;
+      if (!transport || typeof transport !== 'object') continue;
+      if ((transport as any).type !== 'streamable-http') continue;
+      const url = toHttpUrl((transport as any).url ?? (transport as any).endpoint ?? (pkg as any).url);
+      if (url) urls.add(url);
+    }
+  }
+
+  return Array.from(urls);
+}
+
+export function inferHasRemote(server: RegistryServer) {
+  const remotes = (server as any)?.remotes;
+  if (Array.isArray(remotes)) {
+    for (const remote of remotes) {
+      if (!remote || typeof remote !== 'object') continue;
+      if (typeof (remote as any).url === 'string' && (remote as any).url) return true;
+    }
+  }
+  return listStreamableHttpUrls(server).length > 0;
+}
+
+export function inferCitations(text: string) {
+  return /\bcitation(s)?\b|\bprovenance\b|\bsources?\b/i.test(text);
+}
+
 export function buildSearchText(server: RegistryServer) {
   const parts: string[] = [];
   parts.push(server.name ?? '');
@@ -86,6 +140,8 @@ export function enrichRag(server: RegistryServer): RagmapEnrichment {
   const categories: string[] = [];
   const reasons: string[] = [];
   const keywords: string[] = [];
+  const hasRemote = inferHasRemote(server);
+  const citations = inferCitations(text);
 
   let score = 0;
   for (const rule of RULES) {
@@ -114,4 +170,3 @@ export function enrichRag(server: RegistryServer): RagmapEnrichment {
     embeddingTextHash: sha256(text)
   };
 }
-
