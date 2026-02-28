@@ -70,6 +70,27 @@ function parseOptionalBoolish(value: unknown): boolean | undefined {
   return undefined;
 }
 
+function inferHasRemoteFromServer(server: any) {
+  const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+  for (const remote of remotes) {
+    if (typeof remote?.url === 'string' && remote.url) return true;
+  }
+
+  const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+  for (const pkg of packages) {
+    const t = pkg?.transport;
+    if (!t || typeof t !== 'object') continue;
+    if (t.type !== 'streamable-http') continue;
+    const hasUrl =
+      (typeof t.url === 'string' && t.url) ||
+      (typeof t.endpoint === 'string' && t.endpoint) ||
+      (typeof pkg?.url === 'string' && pkg.url);
+    if (hasUrl) return true;
+  }
+
+  return false;
+}
+
 function getDiscoveryRedirectTarget(rawUrl: string) {
   let parsed: URL;
   try {
@@ -1000,9 +1021,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       query: q,
       results: results.map((hit) => {
         const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
-        const hasRemoteOut = ragmap.hasRemote === true;
+        const hasRemoteOut =
+          typeof ragmap.hasRemote === 'boolean' ? ragmap.hasRemote : inferHasRemoteFromServer(hit.entry.server as any);
         const reachableOut = ragmap.reachable === true;
         const citationsOut = ragmap.citations === true;
+        const localOnlyOut = typeof ragmap.localOnly === 'boolean' ? ragmap.localOnly : !hasRemoteOut;
         return {
           name: hit.entry.server.name,
           version: hit.entry.server.version,
@@ -1012,7 +1035,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           ragScore: ragmap.ragScore ?? 0,
           hasRemote: hasRemoteOut,
           reachable: reachableOut,
-          localOnly: ragmap.localOnly === true || !hasRemoteOut,
+          localOnly: localOnlyOut,
           citations: citationsOut,
           kind: hit.kind,
           score: hit.score,
