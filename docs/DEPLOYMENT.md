@@ -91,6 +91,9 @@ For repository workflows that call `/internal/*` routes:
 - `API_BASE_URL` must be the Cloud Run service URL (example: `https://ragmap-api-xxxxx-uc.a.run.app`)
 - Do not set `API_BASE_URL` to `https://ragmap-api.web.app` because Hosting does not expose `/internal/*`
 - `INGEST_TOKEN` must match the API's `INGEST_TOKEN` env var
+- `REACHABILITY_POLICY` controls how HTTP probe statuses map to reachable:
+  - `strict` (default): reachable for `200-399`, `401`, `403`, `405`, `429`; unreachable for `404`, `410`, `5xx`, and network/timeout errors.
+  - `loose`: reachable for any status `<500` except `404` and `410`; still unreachable on network/timeout errors.
 
 This applies to both scheduled ingest (`/internal/ingest/run`) and scheduled reachability refresh (`/internal/reachability/run`).
 

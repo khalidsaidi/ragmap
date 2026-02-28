@@ -20,6 +20,7 @@ export type Env = {
   registryBaseUrl: string;
   ingestToken: string;
   ingestPageLimit: number;
+  reachabilityPolicy: ReachabilityPolicy;
 
   captureAgentPayloads: boolean;
   agentPayloadTtlHours: number;
@@ -33,6 +34,8 @@ export type Env = {
   openaiEmbeddingsModel: string;
 };
 
+export type ReachabilityPolicy = 'strict' | 'loose';
+
 function parseBool(value: string | undefined, fallback: boolean) {
   if (value == null || value === '') return fallback;
   return value.trim().toLowerCase() === 'true';
@@ -42,6 +45,14 @@ function parseIntStrict(value: string | undefined, fallback: number) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.trunc(parsed);
+}
+
+function parseReachabilityPolicy(value: string | undefined): ReachabilityPolicy {
+  const normalized = (value ?? 'strict').trim().toLowerCase();
+  if (normalized === 'strict' || normalized === 'loose') return normalized;
+  throw new Error(
+    `Invalid REACHABILITY_POLICY "${value ?? ''}". Expected one of: strict, loose`
+  );
 }
 
 export function loadEnv(): Env {
@@ -65,6 +76,7 @@ export function loadEnv(): Env {
   const ingestToken = process.env.INGEST_TOKEN ?? '';
   // Upstream registry currently enforces `limit <= 100`.
   const ingestPageLimit = Math.max(1, Math.min(100, parseIntStrict(process.env.INGEST_PAGE_LIMIT, 100)));
+  const reachabilityPolicy = parseReachabilityPolicy(process.env.REACHABILITY_POLICY);
 
   const captureAgentPayloads = parseBool(process.env.CAPTURE_AGENT_PAYLOADS, false);
   const agentPayloadTtlHours = Math.max(0, parseIntStrict(process.env.AGENT_PAYLOAD_TTL_HOURS, 24));
@@ -126,6 +138,7 @@ export function loadEnv(): Env {
     registryBaseUrl,
     ingestToken,
     ingestPageLimit,
+    reachabilityPolicy,
     captureAgentPayloads,
     agentPayloadTtlHours,
     agentPayloadMaxEvents,
