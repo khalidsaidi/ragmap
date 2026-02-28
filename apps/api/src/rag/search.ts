@@ -1,4 +1,4 @@
-import type { RagFilters, RagmapEnrichment, RegistryServerEntry } from '@ragmap/shared';
+import { META_OFFICIAL_KEY, META_RAGMAP_KEY, type RagFilters, type RagmapEnrichment, type RegistryServerEntry, type ServerKind } from '@ragmap/shared';
 
 function tokenize(query: string) {
   return query
@@ -77,6 +77,55 @@ export function inferHasRemoteFromServer(server: any): boolean {
   return false;
 }
 
+export function inferServerKindFromServer(server: any): ServerKind {
+  const text = [server?.name, server?.title, server?.description]
+    .filter((part) => typeof part === 'string' && part)
+    .join(' ');
+  if (/\bevaluate|evaluation|benchmark|dataset|leaderboard|judge\b/i.test(text)) return 'evaluator';
+  if (/\bingest|ingestion|index|indexing|crawl|crawler|scrape|etl|connector\b/i.test(text)) return 'indexer';
+  if (/\brouter|select tool|tool selection|orchestrate|orchestration\b/i.test(text)) return 'router';
+  if (/\bsearch|retrieval|retriever|semantic search|\brag\b|vector search\b/i.test(text)) return 'retriever';
+  return 'other';
+}
+
+function inferServerKind(enrichment: RagmapEnrichment | null | undefined, server: any): ServerKind {
+  const kind = enrichment?.serverKind;
+  if (kind === 'retriever' || kind === 'evaluator' || kind === 'indexer' || kind === 'router' || kind === 'other') {
+    return kind;
+  }
+  return inferServerKindFromServer(server);
+}
+
+function getOfficialUpdatedAtMs(entry: RegistryServerEntry): number {
+  const official = (entry._meta?.[META_OFFICIAL_KEY] as any) ?? {};
+  const updatedAt = official?.updatedAt;
+  if (typeof updatedAt !== 'string' || !updatedAt) return 0;
+  const ts = Date.parse(updatedAt);
+  return Number.isFinite(ts) ? ts : 0;
+}
+
+function getRagmapMeta(entry: RegistryServerEntry): any {
+  return (entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+}
+
+function compareQualitySignals(a: RagSearchHit, b: RagSearchHit): number {
+  const ragA = getRagmapMeta(a.entry);
+  const ragB = getRagmapMeta(b.entry);
+  const reachableA = ragA?.reachable === true ? 1 : 0;
+  const reachableB = ragB?.reachable === true ? 1 : 0;
+  if (reachableA !== reachableB) return reachableB - reachableA;
+
+  const ragScoreA = Number(ragA?.ragScore ?? 0);
+  const ragScoreB = Number(ragB?.ragScore ?? 0);
+  if (ragScoreA !== ragScoreB) return ragScoreB - ragScoreA;
+
+  const updatedAtA = getOfficialUpdatedAtMs(a.entry);
+  const updatedAtB = getOfficialUpdatedAtMs(b.entry);
+  if (updatedAtA !== updatedAtB) return updatedAtB - updatedAtA;
+
+  return a.entry.server.name.localeCompare(b.entry.server.name);
+}
+
 function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (!filters) return true;
   const enrichment: RagmapEnrichment | null | undefined = item.enrichment ?? null;
@@ -86,6 +135,7 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
       : inferHasRemoteFromServer(item.entry.server as any);
   const inferredLocalOnly =
     typeof enrichment?.localOnly === 'boolean' ? enrichment.localOnly : !inferredHasRemote;
+  const inferredServerKind = inferServerKind(enrichment, item.entry.server as any);
 
   if (filters.minScore != null) {
     const score = enrichment?.ragScore ?? 0;
@@ -150,6 +200,9 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (filters.localOnly === true) {
     if (!inferredLocalOnly) return false;
   }
+  if (filters.serverKind) {
+    if (inferredServerKind !== filters.serverKind) return false;
+  }
   return true;
 }
 
@@ -169,7 +222,10 @@ export function ragSearchKeyword(
     if (score <= 0) continue;
     scored.push({ entry: item.entry, kind: 'keyword', score });
   }
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return compareQualitySignals(a, b);
+  });
   return scored.slice(0, limit);
 }
 
@@ -188,6 +244,24 @@ export function ragSearchSemantic(
     if (score <= 0) continue;
     scored.push({ entry: item.entry, kind: 'semantic', score });
   }
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return compareQualitySignals(a, b);
+  });
+  return scored.slice(0, limit);
+}
+
+export function ragSearchTop(
+  items: RagSearchItem[],
+  limit: number,
+  filters?: RagFilters
+): RagSearchHit[] {
+  const scored: RagSearchHit[] = [];
+  for (const item of items) {
+    if (!passesFilters(item, filters)) continue;
+    const score = Number(item.enrichment?.ragScore ?? 0);
+    scored.push({ entry: item.entry, kind: 'keyword', score });
+  }
+  scored.sort(compareQualitySignals);
   return scored.slice(0, limit);
 }

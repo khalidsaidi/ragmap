@@ -70,6 +70,9 @@ export async function runReachabilityRefresh(params: {
   }
 
   const finishedAt = new Date();
+  if (params.store.setLastReachabilityRunAt) {
+    await params.store.setLastReachabilityRunAt(finishedAt);
+  }
   return {
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),

@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import type { RagmapEnrichment, RegistryServer } from '@ragmap/shared';
+import type { RagmapEnrichment, RegistryServer, ServerKind } from '@ragmap/shared';
 
 function uniq(values: string[]) {
   return Array.from(new Set(values));
@@ -81,6 +81,14 @@ function hasRemoteEndpoint(server: RegistryServer): boolean {
   return false;
 }
 
+function classifyServerKind(text: string): ServerKind {
+  if (/\bevaluate|evaluation|benchmark|dataset|leaderboard|judge\b/i.test(text)) return 'evaluator';
+  if (/\bingest|ingestion|index|indexing|crawl|crawler|scrape|etl|connector\b/i.test(text)) return 'indexer';
+  if (/\brouter|select tool|tool selection|orchestrate|orchestration\b/i.test(text)) return 'router';
+  if (/\bsearch|retrieval|retriever|semantic search|\brag\b|vector search\b/i.test(text)) return 'retriever';
+  return 'other';
+}
+
 export function enrichRag(server: RegistryServer): RagmapEnrichment {
   const text = buildSearchText(server);
   const categories: string[] = [];
@@ -103,6 +111,7 @@ export function enrichRag(server: RegistryServer): RagmapEnrichment {
   const capped = Math.max(0, Math.min(100, score));
   const hasRemote = hasRemoteEndpoint(server);
   const citationsMatch = /\bcitation(s)?\b|cite(s|d)?\s+(source|reference)|source\s+attribution|grounding\b|provenance\b/i.test(text);
+  const serverKind = classifyServerKind(text);
   return {
     categories: uniq(categories),
     ragScore: capped,
@@ -110,8 +119,8 @@ export function enrichRag(server: RegistryServer): RagmapEnrichment {
     keywords: uniq(keywords).slice(0, 24),
     hasRemote,
     localOnly: !hasRemote,
+    serverKind,
     citations: citationsMatch,
     embeddingTextHash: sha256(text)
   };
 }
-

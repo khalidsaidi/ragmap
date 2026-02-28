@@ -338,3 +338,94 @@ test('rag search hasRemote response flag matches hasRemote filter even without e
 
   await app.close();
 });
+
+test('rag top returns non-empty recommended retrievers with default filters', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-retriever',
+      version: '0.1.0',
+      description: 'retrieval semantic search rag server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/mcp' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 80, reasons: ['test'], keywords: ['retrieval'], serverKind: 'retriever' },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({ method: 'GET', url: '/rag/top' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.metadata.count >= 1, true);
+  assert.equal(body.results[0].name, 'example/top-retriever');
+  assert.equal(body.results[0].serverKind, 'retriever');
+  await app.close();
+});
+
+test('rag install returns copy-ready config object', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/installable',
+      version: '1.2.3',
+      description: 'retrieval server',
+      packages: [
+        {
+          registryType: 'npm',
+          identifier: '@example/installable-mcp',
+          version: '1.2.3',
+          runtimeHint: 'npx',
+          transport: { type: 'stdio' }
+        }
+      ]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 55, reasons: ['test'], keywords: ['rag'] },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({ method: 'GET', url: '/rag/install?name=example/installable' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.serverName, 'example/installable');
+  assert.equal(body.version, '1.2.3');
+  assert.equal(body.transport.hasStdio, true);
+  assert.equal(typeof body.genericMcpHostConfig?.json, 'string');
+  assert.equal(body.genericMcpHostConfig.json.includes('mcpServers'), true);
+  await app.close();
+});
+
+test('rag stats returns freshness and coverage fields', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/stats-retriever',
+      version: '0.3.0',
+      description: 'retrieval rag search server'
+    },
+    official: { isLatest: true, updatedAt: '2026-02-28T00:00:00.000Z', publishedAt: '2026-02-28T00:00:00.000Z' },
+    ragmap: { categories: ['rag'], ragScore: 30, reasons: ['test'], keywords: ['rag'], serverKind: 'retriever' },
+    hidden: false
+  });
+  await store.setLastSuccessfulIngestAt(new Date('2026-02-28T01:00:00.000Z'));
+  await store.setLastReachabilityRunAt(new Date('2026-02-28T02:00:00.000Z'));
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({ method: 'GET', url: '/rag/stats' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(typeof body.totalLatestServers, 'number');
+  assert.equal(typeof body.countRagScoreGte1, 'number');
+  assert.equal(typeof body.countRagScoreGte25, 'number');
+  assert.equal(typeof body.lastSuccessfulIngestAt, 'string');
+  assert.equal(typeof body.lastReachabilityRunAt, 'string');
+  await app.close();
+});

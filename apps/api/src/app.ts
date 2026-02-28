@@ -10,7 +10,7 @@ import { META_RAGMAP_KEY, RagFiltersSchema, type RagFilters } from '@ragmap/shar
 import { runIngest } from './ingest/ingest.js';
 import { runReachabilityRefresh } from './reachability/run.js';
 import { embedText } from './rag/embedding.js';
-import { inferHasRemoteFromServer } from './rag/search.js';
+import { inferHasRemoteFromServer, inferServerKindFromServer } from './rag/search.js';
 
 type RouteRequest = {
   routerPath?: string;
@@ -156,6 +156,131 @@ function requireIngestToken(env: Env, request: { headers: Record<string, string 
   return true;
 }
 
+function parseOptionalBool(value: 'true' | 'false' | undefined) {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return undefined;
+}
+
+function parseCategories(value: string | undefined) {
+  if (!value) return undefined;
+  const categories = value.split(',').map((c) => c.trim()).filter(Boolean);
+  return categories.length ? categories : undefined;
+}
+
+function isoOrNull(value: Date | null) {
+  return value ? value.toISOString() : null;
+}
+
+function sanitizeHeaderValue(name: string, rawValue: unknown, isSecret: boolean) {
+  if (isSecret || /authorization|token|secret|password|api[-_]?key/i.test(name)) return '<set-secret>';
+  if (typeof rawValue === 'string' && rawValue && rawValue.length <= 120) return rawValue;
+  return '<set-value>';
+}
+
+function buildStdioCommand(pkg: any) {
+  const registryType = String(pkg?.registryType ?? '').toLowerCase();
+  const runtimeHint = String(pkg?.runtimeHint ?? pkg?.runtime?.name ?? '').toLowerCase();
+  const identifier = String(pkg?.identifier ?? pkg?.name ?? '').trim();
+  if (!identifier) return null;
+
+  let command = 'npx';
+  let args: string[] = ['-y'];
+  if (runtimeHint === 'uvx' || registryType === 'pypi' || registryType === 'python') {
+    command = 'uvx';
+    args = [];
+  } else if (runtimeHint === 'pipx') {
+    command = 'pipx';
+    args = ['run'];
+  } else if (runtimeHint === 'npm' || runtimeHint === 'npx' || registryType === 'npm') {
+    command = 'npx';
+    args = ['-y'];
+  }
+
+  let target = identifier;
+  if (command === 'npx' && typeof pkg?.version === 'string' && pkg.version && !identifier.includes('@')) {
+    target = `${identifier}@${pkg.version}`;
+  }
+  if ((command === 'uvx' || command === 'pipx') && typeof pkg?.version === 'string' && pkg.version) {
+    target = `${identifier}==${pkg.version}`;
+  }
+
+  const extraArgs: string[] = Array.isArray(pkg?.packageArguments)
+    ? pkg.packageArguments
+        .filter((arg: any) => arg && arg.type === 'positional' && typeof arg.value === 'string' && arg.value)
+        .map((arg: any) => arg.value)
+    : [];
+  return { command, args: [...args, target, ...extraArgs] };
+}
+
+function mapRemoteEndpoints(server: any) {
+  const endpoints: Array<{ url: string; headers: Array<{ name: string; description: string | null; isSecret: boolean; required: boolean }> }> = [];
+  const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
+  for (const remote of remotes) {
+    if (remote?.type !== 'streamable-http') continue;
+    const url = typeof remote?.url === 'string' ? remote.url : '';
+    if (!url) continue;
+    const headers: Array<{ name: string; description: string | null; isSecret: boolean; required: boolean }> = [];
+    if (Array.isArray(remote?.headers)) {
+      for (const h of remote.headers) {
+        if (!h || typeof h !== 'object') continue;
+        const name = typeof h.name === 'string' ? h.name : '';
+        if (!name) continue;
+        headers.push({
+          name,
+          description: typeof h.description === 'string' ? h.description : null,
+          isSecret: h.isSecret === true,
+          required: h.required !== false
+        });
+      }
+    } else if (remote?.headers && typeof remote.headers === 'object') {
+      for (const [name, value] of Object.entries(remote.headers as Record<string, unknown>)) {
+        headers.push({
+          name,
+          description: null,
+          isSecret: /authorization|token|secret|password|api[-_]?key/i.test(name),
+          required: true
+        });
+        void value;
+      }
+    }
+    endpoints.push({ url, headers });
+  }
+  return endpoints;
+}
+
+function mapRagHit(hit: { entry: any; kind: string; score: number }) {
+  const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+  const serverAny = hit.entry.server as any;
+  const hasRemoteOut =
+    typeof ragmap.hasRemote === 'boolean'
+      ? ragmap.hasRemote
+      : inferHasRemoteFromServer(hit.entry.server as any);
+  const localOnlyOut =
+    typeof ragmap.localOnly === 'boolean' ? ragmap.localOnly : !hasRemoteOut;
+  const serverKindOut =
+    typeof ragmap.serverKind === 'string'
+      ? ragmap.serverKind
+      : inferServerKindFromServer(hit.entry.server as any);
+  return {
+    name: hit.entry.server.name,
+    version: hit.entry.server.version,
+    title: serverAny.title ?? null,
+    description: hit.entry.server.description ?? null,
+    categories: ragmap.categories ?? [],
+    ragScore: ragmap.ragScore ?? 0,
+    hasRemote: hasRemoteOut,
+    reachable: ragmap.reachable ?? false,
+    citations: ragmap.citations ?? false,
+    localOnly: localOnlyOut,
+    serverKind: serverKindOut,
+    discoveryService: typeof serverAny.discoveryService === 'string' ? serverAny.discoveryService : null,
+    kind: hit.kind,
+    score: hit.score,
+    server: hit.entry.server
+  };
+}
+
 const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----/i, label: 'private-key' },
   { pattern: /\bsk-[A-Za-z0-9]{16,}\b/, label: 'openai-key' },
@@ -254,7 +379,9 @@ function agentCard(baseUrl: string) {
     version: '0.1.0',
     protocolVersion: '0.1',
     skills: [
-      { id: 'rag_find_servers', name: 'Find servers', description: 'Search/filter RAG-related MCP servers. Params: query (q), limit, hasRemote, reachable, citations, localOnly, minScore, categories.' },
+      { id: 'rag_find_servers', name: 'Find servers', description: 'Search/filter RAG-related MCP servers. Params: query (q), limit, hasRemote, reachable, citations, localOnly, minScore, categories, serverKind.' },
+      { id: 'rag_top_servers', name: 'Top servers', description: 'Get top recommended retriever servers with smart defaults and filters.' },
+      { id: 'rag_get_install_config', name: 'Get install config', description: 'Get copy-ready Claude Desktop and generic MCP host snippets for a server.' },
       { id: 'rag_get_server', name: 'Get server', description: 'Fetch a server record by name (latest version).' },
       { id: 'rag_list_categories', name: 'List categories', description: 'List RAG categories.' },
       { id: 'rag_explain_score', name: 'Explain score', description: 'Explain RAG scoring for a server.' }
@@ -265,7 +392,10 @@ function agentCard(baseUrl: string) {
     },
     // So HTTP-only agents can call the API directly without installing the MCP
     apiEndpoints: {
-      search: { method: 'GET', path: '/rag/search', params: ['q', 'limit', 'hasRemote', 'reachable', 'citations', 'localOnly', 'minScore', 'categories'] },
+      search: { method: 'GET', path: '/rag/search', params: ['q', 'limit', 'hasRemote', 'reachable', 'citations', 'localOnly', 'minScore', 'categories', 'serverKind'] },
+      top: { method: 'GET', path: '/rag/top', params: ['limit', 'minScore', 'hasRemote', 'reachable', 'localOnly', 'categories', 'serverKind'] },
+      install: { method: 'GET', path: '/rag/install', params: ['name'] },
+      stats: { method: 'GET', path: '/rag/stats', params: [] },
       listServers: { method: 'GET', path: '/v0.1/servers', params: ['limit', 'cursor'] },
       getServer: { method: 'GET', path: '/v0.1/servers/{name}/versions/latest' },
       categories: { method: 'GET', path: '/rag/categories' }
@@ -301,7 +431,22 @@ const RagSearchQuerySchema = z.object({
   hasRemote: z.enum(['true', 'false']).optional(),
   reachable: z.enum(['true', 'false']).optional(),
   citations: z.enum(['true', 'false']).optional(),
-  localOnly: z.enum(['true', 'false']).optional()
+  localOnly: z.enum(['true', 'false']).optional(),
+  serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional()
+});
+
+const RagTopQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional(),
+  categories: z.string().optional(),
+  minScore: z.coerce.number().int().min(0).max(100).optional(),
+  hasRemote: z.enum(['true', 'false']).optional(),
+  reachable: z.enum(['true', 'false']).optional(),
+  localOnly: z.enum(['true', 'false']).optional(),
+  serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional()
+});
+
+const RagInstallQuerySchema = z.object({
+  name: z.string().min(1)
 });
 
 const IngestRunBodySchema = z.object({
@@ -346,7 +491,15 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   await fastify.register(cors, { origin: true });
   await fastify.register(rateLimit, { global: false });
 
-  const CAPTURED_ROUTES = new Set(['/v0.1/servers', '/v0.1/servers/*', '/rag/search', '/rag/categories', '/rag/servers/*']);
+  const CAPTURED_ROUTES = new Set([
+    '/v0.1/servers',
+    '/v0.1/servers/*',
+    '/rag/search',
+    '/rag/top',
+    '/rag/install',
+    '/rag/categories',
+    '/rag/servers/*'
+  ]);
 
   fastify.addHook('onRequest', async (request, reply) => {
     (request as { startTimeNs?: bigint }).startTimeNs = process.hrtime.bigint();
@@ -1030,18 +1183,12 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
     const q = (query.q ?? '').trim() || 'rag';
     const limit = query.limit ?? 10;
-    const categories = query.categories
-      ? query.categories.split(',').map((c) => c.trim()).filter(Boolean)
-      : undefined;
+    const categories = parseCategories(query.categories);
     const registryType = (query.registryType ?? '').trim() || undefined;
-    const hasRemote =
-      query.hasRemote === 'true' ? true : query.hasRemote === 'false' ? false : undefined;
-    const reachable =
-      query.reachable === 'true' ? true : query.reachable === 'false' ? false : undefined;
-    const citations =
-      query.citations === 'true' ? true : query.citations === 'false' ? false : undefined;
-    const localOnly =
-      query.localOnly === 'true' ? true : query.localOnly === 'false' ? false : undefined;
+    const hasRemote = parseOptionalBool(query.hasRemote);
+    const reachable = parseOptionalBool(query.reachable);
+    const citations = parseOptionalBool(query.citations);
+    const localOnly = parseOptionalBool(query.localOnly);
     const filters: RagFilters = RagFiltersSchema.parse({
       categories,
       minScore: query.minScore,
@@ -1050,7 +1197,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       hasRemote,
       reachable,
       citations,
-      localOnly
+      localOnly,
+      serverKind: query.serverKind
     });
 
     let queryEmbedding: number[] | null = null;
@@ -1065,33 +1213,155 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
     return {
       query: q,
-      results: results.map((hit) => {
-        const ragmap = (hit.entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
-        const serverAny = hit.entry.server as any;
-        const hasRemoteOut =
-          typeof ragmap.hasRemote === 'boolean'
-            ? ragmap.hasRemote
-            : inferHasRemoteFromServer(hit.entry.server as any);
-        const localOnlyOut =
-          typeof ragmap.localOnly === 'boolean' ? ragmap.localOnly : !hasRemoteOut;
-        return {
-          name: hit.entry.server.name,
-          version: hit.entry.server.version,
-          title: serverAny.title ?? null,
-          description: hit.entry.server.description ?? null,
-          categories: ragmap.categories ?? [],
-          ragScore: ragmap.ragScore ?? 0,
-          hasRemote: hasRemoteOut,
-          reachable: ragmap.reachable ?? false,
-          citations: ragmap.citations ?? false,
-          localOnly: localOnlyOut,
-          discoveryService: typeof serverAny.discoveryService === 'string' ? serverAny.discoveryService : null,
-          kind: hit.kind,
-          score: hit.score,
-          server: hit.entry.server
-        };
-      }),
+      results: results.map(mapRagHit),
       metadata: { count: results.length }
+    };
+  });
+
+  fastify.get('/rag/top', async (request, reply) => {
+    const query = parse(RagTopQuerySchema, (request as any).query, reply);
+    if (!query) return;
+
+    const limit = query.limit ?? 25;
+    const filters: RagFilters = RagFiltersSchema.parse({
+      categories: parseCategories(query.categories),
+      minScore: query.minScore ?? 10,
+      hasRemote: parseOptionalBool(query.hasRemote),
+      reachable: parseOptionalBool(query.reachable),
+      localOnly: parseOptionalBool(query.localOnly),
+      serverKind: query.serverKind ?? 'retriever'
+    });
+
+    const results = await params.store.searchRagTop({ limit, filters });
+    return {
+      results: results.map(mapRagHit),
+      metadata: { count: results.length }
+    };
+  });
+
+  fastify.get('/rag/install', async (request, reply) => {
+    const query = parse(RagInstallQuerySchema, (request as any).query, reply);
+    if (!query) return;
+
+    const entry = await params.store.getServerVersion(decodeURIComponent(query.name), 'latest');
+    if (!entry) return reply.code(404).send({ error: 'Not found', message: 'Server not in registry' });
+
+    const server = entry.server as any;
+    const packages: any[] = Array.isArray(server?.packages) ? server.packages : [];
+    const stdioPackage =
+      packages.find((pkg) => pkg?.transport?.type === 'stdio') ??
+      packages.find((pkg) => !pkg?.transport || pkg?.transport?.type !== 'streamable-http') ??
+      null;
+    const stdioCommand = stdioPackage ? buildStdioCommand(stdioPackage) : null;
+    const remoteEndpoints = mapRemoteEndpoints(server);
+    const primaryRemote = remoteEndpoints[0] ?? null;
+    const remoteHeadersObject = primaryRemote
+      ? Object.fromEntries(
+          primaryRemote.headers.map((h) => [h.name, sanitizeHeaderValue(h.name, undefined, h.isSecret)])
+        )
+      : {};
+
+    const transportSummary =
+      stdioCommand && primaryRemote
+        ? 'hybrid'
+        : primaryRemote
+          ? 'remote'
+          : stdioCommand
+            ? 'stdio'
+            : 'unknown';
+
+    const configName = entry.server.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+    const genericConfig =
+      primaryRemote
+        ? {
+            mcpServers: {
+              [configName]: {
+                transport: 'streamable-http',
+                url: primaryRemote.url,
+                ...(Object.keys(remoteHeadersObject).length ? { headers: remoteHeadersObject } : {})
+              }
+            }
+          }
+        : stdioCommand
+          ? {
+              mcpServers: {
+                [configName]: {
+                  command: stdioCommand.command,
+                  args: stdioCommand.args
+                }
+              }
+            }
+          : { mcpServers: {} };
+
+    const claudeDesktopConfig = JSON.parse(JSON.stringify(genericConfig));
+
+    return {
+      serverName: entry.server.name,
+      version: entry.server.version,
+      transport: {
+        summary: transportSummary,
+        hasStdio: Boolean(stdioCommand),
+        hasRemote: Boolean(primaryRemote)
+      },
+      stdio: stdioCommand
+        ? {
+            registryType: typeof stdioPackage?.registryType === 'string' ? stdioPackage.registryType : null,
+            identifier: typeof stdioPackage?.identifier === 'string' ? stdioPackage.identifier : null,
+            command: [stdioCommand.command, ...stdioCommand.args].join(' '),
+            commandParts: stdioCommand
+          }
+        : null,
+      remote: primaryRemote
+        ? {
+            url: primaryRemote.url,
+            headers: primaryRemote.headers.map((h) => ({
+              name: h.name,
+              description: h.description,
+              required: h.required,
+              isSecret: h.isSecret,
+              value: sanitizeHeaderValue(h.name, undefined, h.isSecret)
+            }))
+          }
+        : null,
+      claudeDesktopConfig: {
+        object: claudeDesktopConfig,
+        json: JSON.stringify(claudeDesktopConfig, null, 2)
+      },
+      genericMcpHostConfig: {
+        object: genericConfig,
+        json: JSON.stringify(genericConfig, null, 2)
+      }
+    };
+  });
+
+  fastify.get('/rag/stats', async () => {
+    let totalLatestServers = 0;
+    let countRagScoreGte1 = 0;
+    let countRagScoreGte25 = 0;
+    let cursor: string | undefined;
+    do {
+      const page = await params.store.listLatestServers({ limit: 200, cursor });
+      for (const entry of page.servers) {
+        totalLatestServers += 1;
+        const ragmap = (entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+        const ragScore = Number(ragmap?.ragScore ?? 0);
+        if (ragScore >= 1) countRagScoreGte1 += 1;
+        if (ragScore >= 25) countRagScoreGte25 += 1;
+      }
+      cursor = page.nextCursor;
+    } while (cursor);
+
+    const lastSuccessfulIngestAt = await params.store.getLastSuccessfulIngestAt();
+    const lastReachabilityRunAt = params.store.getLastReachabilityRunAt
+      ? await params.store.getLastReachabilityRunAt()
+      : null;
+
+    return {
+      totalLatestServers,
+      countRagScoreGte1,
+      countRagScoreGte25,
+      lastSuccessfulIngestAt: isoOrNull(lastSuccessfulIngestAt),
+      lastReachabilityRunAt: isoOrNull(lastReachabilityRunAt)
     };
   });
 
