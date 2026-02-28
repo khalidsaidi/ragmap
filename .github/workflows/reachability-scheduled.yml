@@ -11,11 +11,26 @@ jobs:
     steps:
       - name: Trigger reachability refresh
         run: |
-          curl -sS -X POST "${{ secrets.API_BASE_URL }}/internal/reachability/run" \
+          set -euo pipefail
+          BASE="${{ secrets.API_BASE_URL }}"
+          BASE="${BASE%/}"
+          echo "API_BASE_URL=$BASE"
+
+          status=0
+          code=""
+          if ! code=$(curl --fail-with-body -sS -X POST "$BASE/internal/reachability/run" \
             -H "Content-Type: application/json" \
             -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
             -d '{"limit":150}' \
             --max-time 600 \
-            -w "\nHTTP %{http_code}\n" \
-            -o /tmp/out.json
-          cat /tmp/out.json
+            -o /tmp/out.json \
+            -w "%{http_code}"); then
+            status=$?
+          fi
+
+          cat /tmp/out.json || true
+          echo
+          echo "HTTP $code"
+          if [[ "$status" -ne 0 ]]; then
+            exit "$status"
+          fi
