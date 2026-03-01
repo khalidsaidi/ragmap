@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { Env } from './env.js';
 import type { RegistryStore } from './store/types.js';
 import { META_RAGMAP_KEY, RagFiltersSchema, type RagFilters } from '@ragmap/shared';
-import { runIngest } from './ingest/ingest.js';
+import { getStreamableHttpUrl, runIngest } from './ingest/ingest.js';
 import { runReachabilityRefresh } from './reachability/run.js';
 import { embedText } from './rag/embedding.js';
 import { inferHasRemoteFromServer, inferServerKindFromServer } from './rag/search.js';
@@ -1338,6 +1338,9 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     let totalLatestServers = 0;
     let countRagScoreGte1 = 0;
     let countRagScoreGte25 = 0;
+    let reachabilityCandidates = 0;
+    let reachabilityKnown = 0;
+    let reachabilityTrue = 0;
     let cursor: string | undefined;
     do {
       const page = await params.store.listLatestServers({ limit: 200, cursor });
@@ -1347,6 +1350,26 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         const ragScore = Number(ragmap?.ragScore ?? 0);
         if (ragScore >= 1) countRagScoreGte1 += 1;
         if (ragScore >= 25) countRagScoreGte25 += 1;
+
+        const inferredHasRemote =
+          typeof ragmap?.hasRemote === 'boolean'
+            ? ragmap.hasRemote
+            : inferHasRemoteFromServer(entry.server as any);
+        const streamableUrl = getStreamableHttpUrl(entry.server);
+        if (inferredHasRemote && streamableUrl) {
+          reachabilityCandidates += 1;
+          const hasReachabilityMetadata =
+            typeof ragmap?.lastReachableAt === 'string' ||
+            typeof ragmap?.reachableCheckedAt === 'string' ||
+            typeof ragmap?.reachableStatus === 'number' ||
+            typeof ragmap?.reachableMethod === 'string';
+          if (typeof ragmap?.reachable === 'boolean' || hasReachabilityMetadata) {
+            reachabilityKnown += 1;
+          }
+          if (ragmap?.reachable === true) {
+            reachabilityTrue += 1;
+          }
+        }
       }
       cursor = page.nextCursor;
     } while (cursor);
@@ -1360,6 +1383,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       totalLatestServers,
       countRagScoreGte1,
       countRagScoreGte25,
+      reachabilityCandidates,
+      reachabilityKnown,
+      reachabilityTrue,
+      reachabilityUnknown: Math.max(0, reachabilityCandidates - reachabilityKnown),
       lastSuccessfulIngestAt: isoOrNull(lastSuccessfulIngestAt),
       lastReachabilityRunAt: isoOrNull(lastReachabilityRunAt)
     };
