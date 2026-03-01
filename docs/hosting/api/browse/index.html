@@ -98,6 +98,13 @@
         <input type="search" id="q" placeholder="Optional search query (leave empty for Top picks)" value="" />
         <label><input type="checkbox" id="hasRemote" /> Remote</label>
         <label><input type="checkbox" id="reachable" /> Reachable</label>
+        <label>Checked within
+          <select id="reachableMaxAgeHours">
+            <option value="6">6h</option>
+            <option value="24" selected>24h</option>
+            <option value="72">72h</option>
+          </select>
+        </label>
         <label><input type="checkbox" id="localOnly" /> Local-only</label>
         <label><input type="checkbox" id="retrievers" checked /> Retrievers</label>
         <label>Min score <input type="number" id="minScore" min="0" max="100" value="" placeholder="10" style="width:56px" /></label>
@@ -109,6 +116,13 @@
     </main>
     <script>
       const API = '';
+      const DEFAULT_REACHABLE_MAX_AGE_HOURS = '24';
+      function syncReachableFreshnessUi() {
+        const reachableInput = document.getElementById('reachable');
+        const freshnessSelect = document.getElementById('reachableMaxAgeHours');
+        if (!reachableInput || !freshnessSelect) return;
+        freshnessSelect.disabled = !reachableInput.checked;
+      }
       function buildUrl() {
         const query = document.getElementById('q').value.trim();
         const endpoint = query ? '/rag/search' : '/rag/top';
@@ -116,7 +130,10 @@
         if (query) u.searchParams.set('q', query);
         u.searchParams.set('limit', '24');
         if (document.getElementById('hasRemote').checked) u.searchParams.set('hasRemote', 'true');
-        if (document.getElementById('reachable').checked) u.searchParams.set('reachable', 'true');
+        if (document.getElementById('reachable').checked) {
+          u.searchParams.set('reachable', 'true');
+          u.searchParams.set('reachableMaxAgeHours', document.getElementById('reachableMaxAgeHours').value || DEFAULT_REACHABLE_MAX_AGE_HOURS);
+        }
         if (document.getElementById('localOnly').checked) u.searchParams.set('localOnly', 'true');
         if (document.getElementById('retrievers').checked) u.searchParams.set('serverKind', 'retriever');
         const min = document.getElementById('minScore').value.trim();
@@ -265,6 +282,14 @@
       }
       document.getElementById('go').onclick = run;
       document.getElementById('q').onkeydown = e => { if (e.key === 'Enter') run(); };
+      document.getElementById('reachable').addEventListener('change', () => {
+        syncReachableFreshnessUi();
+        run();
+      });
+      document.getElementById('reachableMaxAgeHours').addEventListener('change', () => {
+        if (document.getElementById('reachable').checked) run();
+      });
+      syncReachableFreshnessUi();
       loadStats();
       run();
     </script>
