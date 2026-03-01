@@ -87,6 +87,7 @@ export const RagFiltersSchema = z
     registryType: z.string().optional(),
     hasRemote: z.boolean().optional(),
     reachable: z.boolean().optional(),
+    reachableMaxAgeHours: z.number().int().min(1).max(8760).optional(),
     citations: z.boolean().optional(),
     localOnly: z.boolean().optional(),
     serverKind: ServerKindSchema.optional()

@@ -752,6 +752,105 @@ test('rag search exposes reachability metadata fields', async () => {
   await app.close();
 });
 
+test('rag search reachableMaxAgeHours keeps only fresh reachable results and leaves reachable=true unchanged when omitted', async () => {
+  const store = new InMemoryStore();
+  const nowMs = Date.now();
+  const freshCheckedAt = new Date(nowMs - 1 * 3_600_000).toISOString();
+  const staleCheckedAt = new Date(nowMs - 30 * 3_600_000).toISOString();
+
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/freshness-fresh',
+      version: '1.0.0',
+      description: 'freshness retriever',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/fresh' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 80,
+      reasons: ['test'],
+      keywords: ['freshness'],
+      hasRemote: true,
+      reachable: true,
+      reachableCheckedAt: freshCheckedAt,
+      serverKind: 'retriever'
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/freshness-stale',
+      version: '1.0.0',
+      description: 'freshness retriever',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/stale' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 70,
+      reasons: ['test'],
+      keywords: ['freshness'],
+      hasRemote: true,
+      reachable: true,
+      reachableCheckedAt: staleCheckedAt,
+      serverKind: 'retriever'
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/freshness-missing-checked-at',
+      version: '1.0.0',
+      description: 'freshness retriever',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/missing' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 60,
+      reasons: ['test'],
+      keywords: ['freshness'],
+      hasRemote: true,
+      reachable: true,
+      serverKind: 'retriever'
+    },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const withFreshness = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=freshness&hasRemote=true&reachable=true&reachableMaxAgeHours=24&limit=50'
+  });
+  assert.equal(withFreshness.statusCode, 200);
+  const withFreshnessBody = withFreshness.json() as any;
+  assert.equal(withFreshnessBody.metadata.count, 1);
+  assert.equal(withFreshnessBody.metadata.filters.reachableMaxAgeHours, 24);
+  assert.equal(withFreshnessBody.results[0].name, 'example/freshness-fresh');
+
+  const withoutFreshness = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=freshness&hasRemote=true&reachable=true&limit=50'
+  });
+  assert.equal(withoutFreshness.statusCode, 200);
+  const withoutFreshnessBody = withoutFreshness.json() as any;
+  const names = withoutFreshnessBody.results.map((result: any) => result.name);
+  assert.equal(withoutFreshnessBody.metadata.count, 3);
+  assert.equal(names.includes('example/freshness-fresh'), true);
+  assert.equal(names.includes('example/freshness-stale'), true);
+  assert.equal(names.includes('example/freshness-missing-checked-at'), true);
+  assert.equal(withoutFreshnessBody.metadata.filters, undefined);
+
+  await app.close();
+});
+
 test('rag top returns non-empty recommended retrievers with default filters', async () => {
   const store = new InMemoryStore();
   await store.upsertServerVersion({
@@ -775,6 +874,92 @@ test('rag top returns non-empty recommended retrievers with default filters', as
   assert.equal(body.metadata.count >= 1, true);
   assert.equal(body.results[0].name, 'example/top-retriever');
   assert.equal(body.results[0].serverKind, 'retriever');
+  await app.close();
+});
+
+test('rag top applies reachableMaxAgeHours when reachable=true and echoes the filter', async () => {
+  const store = new InMemoryStore();
+  const nowMs = Date.now();
+  const freshCheckedAt = new Date(nowMs - 1 * 3_600_000).toISOString();
+  const staleCheckedAt = new Date(nowMs - 30 * 3_600_000).toISOString();
+
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-fresh',
+      version: '0.1.0',
+      description: 'retrieval semantic search rag server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/top-fresh' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 90,
+      reasons: ['test'],
+      keywords: ['top'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableCheckedAt: freshCheckedAt
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-stale',
+      version: '0.1.0',
+      description: 'retrieval semantic search rag server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/top-stale' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 80,
+      reasons: ['test'],
+      keywords: ['top'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableCheckedAt: staleCheckedAt
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-missing-checked-at',
+      version: '0.1.0',
+      description: 'retrieval semantic search rag server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/top-missing' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 70,
+      reasons: ['test'],
+      keywords: ['top'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true
+    },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const withFreshness = await app.inject({
+    method: 'GET',
+    url: '/rag/top?reachable=true&reachableMaxAgeHours=24&minScore=0&serverKind=retriever&limit=50'
+  });
+  assert.equal(withFreshness.statusCode, 200);
+  const withFreshnessBody = withFreshness.json() as any;
+  assert.equal(withFreshnessBody.metadata.count, 1);
+  assert.equal(withFreshnessBody.metadata.filters.reachableMaxAgeHours, 24);
+  assert.equal(withFreshnessBody.results[0].name, 'example/top-fresh');
+
   await app.close();
 });
 

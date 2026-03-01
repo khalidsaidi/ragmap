@@ -433,8 +433,8 @@ function agentCard(baseUrl: string) {
     },
     // So HTTP-only agents can call the API directly without installing the MCP
     apiEndpoints: {
-      search: { method: 'GET', path: '/rag/search', params: ['q', 'limit', 'hasRemote', 'reachable', 'citations', 'localOnly', 'minScore', 'categories', 'serverKind'] },
-      top: { method: 'GET', path: '/rag/top', params: ['limit', 'minScore', 'hasRemote', 'reachable', 'localOnly', 'categories', 'serverKind'] },
+      search: { method: 'GET', path: '/rag/search', params: ['q', 'limit', 'hasRemote', 'reachable', 'reachableMaxAgeHours', 'citations', 'localOnly', 'minScore', 'categories', 'serverKind'] },
+      top: { method: 'GET', path: '/rag/top', params: ['limit', 'minScore', 'hasRemote', 'reachable', 'reachableMaxAgeHours', 'localOnly', 'categories', 'serverKind'] },
       install: { method: 'GET', path: '/rag/install', params: ['name'] },
       stats: { method: 'GET', path: '/rag/stats', params: [] },
       listServers: { method: 'GET', path: '/v0.1/servers', params: ['limit', 'cursor'] },
@@ -471,6 +471,7 @@ const RagSearchQuerySchema = z.object({
   registryType: z.string().optional(),
   hasRemote: z.enum(['true', 'false']).optional(),
   reachable: z.enum(['true', 'false']).optional(),
+  reachableMaxAgeHours: z.coerce.number().int().min(1).max(8760).optional(),
   citations: z.enum(['true', 'false']).optional(),
   localOnly: z.enum(['true', 'false']).optional(),
   serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional()
@@ -482,6 +483,7 @@ const RagTopQuerySchema = z.object({
   minScore: z.coerce.number().int().min(0).max(100).optional(),
   hasRemote: z.enum(['true', 'false']).optional(),
   reachable: z.enum(['true', 'false']).optional(),
+  reachableMaxAgeHours: z.coerce.number().int().min(1).max(8760).optional(),
   localOnly: z.enum(['true', 'false']).optional(),
   serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional()
 });
@@ -1228,6 +1230,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const registryType = (query.registryType ?? '').trim() || undefined;
     const hasRemote = parseOptionalBool(query.hasRemote);
     const reachable = parseOptionalBool(query.reachable);
+    const reachableMaxAgeHours = reachable === true ? query.reachableMaxAgeHours : undefined;
     const citations = parseOptionalBool(query.citations);
     const localOnly = parseOptionalBool(query.localOnly);
     const filters: RagFilters = RagFiltersSchema.parse({
@@ -1237,6 +1240,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       registryType,
       hasRemote,
       reachable,
+      reachableMaxAgeHours,
       citations,
       localOnly,
       serverKind: query.serverKind
@@ -1255,7 +1259,16 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return {
       query: q,
       results: results.map(mapRagHit),
-      metadata: { count: results.length }
+      metadata: {
+        count: results.length,
+        ...(reachableMaxAgeHours != null
+          ? {
+              filters: {
+                reachableMaxAgeHours
+              }
+            }
+          : {})
+      }
     };
   });
 
@@ -1264,11 +1277,14 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     if (!query) return;
 
     const limit = query.limit ?? 25;
+    const reachable = parseOptionalBool(query.reachable);
+    const reachableMaxAgeHours = reachable === true ? query.reachableMaxAgeHours : undefined;
     const filters: RagFilters = RagFiltersSchema.parse({
       categories: parseCategories(query.categories),
       minScore: query.minScore ?? 10,
       hasRemote: parseOptionalBool(query.hasRemote),
-      reachable: parseOptionalBool(query.reachable),
+      reachable,
+      reachableMaxAgeHours,
       localOnly: parseOptionalBool(query.localOnly),
       serverKind: query.serverKind ?? 'retriever'
     });
@@ -1276,7 +1292,16 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const results = await params.store.searchRagTop({ limit, filters });
     return {
       results: results.map(mapRagHit),
-      metadata: { count: results.length }
+      metadata: {
+        count: results.length,
+        ...(reachableMaxAgeHours != null
+          ? {
+              filters: {
+                reachableMaxAgeHours
+              }
+            }
+          : {})
+      }
     };
   });
 
