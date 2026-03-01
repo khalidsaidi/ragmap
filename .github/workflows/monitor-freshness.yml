@@ -1,0 +1,46 @@
+name: monitor-freshness
+
+on:
+  schedule:
+    # Every 6 hours, offset to avoid clashing exactly with ingest/reachability schedules.
+    - cron: "30 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check /rag/stats freshness
+        run: |
+          set -euo pipefail
+
+          STATS="$(curl --fail-with-body -sS https://ragmap-api.web.app/rag/stats)"
+          echo "$STATS" | jq .
+
+          lastIngest="$(echo "$STATS" | jq -r '.lastSuccessfulIngestAt // empty')"
+          lastReach="$(echo "$STATS" | jq -r '.lastReachabilityRunAt // empty')"
+
+          if [[ -z "$lastIngest" || -z "$lastReach" ]]; then
+            echo "ERROR: missing lastSuccessfulIngestAt or lastReachabilityRunAt"
+            exit 1
+          fi
+
+          now="$(date +%s)"
+          ingestEpoch="$(date -d "$lastIngest" +%s)"
+          reachEpoch="$(date -d "$lastReach" +%s)"
+
+          ingestAgeHours="$(( (now - ingestEpoch) / 3600 ))"
+          reachAgeHours="$(( (now - reachEpoch) / 3600 ))"
+
+          echo "Ingest age (hours): $ingestAgeHours"
+          echo "Reachability age (hours): $reachAgeHours"
+
+          if (( ingestAgeHours > 36 )); then
+            echo "ERROR: ingest stale (>36h)"
+            exit 1
+          fi
+
+          if (( reachAgeHours > 18 )); then
+            echo "ERROR: reachability stale (>18h)"
+            exit 1
+          fi
