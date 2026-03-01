@@ -2,7 +2,9 @@ name: reachability-scheduled
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    # Run every 6 hours at 03:00, 09:00, 15:00, 21:00 UTC.
+    # Keeps one run shortly after daily ingest (02:00 UTC) and refreshes through the day.
+    - cron: '0 3-21/6 * * *'
   workflow_dispatch:
 
 jobs:
