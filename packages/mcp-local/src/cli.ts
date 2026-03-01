@@ -38,13 +38,14 @@ server.registerTool(
       registryType: z.string().min(1).optional(),
       hasRemote: z.boolean().optional(),
       reachable: z.boolean().optional(),
+      reachableMaxAgeHours: z.number().int().min(1).max(8760).optional(),
       citations: z.boolean().optional(),
       localOnly: z.boolean().optional(),
       serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional(),
       limit: z.number().int().min(1).max(50).optional()
     }
   },
-  async ({ query, categories, minScore, transport, registryType, hasRemote, reachable, citations, localOnly, serverKind, limit }) => {
+  async ({ query, categories, minScore, transport, registryType, hasRemote, reachable, reachableMaxAgeHours, citations, localOnly, serverKind, limit }) => {
     const response = await apiGet('/rag/search', {
       q: query ?? 'rag',
       limit: String(limit ?? 10),
@@ -54,6 +55,9 @@ server.registerTool(
       ...(registryType ? { registryType } : {}),
       ...(hasRemote !== undefined ? { hasRemote: String(hasRemote) } : {}),
       ...(reachable !== undefined ? { reachable: String(reachable) } : {}),
+      ...(reachable === true && reachableMaxAgeHours != null
+        ? { reachableMaxAgeHours: String(reachableMaxAgeHours) }
+        : {}),
       ...(citations !== undefined ? { citations: String(citations) } : {}),
       ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {}),
       ...(serverKind ? { serverKind } : {})
@@ -74,18 +78,22 @@ server.registerTool(
       minScore: z.number().int().min(0).max(100).optional(),
       hasRemote: z.boolean().optional(),
       reachable: z.boolean().optional(),
+      reachableMaxAgeHours: z.number().int().min(1).max(8760).optional(),
       localOnly: z.boolean().optional(),
       serverKind: z.enum(['retriever', 'evaluator', 'indexer', 'router', 'other']).optional(),
       limit: z.number().int().min(1).max(50).optional()
     }
   },
-  async ({ categories, minScore, hasRemote, reachable, localOnly, serverKind, limit }) => {
+  async ({ categories, minScore, hasRemote, reachable, reachableMaxAgeHours, localOnly, serverKind, limit }) => {
     const response = await apiGet('/rag/top', {
       limit: String(limit ?? 25),
       ...(categories && categories.length ? { categories: categories.join(',') } : {}),
       ...(minScore != null ? { minScore: String(minScore) } : {}),
       ...(hasRemote !== undefined ? { hasRemote: String(hasRemote) } : {}),
       ...(reachable !== undefined ? { reachable: String(reachable) } : {}),
+      ...(reachable === true && reachableMaxAgeHours != null
+        ? { reachableMaxAgeHours: String(reachableMaxAgeHours) }
+        : {}),
       ...(localOnly !== undefined ? { localOnly: String(localOnly) } : {}),
       ...(serverKind ? { serverKind } : {})
     });

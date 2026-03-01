@@ -97,6 +97,10 @@ For repository workflows that call `/internal/*` routes:
 - Reachability probes now cover both `streamable-http` and `sse` remotes:
   - `streamable-http`: `HEAD` probe, with `GET` fallback.
   - `sse`: short `GET` with `Accept: text/event-stream`, then immediate body cancel so checks do not hang on streaming responses.
+- Search freshness filter:
+  - `/rag/search` and `/rag/top` support `reachableMaxAgeHours`.
+  - `reachable=true&reachableMaxAgeHours=24` means "reachable and checked within the last 24 hours."
+  - When `reachableMaxAgeHours` is set, entries missing `reachableCheckedAt` are excluded.
 - `/rag/install` now emits remote configs for both `streamable-http` and `sse` endpoints.  
   Note: SSE support depends on the MCP host/client; Ragmap only emits the correct transport config.
 - `/rag/install` also emits `claudeDesktopNote` so UIs can clarify that Claude Desktop remote MCP servers may need to be added via the Connectors UI.

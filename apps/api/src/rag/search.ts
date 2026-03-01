@@ -194,6 +194,15 @@ function passesFilters(item: RagSearchItem, filters: RagFilters | undefined) {
   if (filters.reachable === true) {
     if (enrichment?.reachable !== true) return false;
   }
+  if (filters.reachable === true && filters.reachableMaxAgeHours != null) {
+    const checkedAtRaw = (enrichment as any)?.reachableCheckedAt;
+    if (typeof checkedAtRaw !== 'string' || !checkedAtRaw) return false;
+    const checkedAtMs = Date.parse(checkedAtRaw);
+    if (!Number.isFinite(checkedAtMs)) return false;
+    const maxAgeMs = filters.reachableMaxAgeHours * 3_600_000;
+    const ageMs = Date.now() - checkedAtMs;
+    if (ageMs > maxAgeMs) return false;
+  }
   if (filters.citations === true) {
     if (enrichment?.citations !== true) return false;
   }
