@@ -6,6 +6,7 @@
 [![Glama](https://glama.ai/mcp/servers/@khalidsaidi/ragmap/badge)](https://glama.ai/mcp/servers/@khalidsaidi/ragmap)
 
 **Try it:** https://ragmap-api.web.app/browse/
+**Start here:** https://github.com/khalidsaidi/ragmap/discussions/17
 
 RAGMap is a lightweight MCP Registry-compatible subregistry + MCP server focused on **RAG-related MCP servers**.
 
