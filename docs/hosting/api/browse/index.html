@@ -53,6 +53,15 @@
       .card button:hover { background: var(--bg); }
       .card button.primary { background: var(--accent); color: white; border-color: var(--accent); }
       .card button.primary:hover { opacity: 0.92; }
+      .install-info { margin-top: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: #faf8f4; font-size: 12px; color: var(--muted); }
+      .install-info:empty { display: none; }
+      .install-info .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+      .install-info .row:last-child { margin-bottom: 0; }
+      .transport-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); color: var(--ink); background: #fff; }
+      .transport-remote { border-color: #9ec3ff; background: #eef5ff; }
+      .transport-local { border-color: #b8dcbf; background: #eefaf0; }
+      .install-info details { margin-top: 6px; }
+      .install-info summary { cursor: pointer; color: var(--ink); }
       .empty { color: var(--muted); padding: 24px; text-align: center; }
       .top-cta { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; }
       .top-cta strong { display: block; margin-bottom: 6px; }
@@ -166,6 +175,30 @@
       document.getElementById('copy-ragmap-npx').onclick = () => copyText(npxRagmap, 'npx command copied');
 
       function esc(s) { if (s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+      function transportLabel(installData) {
+        const t = installData && installData.primaryRemoteType;
+        if (t === 'sse') return { text: 'Remote (SSE)', cls: 'transport-badge transport-remote' };
+        if (t === 'streamable-http') return { text: 'Remote (Streamable HTTP)', cls: 'transport-badge transport-remote' };
+        if (installData && installData.transport && installData.transport.hasStdio) {
+          return { text: 'Local (stdio)', cls: 'transport-badge transport-local' };
+        }
+        return { text: 'Transport unknown', cls: 'transport-badge' };
+      }
+      function renderInstallInfo(index, installData) {
+        const host = document.getElementById('install-info-' + index);
+        if (!host) return;
+        if (!installData) { host.innerHTML = ''; return; }
+        const label = transportLabel(installData);
+        const remoteUrl = installData.remote && installData.remote.url ? installData.remote.url : '';
+        const note = installData.claudeDesktopNote || '';
+        host.innerHTML =
+          '<div class="row"><span class="' + label.cls + '">' + esc(label.text) + '</span>' +
+          (remoteUrl ? '<span><b>URL:</b> <code>' + esc(remoteUrl) + '</code></span>' : '') +
+          '</div>' +
+          (note
+            ? '<details><summary>Claude Desktop note</summary><div>' + esc(note) + '</div></details>'
+            : '');
+      }
       let lastResults = [];
       function render(results) {
         lastResults = results;
@@ -191,7 +224,8 @@
             '</div>' +
             (desc ? '<div class="desc">' + esc(desc) + '</div>' : '') +
             (r.categories && r.categories.length ? '<div class="cats">' + r.categories.map(c => '<span class="cat">' + esc(c) + '</span>').join('') + '</div>' : '') +
-            '<div class="actions">' + actions + '</div></div>';
+            '<div class="actions">' + actions + '</div>' +
+            '<div class="install-info" id="install-info-' + i + '"></div></div>';
         }).join('');
         el.querySelectorAll('.copy-name').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; if (r) copyText(r.name || '', 'Name copied'); }));
         el.querySelectorAll('.copy-install').forEach(b => b.addEventListener('click', () => { const r = lastResults[parseInt(b.dataset.idx, 10)]; const line = r && installLine(r.server); if (line) copyText(line, 'Install copied'); }));
@@ -201,6 +235,7 @@
           fetch('/rag/install?name=' + encodeURIComponent(r.name), { headers: { accept: 'application/json' } })
             .then(res => res.ok ? res.json() : Promise.reject(new Error('install config unavailable')))
             .then(data => {
+              renderInstallInfo(parseInt(b.dataset.idx, 10), data);
               const text = (data && data.genericMcpHostConfig && data.genericMcpHostConfig.json) || '';
               if (!text) throw new Error('install config unavailable');
               copyText(text, 'Config copied');

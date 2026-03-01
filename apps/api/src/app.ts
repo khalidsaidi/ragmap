@@ -1335,6 +1335,11 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           : { mcpServers: {} };
 
     const claudeDesktopConfig = JSON.parse(JSON.stringify(genericConfig));
+    const claudeDesktopNote = primaryRemote
+      ? 'Claude Desktop remote MCP servers may need to be added via Settings > Connectors. Remote servers might not connect when configured only in claude_desktop_config.json.'
+      : stdioCommand
+        ? 'Claude Desktop local stdio MCP servers can be configured in claude_desktop_config.json.'
+        : '';
 
     return {
       serverName: entry.server.name,
@@ -1384,7 +1389,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       genericMcpHostConfig: {
         object: genericConfig,
         json: JSON.stringify(genericConfig, null, 2)
-      }
+      },
+      claudeDesktopNote
     };
   });
 
@@ -1439,6 +1445,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       totalLatestServers,
       countRagScoreGte1,
       countRagScoreGte25,
+      reachabilityPolicy: params.env.reachabilityPolicy,
       reachabilityCandidates,
       reachabilityKnown,
       reachabilityTrue,
