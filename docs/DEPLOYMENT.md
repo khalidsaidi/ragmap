@@ -94,6 +94,9 @@ For repository workflows that call `/internal/*` routes:
 - `REACHABILITY_POLICY` controls how HTTP probe statuses map to reachable:
   - `strict` (default): reachable for `200-399`, `401`, `403`, `405`, `429`; unreachable for `404`, `410`, `5xx`, and network/timeout errors.
   - `loose`: reachable for any status `<500` except `404` and `410`; still unreachable on network/timeout errors.
+- Reachability probes now cover both `streamable-http` and `sse` remotes:
+  - `streamable-http`: `HEAD` probe, with `GET` fallback.
+  - `sse`: short `GET` with `Accept: text/event-stream`, then immediate body cancel so checks do not hang on streaming responses.
 
 This applies to both scheduled ingest (`/internal/ingest/run`) and scheduled reachability refresh (`/internal/reachability/run`).
 

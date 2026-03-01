@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { Env } from './env.js';
 import type { RegistryStore } from './store/types.js';
 import { META_RAGMAP_KEY, RagFiltersSchema, type RagFilters } from '@ragmap/shared';
-import { getStreamableHttpUrl, runIngest } from './ingest/ingest.js';
+import { getProbeTargets, runIngest } from './ingest/ingest.js';
 import { runReachabilityRefresh } from './reachability/run.js';
 import { embedText } from './rag/embedding.js';
 import { inferHasRemoteFromServer, inferServerKindFromServer } from './rag/search.js';
@@ -1355,14 +1355,16 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           typeof ragmap?.hasRemote === 'boolean'
             ? ragmap.hasRemote
             : inferHasRemoteFromServer(entry.server as any);
-        const streamableUrl = getStreamableHttpUrl(entry.server);
-        if (inferredHasRemote && streamableUrl) {
+        const probeTargets = getProbeTargets(entry.server);
+        if (inferredHasRemote && probeTargets.length > 0) {
           reachabilityCandidates += 1;
           const hasReachabilityMetadata =
             typeof ragmap?.lastReachableAt === 'string' ||
             typeof ragmap?.reachableCheckedAt === 'string' ||
             typeof ragmap?.reachableStatus === 'number' ||
-            typeof ragmap?.reachableMethod === 'string';
+            typeof ragmap?.reachableMethod === 'string' ||
+            typeof ragmap?.reachableRemoteType === 'string' ||
+            typeof ragmap?.reachableUrl === 'string';
           if (typeof ragmap?.reachable === 'boolean' || hasReachabilityMetadata) {
             reachabilityKnown += 1;
           }

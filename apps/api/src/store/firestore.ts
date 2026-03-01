@@ -49,7 +49,27 @@ function mergeReachabilityIntoRagmap(
     ...base,
     ...(typeof base.reachable === 'boolean' ? {} : { reachable: Boolean(reachability.ok) }),
     ...(base.lastReachableAt ? {} : checkedAt ? { lastReachableAt: checkedAt } : {}),
-    ...(checkedAt ? { reachableCheckedAt: checkedAt } : {})
+    ...(checkedAt ? { reachableCheckedAt: checkedAt } : {}),
+    ...(typeof base.reachableStatus === 'number'
+      ? {}
+      : typeof reachability.status === 'number'
+        ? { reachableStatus: reachability.status }
+        : {}),
+    ...(base.reachableMethod === 'HEAD' || base.reachableMethod === 'GET'
+      ? {}
+      : reachability.method === 'HEAD' || reachability.method === 'GET'
+        ? { reachableMethod: reachability.method }
+        : {}),
+    ...(typeof base.reachableRemoteType === 'string'
+      ? {}
+      : reachability.remoteType === 'streamable-http' || reachability.remoteType === 'sse'
+        ? { reachableRemoteType: reachability.remoteType }
+        : {}),
+    ...(typeof base.reachableUrl === 'string'
+      ? {}
+      : typeof reachability.url === 'string'
+        ? { reachableUrl: reachability.url }
+        : {})
   } as RagmapEnrichment;
 }
 
@@ -61,12 +81,16 @@ function normalizeLatestRagmap(data: any): RagmapEnrichment | null {
   const dottedCheckedAt = data?.['latestRagmap.reachableCheckedAt'];
   const dottedStatus = data?.['latestRagmap.reachableStatus'];
   const dottedMethod = data?.['latestRagmap.reachableMethod'];
+  const dottedRemoteType = data?.['latestRagmap.reachableRemoteType'];
+  const dottedUrl = data?.['latestRagmap.reachableUrl'];
 
   const hasDottedFallback =
     dottedReachable !== undefined ||
     dottedCheckedAt !== undefined ||
     dottedStatus !== undefined ||
-    dottedMethod !== undefined;
+    dottedMethod !== undefined ||
+    dottedRemoteType !== undefined ||
+    dottedUrl !== undefined;
 
   if (!hasDottedFallback) {
     return mergeReachabilityIntoRagmap(base, data?.reachability);
@@ -77,7 +101,11 @@ function normalizeLatestRagmap(data: any): RagmapEnrichment | null {
     ...(typeof dottedReachable === 'boolean' ? { reachable: dottedReachable } : {}),
     ...(typeof dottedCheckedAt === 'string' ? { reachableCheckedAt: dottedCheckedAt, lastReachableAt: dottedCheckedAt } : {}),
     ...(typeof dottedStatus === 'number' ? { reachableStatus: dottedStatus } : {}),
-    ...(dottedMethod === 'HEAD' || dottedMethod === 'GET' ? { reachableMethod: dottedMethod } : {})
+    ...(dottedMethod === 'HEAD' || dottedMethod === 'GET' ? { reachableMethod: dottedMethod } : {}),
+    ...(dottedRemoteType === 'streamable-http' || dottedRemoteType === 'sse'
+      ? { reachableRemoteType: dottedRemoteType }
+      : {}),
+    ...(typeof dottedUrl === 'string' ? { reachableUrl: dottedUrl } : {})
   } as RagmapEnrichment;
 
   return mergeReachabilityIntoRagmap(merged, data?.reachability);
@@ -497,7 +525,12 @@ export class FirestoreStore implements RegistryStore {
     serverName: string,
     ok: boolean,
     lastCheckedAt: Date,
-    details?: { status?: number; method?: 'HEAD' | 'GET' }
+    details?: {
+      status?: number;
+      method?: 'HEAD' | 'GET';
+      remoteType?: 'streamable-http' | 'sse';
+      url?: string;
+    }
   ): Promise<void> {
     const serverId = encodeServerId(serverName);
     const checkedAtIso = lastCheckedAt.toISOString();
@@ -505,14 +538,20 @@ export class FirestoreStore implements RegistryStore {
       {
         reachability: {
           ok,
-          lastCheckedAt: checkedAtIso
+          lastCheckedAt: checkedAtIso,
+          status: details?.status ?? null,
+          method: details?.method ?? null,
+          remoteType: details?.remoteType ?? null,
+          url: details?.url ?? null
         },
         latestRagmap: {
           reachable: ok,
           lastReachableAt: checkedAtIso,
           reachableCheckedAt: checkedAtIso,
           reachableStatus: details?.status ?? null,
-          reachableMethod: details?.method ?? null
+          reachableMethod: details?.method ?? null,
+          reachableRemoteType: details?.remoteType ?? null,
+          reachableUrl: details?.url ?? null
         }
       },
       { merge: true }

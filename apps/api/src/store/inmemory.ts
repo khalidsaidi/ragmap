@@ -275,7 +275,12 @@ export class InMemoryStore implements RegistryStore {
     serverName: string,
     ok: boolean,
     lastCheckedAt: Date,
-    details?: { status?: number; method?: 'HEAD' | 'GET' }
+    details?: {
+      status?: number;
+      method?: 'HEAD' | 'GET';
+      remoteType?: 'streamable-http' | 'sse';
+      url?: string;
+    }
   ) {
     const srv = this.servers.get(serverName);
     if (!srv || srv.hidden) return;
@@ -288,7 +293,9 @@ export class InMemoryStore implements RegistryStore {
       lastReachableAt: lastCheckedAt.toISOString(),
       reachableCheckedAt: lastCheckedAt.toISOString(),
       ...(details?.status != null ? { reachableStatus: details.status } : {}),
-      ...(details?.method ? { reachableMethod: details.method } : {})
+      ...(details?.method ? { reachableMethod: details.method } : {}),
+      ...(details?.remoteType ? { reachableRemoteType: details.remoteType } : {}),
+      ...(typeof details?.url === 'string' ? { reachableUrl: details.url } : {})
     } as RagmapEnrichment;
   }
 
