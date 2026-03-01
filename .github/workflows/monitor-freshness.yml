@@ -14,7 +14,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          STATS="$(curl --fail-with-body -sS https://ragmap-api.web.app/rag/stats)"
+          STATS="$(curl --fail-with-body -sS \
+            --retry 3 \
+            --retry-all-errors \
+            --retry-delay 2 \
+            --connect-timeout 10 \
+            --max-time 30 \
+            https://ragmap-api.web.app/rag/stats)"
           echo "$STATS" | jq .
 
           lastIngest="$(echo "$STATS" | jq -r '.lastSuccessfulIngestAt // empty')"
@@ -29,18 +35,22 @@ jobs:
           ingestEpoch="$(date -d "$lastIngest" +%s)"
           reachEpoch="$(date -d "$lastReach" +%s)"
 
-          ingestAgeHours="$(( (now - ingestEpoch) / 3600 ))"
-          reachAgeHours="$(( (now - reachEpoch) / 3600 ))"
+          ingestAgeSec="$(( now - ingestEpoch ))"
+          reachAgeSec="$(( now - reachEpoch ))"
+          ingestAgeHours="$(( ingestAgeSec / 3600 ))"
+          reachAgeHours="$(( reachAgeSec / 3600 ))"
 
+          echo "Ingest age (sec): $ingestAgeSec"
+          echo "Reachability age (sec): $reachAgeSec"
           echo "Ingest age (hours): $ingestAgeHours"
           echo "Reachability age (hours): $reachAgeHours"
 
-          if (( ingestAgeHours > 36 )); then
+          if (( ingestAgeSec > 36 * 3600 )); then
             echo "ERROR: ingest stale (>36h)"
             exit 1
           fi
 
-          if (( reachAgeHours > 18 )); then
+          if (( reachAgeSec > 18 * 3600 )); then
             echo "ERROR: reachability stale (>18h)"
             exit 1
           fi
