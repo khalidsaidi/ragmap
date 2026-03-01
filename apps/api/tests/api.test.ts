@@ -58,7 +58,7 @@ test('isReachableStatus supports strict and loose policies', () => {
   assert.equal(isReachableStatus(500, 'loose'), false);
 });
 
-test('selectReachabilityCandidates prioritizes high-score retrievers before random tail', () => {
+test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
   const selected = selectReachabilityCandidates(
     [
       {
@@ -66,35 +66,40 @@ test('selectReachabilityCandidates prioritizes high-score retrievers before rand
         url: 'https://example.com/other',
         ragScore: 99,
         serverKind: 'other',
-        updatedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
+        updatedAtMs: Date.parse('2026-02-01T00:00:00.000Z'),
+        reachableCheckedAtMs: null
       },
       {
         name: 'retriever/priority-a-old',
         url: 'https://example.com/a-old',
         ragScore: 50,
         serverKind: 'retriever',
-        updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z')
+        updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
       },
       {
         name: 'retriever/priority-a-new',
         url: 'https://example.com/a-new',
         ragScore: 50,
         serverKind: 'retriever',
-        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z')
+        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
       },
       {
         name: 'retriever/priority-b',
         url: 'https://example.com/b',
         ragScore: 5,
         serverKind: 'retriever',
-        updatedAtMs: Date.parse('2026-02-15T00:00:00.000Z')
+        updatedAtMs: Date.parse('2026-02-15T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
       },
       {
         name: 'retriever/zero-score',
         url: 'https://example.com/z',
         ragScore: 0,
         serverKind: 'retriever',
-        updatedAtMs: Date.parse('2026-02-10T00:00:00.000Z')
+        updatedAtMs: Date.parse('2026-02-10T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
       }
     ],
     3
@@ -103,6 +108,65 @@ test('selectReachabilityCandidates prioritizes high-score retrievers before rand
   assert.deepEqual(
     selected.map((s) => s.name),
     ['retriever/priority-a-new', 'retriever/priority-a-old', 'retriever/priority-b']
+  );
+});
+
+test('selectReachabilityCandidates rotates priority A by unknown and oldest checked first', () => {
+  const selected = selectReachabilityCandidates(
+    [
+      {
+        name: 'retriever/unknown',
+        url: 'https://example.com/unknown',
+        ragScore: 10,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
+        reachableCheckedAtMs: null
+      },
+      {
+        name: 'retriever/oldest',
+        url: 'https://example.com/oldest',
+        ragScore: 5_000,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-01-15T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/high-newer-check',
+        url: 'https://example.com/high-newer-check',
+        ragScore: 9_000,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/same-check-high-updated',
+        url: 'https://example.com/same-check-high-updated',
+        ragScore: 100,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-03-10T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-10T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/same-check-high-old',
+        url: 'https://example.com/same-check-high-old',
+        ragScore: 100,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
+        reachableCheckedAtMs: Date.parse('2026-02-10T00:00:00.000Z')
+      }
+    ],
+    8
+  );
+
+  assert.deepEqual(
+    selected.map((s) => s.name),
+    [
+      'retriever/unknown',
+      'retriever/oldest',
+      'retriever/high-newer-check',
+      'retriever/same-check-high-updated',
+      'retriever/same-check-high-old'
+    ]
   );
 });
 
