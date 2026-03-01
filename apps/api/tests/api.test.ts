@@ -963,6 +963,142 @@ test('rag top applies reachableMaxAgeHours when reachable=true and echoes the fi
   await app.close();
 });
 
+test('rag top prefers reachable streamable-http over sse when reachable=true', async () => {
+  const store = new InMemoryStore();
+  const nowMs = Date.now();
+  const olderCheckedAt = new Date(nowMs - 2 * 3_600_000).toISOString();
+  const newerCheckedAt = new Date(nowMs - 30 * 60_000).toISOString();
+  const officialUpdatedAt = '2026-03-01T00:00:00.000Z';
+
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-streamable-older',
+      version: '0.1.0',
+      description: 'retrieval rag server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/top-streamable' }]
+    },
+    official: { isLatest: true, updatedAt: officialUpdatedAt, publishedAt: officialUpdatedAt },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 70,
+      reasons: ['test'],
+      keywords: ['rank'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableRemoteType: 'streamable-http',
+      reachableCheckedAt: olderCheckedAt
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/top-sse-newer',
+      version: '0.1.0',
+      description: 'retrieval rag server',
+      remotes: [{ type: 'sse', url: 'https://example.com/top-sse' }]
+    },
+    official: { isLatest: true, updatedAt: officialUpdatedAt, publishedAt: officialUpdatedAt },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 70,
+      reasons: ['test'],
+      keywords: ['rank'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableRemoteType: 'sse',
+      reachableCheckedAt: newerCheckedAt
+    },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({
+    method: 'GET',
+    url: '/rag/top?reachable=true&reachableMaxAgeHours=24&minScore=0&serverKind=retriever&limit=10'
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.metadata.count, 2);
+  assert.equal(body.results[0].name, 'example/top-streamable-older');
+  assert.equal(body.results[1].name, 'example/top-sse-newer');
+
+  await app.close();
+});
+
+test('rag search prefers more recently checked entries when remote type ties', async () => {
+  const store = new InMemoryStore();
+  const nowMs = Date.now();
+  const olderCheckedAt = new Date(nowMs - 5 * 3_600_000).toISOString();
+  const newerCheckedAt = new Date(nowMs - 45 * 60_000).toISOString();
+  const officialUpdatedAt = '2026-03-01T00:00:00.000Z';
+
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/search-streamable-older',
+      version: '0.1.0',
+      description: 'ranksignal retriever endpoint',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/search-older' }]
+    },
+    official: { isLatest: true, updatedAt: officialUpdatedAt, publishedAt: officialUpdatedAt },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 65,
+      reasons: ['test'],
+      keywords: ['ranksignal'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableRemoteType: 'streamable-http',
+      reachableCheckedAt: olderCheckedAt
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/search-streamable-newer',
+      version: '0.1.0',
+      description: 'ranksignal retriever endpoint',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/search-newer' }]
+    },
+    official: { isLatest: true, updatedAt: officialUpdatedAt, publishedAt: officialUpdatedAt },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 65,
+      reasons: ['test'],
+      keywords: ['ranksignal'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      reachableRemoteType: 'streamable-http',
+      reachableCheckedAt: newerCheckedAt
+    },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=ranksignal&hasRemote=true&reachable=true&reachableMaxAgeHours=24&limit=10'
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.metadata.count, 2);
+  assert.equal(body.results[0].name, 'example/search-streamable-newer');
+  assert.equal(body.results[1].name, 'example/search-streamable-older');
+
+  await app.close();
+});
+
 test('rag install returns copy-ready config object', async () => {
   const store = new InMemoryStore();
   await store.upsertServerVersion({
