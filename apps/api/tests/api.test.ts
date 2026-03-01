@@ -4,6 +4,7 @@ import http from 'node:http';
 import { buildApp } from '../src/app.js';
 import type { Env } from '../src/env.js';
 import { isReachableStatus } from '../src/ingest/ingest.js';
+import { selectReachabilityCandidates } from '../src/reachability/run.js';
 import { InMemoryStore } from '../src/store/inmemory.js';
 
 const env: Env = {
@@ -55,6 +56,54 @@ test('isReachableStatus supports strict and loose policies', () => {
   assert.equal(isReachableStatus(404, 'loose'), false);
   assert.equal(isReachableStatus(410, 'loose'), false);
   assert.equal(isReachableStatus(500, 'loose'), false);
+});
+
+test('selectReachabilityCandidates prioritizes high-score retrievers before random tail', () => {
+  const selected = selectReachabilityCandidates(
+    [
+      {
+        name: 'other/random-high',
+        url: 'https://example.com/other',
+        ragScore: 99,
+        serverKind: 'other',
+        updatedAtMs: Date.parse('2026-02-01T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/priority-a-old',
+        url: 'https://example.com/a-old',
+        ragScore: 50,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/priority-a-new',
+        url: 'https://example.com/a-new',
+        ragScore: 50,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/priority-b',
+        url: 'https://example.com/b',
+        ragScore: 5,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-02-15T00:00:00.000Z')
+      },
+      {
+        name: 'retriever/zero-score',
+        url: 'https://example.com/z',
+        ragScore: 0,
+        serverKind: 'retriever',
+        updatedAtMs: Date.parse('2026-02-10T00:00:00.000Z')
+      }
+    ],
+    3
+  );
+
+  assert.deepEqual(
+    selected.map((s) => s.name),
+    ['retriever/priority-a-new', 'retriever/priority-a-old', 'retriever/priority-b']
+  );
 });
 
 test('health endpoint', async () => {
@@ -503,10 +552,54 @@ test('rag stats returns freshness and coverage fields', async () => {
     server: {
       name: 'example/stats-retriever',
       version: '0.3.0',
-      description: 'retrieval rag search server'
+      description: 'retrieval rag search server',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/r1' }]
     },
     official: { isLatest: true, updatedAt: '2026-02-28T00:00:00.000Z', publishedAt: '2026-02-28T00:00:00.000Z' },
-    ragmap: { categories: ['rag'], ragScore: 30, reasons: ['test'], keywords: ['rag'], serverKind: 'retriever' },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 30,
+      reasons: ['test'],
+      keywords: ['rag'],
+      serverKind: 'retriever',
+      hasRemote: true,
+      reachable: true,
+      lastReachableAt: '2026-02-28T02:00:00.000Z',
+      reachableCheckedAt: '2026-02-28T02:00:00.000Z'
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/stats-unknown',
+      version: '0.1.0',
+      description: 'remote without reachability yet',
+      remotes: [{ type: 'streamable-http', url: 'https://example.com/r2' }]
+    },
+    official: { isLatest: true, updatedAt: '2026-02-27T00:00:00.000Z', publishedAt: '2026-02-27T00:00:00.000Z' },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 2,
+      reasons: ['test'],
+      keywords: ['rag'],
+      serverKind: 'retriever',
+      hasRemote: true
+    },
+    hidden: false
+  });
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/stats-local-only',
+      version: '0.1.0',
+      description: 'local stdio retriever',
+      packages: [{ registryType: 'npm', identifier: '@example/local', version: '0.1.0', transport: { type: 'stdio' } }]
+    },
+    official: { isLatest: true, updatedAt: '2026-02-26T00:00:00.000Z', publishedAt: '2026-02-26T00:00:00.000Z' },
+    ragmap: { categories: ['rag'], ragScore: 0, reasons: ['test'], keywords: ['rag'], hasRemote: false },
     hidden: false
   });
   await store.setLastSuccessfulIngestAt(new Date('2026-02-28T01:00:00.000Z'));
@@ -519,6 +612,10 @@ test('rag stats returns freshness and coverage fields', async () => {
   assert.equal(typeof body.totalLatestServers, 'number');
   assert.equal(typeof body.countRagScoreGte1, 'number');
   assert.equal(typeof body.countRagScoreGte25, 'number');
+  assert.equal(body.reachabilityCandidates, 2);
+  assert.equal(body.reachabilityKnown, 1);
+  assert.equal(body.reachabilityTrue, 1);
+  assert.equal(body.reachabilityUnknown, 1);
   assert.equal(typeof body.lastSuccessfulIngestAt, 'string');
   assert.equal(typeof body.lastReachabilityRunAt, 'string');
   await app.close();
