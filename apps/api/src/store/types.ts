@@ -146,7 +146,12 @@ export interface RegistryStore {
     serverName: string,
     ok: boolean,
     lastCheckedAt: Date,
-    details?: { status?: number; method?: 'HEAD' | 'GET' }
+    details?: {
+      status?: number;
+      method?: 'HEAD' | 'GET';
+      remoteType?: 'streamable-http' | 'sse';
+      url?: string;
+    }
   ): Promise<void>;
 
   writeUsageEvent(event: UsageEvent): Promise<void>;

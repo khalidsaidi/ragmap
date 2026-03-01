@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import { buildApp } from '../src/app.js';
 import type { Env } from '../src/env.js';
-import { isReachableStatus } from '../src/ingest/ingest.js';
+import { META_RAGMAP_KEY } from '@ragmap/shared';
+import { getProbeTargets, isReachableStatus, probeSseReachable } from '../src/ingest/ingest.js';
 import { selectReachabilityCandidates } from '../src/reachability/run.js';
 import { InMemoryStore } from '../src/store/inmemory.js';
 
@@ -58,12 +59,27 @@ test('isReachableStatus supports strict and loose policies', () => {
   assert.equal(isReachableStatus(500, 'loose'), false);
 });
 
+test('getProbeTargets includes streamable-http and sse targets once per url', () => {
+  const targets = getProbeTargets({
+    remotes: [
+      { type: 'streamable-http', url: 'https://example.com/mcp-http' },
+      { type: 'sse', url: 'https://example.com/mcp-sse' },
+      { type: 'sse', url: 'https://example.com/mcp-sse' }
+    ]
+  });
+
+  assert.deepEqual(targets, [
+    { url: 'https://example.com/mcp-http', remoteType: 'streamable-http' },
+    { url: 'https://example.com/mcp-sse', remoteType: 'sse' }
+  ]);
+});
+
 test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
   const selected = selectReachabilityCandidates(
     [
       {
         name: 'other/random-high',
-        url: 'https://example.com/other',
+        probeTargets: [{ url: 'https://example.com/other', remoteType: 'streamable-http' }],
         ragScore: 99,
         serverKind: 'other',
         updatedAtMs: Date.parse('2026-02-01T00:00:00.000Z'),
@@ -71,7 +87,7 @@ test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
       },
       {
         name: 'retriever/priority-a-old',
-        url: 'https://example.com/a-old',
+        probeTargets: [{ url: 'https://example.com/a-old', remoteType: 'streamable-http' }],
         ragScore: 50,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z'),
@@ -79,7 +95,7 @@ test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
       },
       {
         name: 'retriever/priority-a-new',
-        url: 'https://example.com/a-new',
+        probeTargets: [{ url: 'https://example.com/a-new', remoteType: 'streamable-http' }],
         ragScore: 50,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
@@ -87,7 +103,7 @@ test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
       },
       {
         name: 'retriever/priority-b',
-        url: 'https://example.com/b',
+        probeTargets: [{ url: 'https://example.com/b', remoteType: 'streamable-http' }],
         ragScore: 5,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-02-15T00:00:00.000Z'),
@@ -95,7 +111,7 @@ test('selectReachabilityCandidates preserves A/B/C allocation priority', () => {
       },
       {
         name: 'retriever/zero-score',
-        url: 'https://example.com/z',
+        probeTargets: [{ url: 'https://example.com/z', remoteType: 'streamable-http' }],
         ragScore: 0,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-02-10T00:00:00.000Z'),
@@ -116,7 +132,7 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
     [
       {
         name: 'retriever/unknown',
-        url: 'https://example.com/unknown',
+        probeTargets: [{ url: 'https://example.com/unknown', remoteType: 'streamable-http' }],
         ragScore: 10,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
@@ -124,7 +140,7 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
       },
       {
         name: 'retriever/oldest',
-        url: 'https://example.com/oldest',
+        probeTargets: [{ url: 'https://example.com/oldest', remoteType: 'streamable-http' }],
         ragScore: 5_000,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-01-01T00:00:00.000Z'),
@@ -132,7 +148,7 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
       },
       {
         name: 'retriever/high-newer-check',
-        url: 'https://example.com/high-newer-check',
+        probeTargets: [{ url: 'https://example.com/high-newer-check', remoteType: 'streamable-http' }],
         ragScore: 9_000,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
@@ -140,7 +156,7 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
       },
       {
         name: 'retriever/same-check-high-updated',
-        url: 'https://example.com/same-check-high-updated',
+        probeTargets: [{ url: 'https://example.com/same-check-high-updated', remoteType: 'streamable-http' }],
         ragScore: 100,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-03-10T00:00:00.000Z'),
@@ -148,7 +164,7 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
       },
       {
         name: 'retriever/same-check-high-old',
-        url: 'https://example.com/same-check-high-old',
+        probeTargets: [{ url: 'https://example.com/same-check-high-old', remoteType: 'streamable-http' }],
         ragScore: 100,
         serverKind: 'retriever',
         updatedAtMs: Date.parse('2026-03-01T00:00:00.000Z'),
@@ -168,6 +184,71 @@ test('selectReachabilityCandidates rotates priority A by unknown and oldest chec
       'retriever/same-check-high-old'
     ]
   );
+});
+
+test('probeSseReachable returns after headers for open event-stream responses', async () => {
+  const sockets = new Set<any>();
+  const upstream = http.createServer((req, res) => {
+    if (req.url === '/sse') {
+      res.writeHead(200, {
+        'content-type': 'text/event-stream',
+        'cache-control': 'no-cache'
+      });
+      res.write('data: ping\n\n');
+      return;
+    }
+    res.statusCode = 404;
+    res.end('not found');
+  });
+  upstream.on('connection', (socket) => {
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
+  });
+  await new Promise<void>((resolve, reject) => upstream.listen(0, '127.0.0.1', (err?: Error) => (err ? reject(err) : resolve())));
+  const address = upstream.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  const url = `http://127.0.0.1:${port}/sse`;
+
+  const startedAtMs = Date.now();
+  const probe = await probeSseReachable(url, 1500, 'strict');
+  const durationMs = Date.now() - startedAtMs;
+
+  assert.equal(probe.ok, true);
+  assert.equal(probe.status, 200);
+  assert.equal(probe.method, 'GET');
+  assert.equal(probe.remoteType, 'sse');
+  assert.equal(durationMs < 1200, true);
+
+  for (const socket of sockets) socket.destroy();
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
+});
+
+test('probeSseReachable applies strict/loose policy to SSE statuses', async () => {
+  const upstream = http.createServer((req, res) => {
+    if (req.url === '/sse-422') {
+      res.statusCode = 422;
+      res.end('unprocessable');
+      return;
+    }
+    res.statusCode = 404;
+    res.end('not found');
+  });
+  await new Promise<void>((resolve, reject) =>
+    upstream.listen(0, '127.0.0.1', (err?: Error) => (err ? reject(err) : resolve()))
+  );
+  const address = upstream.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  const url = `http://127.0.0.1:${port}/sse-422`;
+
+  const strictProbe = await probeSseReachable(url, 1500, 'strict');
+  const looseProbe = await probeSseReachable(url, 1500, 'loose');
+
+  assert.equal(strictProbe.status, 422);
+  assert.equal(strictProbe.ok, false);
+  assert.equal(looseProbe.status, 422);
+  assert.equal(looseProbe.ok, true);
+
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
 });
 
 test('health endpoint', async () => {
@@ -442,9 +523,9 @@ test('internal reachability run marks 401 endpoints reachable and searchable', a
   await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
 });
 
-test('internal reachability run respects strict vs loose policy', async () => {
+test('internal reachability run respects strict vs loose policy for SSE targets', async () => {
   const upstream = http.createServer((req, res) => {
-    if (req.url === '/mcp') {
+    if (req.url === '/mcp-sse') {
       res.statusCode = 422;
       res.end('unprocessable');
       return;
@@ -457,7 +538,7 @@ test('internal reachability run respects strict vs loose policy', async () => {
   );
   const address = upstream.address();
   const port = typeof address === 'object' && address ? address.port : 0;
-  const remoteUrl = `http://127.0.0.1:${port}/mcp`;
+  const remoteUrl = `http://127.0.0.1:${port}/mcp-sse`;
 
   async function runForPolicy(policy: Env['reachabilityPolicy'], expectedReachable: boolean) {
     const store = new InMemoryStore();
@@ -468,7 +549,7 @@ test('internal reachability run respects strict vs loose policy', async () => {
         name: `example/reachability-422-${policy}`,
         version: '0.1.0',
         description: 'rag remote endpoint',
-        remotes: [{ type: 'streamable-http', url: remoteUrl }]
+        remotes: [{ type: 'sse', url: remoteUrl }]
       },
       official: {
         isLatest: true,
@@ -512,6 +593,85 @@ test('internal reachability run respects strict vs loose policy', async () => {
   await runForPolicy('strict', false);
   await runForPolicy('loose', true);
 
+  await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
+});
+
+test('internal reachability run falls back from streamable-http failure to SSE success', async () => {
+  const sockets = new Set<any>();
+  const upstream = http.createServer((req, res) => {
+    if (req.url === '/mcp-http') {
+      res.statusCode = 404;
+      res.end('missing');
+      return;
+    }
+    if (req.url === '/mcp-sse') {
+      res.writeHead(200, {
+        'content-type': 'text/event-stream',
+        'cache-control': 'no-cache'
+      });
+      res.write('data: ready\n\n');
+      return;
+    }
+    res.statusCode = 404;
+    res.end('not found');
+  });
+  upstream.on('connection', (socket) => {
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
+  });
+  await new Promise<void>((resolve, reject) =>
+    upstream.listen(0, '127.0.0.1', (err?: Error) => (err ? reject(err) : resolve()))
+  );
+  const address = upstream.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/reachability-streamable-fallback-sse',
+      version: '0.1.0',
+      description: 'rag remote endpoint',
+      remotes: [
+        { type: 'streamable-http', url: `http://127.0.0.1:${port}/mcp-http` },
+        { type: 'sse', url: `http://127.0.0.1:${port}/mcp-sse` }
+      ]
+    },
+    official: {
+      isLatest: true,
+      updatedAt: new Date().toISOString(),
+      publishedAt: new Date().toISOString()
+    },
+    ragmap: { categories: ['rag'], ragScore: 60, reasons: ['test'], keywords: ['rag'] },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const run = await app.inject({
+    method: 'POST',
+    url: '/internal/reachability/run',
+    headers: {
+      'content-type': 'application/json',
+      'x-ingest-token': env.ingestToken
+    },
+    payload: { limit: 1 }
+  });
+  assert.equal(run.statusCode, 200);
+  const stats = run.json() as any;
+  assert.equal(stats.checked, 1);
+  assert.equal(stats.reachable, 1);
+
+  const latest = await store.getServerVersion('example/reachability-streamable-fallback-sse', 'latest');
+  const ragmap = (latest?._meta?.[META_RAGMAP_KEY] as any) ?? {};
+  assert.equal(ragmap.reachable, true);
+  assert.equal(ragmap.reachableMethod, 'GET');
+  assert.equal(ragmap.reachableStatus, 200);
+  assert.equal(ragmap.reachableRemoteType, 'sse');
+  assert.equal(ragmap.reachableUrl, `http://127.0.0.1:${port}/mcp-sse`);
+
+  await app.close();
+  for (const socket of sockets) socket.destroy();
   await new Promise<void>((resolve, reject) => upstream.close((err) => (err ? reject(err) : resolve())));
 });
 
@@ -640,7 +800,7 @@ test('rag stats returns freshness and coverage fields', async () => {
       name: 'example/stats-unknown',
       version: '0.1.0',
       description: 'remote without reachability yet',
-      remotes: [{ type: 'streamable-http', url: 'https://example.com/r2' }]
+      remotes: [{ type: 'sse', url: 'https://example.com/r2-sse' }]
     },
     official: { isLatest: true, updatedAt: '2026-02-27T00:00:00.000Z', publishedAt: '2026-02-27T00:00:00.000Z' },
     ragmap: {

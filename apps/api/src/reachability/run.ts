@@ -1,6 +1,7 @@
 import {
-  getStreamableHttpUrl,
-  probeReachable,
+  getProbeTargets,
+  probeTargetsReachable,
+  type ProbeTarget,
   REACHABILITY_DELAY_MS,
   REACHABILITY_MAX_PER_RUN,
   REACHABILITY_TIMEOUT_MS,
@@ -32,7 +33,7 @@ export type ReachabilityRunStats = {
 
 export type ReachabilityCandidate = {
   name: string;
-  url: string;
+  probeTargets: ProbeTarget[];
   ragScore: number;
   serverKind: ServerKind;
   updatedAtMs: number;
@@ -177,12 +178,12 @@ export async function runReachabilityRefresh(params: {
   do {
     const page = await params.store.listLatestServers({ limit: 200, cursor });
     for (const entry of page.servers) {
-      const url = getStreamableHttpUrl(entry.server);
-      if (!url) continue;
       if (!inferHasRemote(entry)) continue;
+      const probeTargets = getProbeTargets(entry.server);
+      if (!probeTargets.length) continue;
       candidates.push({
         name: entry.server.name,
-        url,
+        probeTargets,
         ragScore: getRagScore(entry),
         serverKind: inferServerKind(entry),
         updatedAtMs: getOfficialUpdatedAtMs(entry),
@@ -197,15 +198,17 @@ export async function runReachabilityRefresh(params: {
   let checked = 0;
   let reachable = 0;
   for (const item of selected) {
-    const probe = await probeReachable(
-      item.url,
+    const probe = await probeTargetsReachable(
+      item.probeTargets,
       REACHABILITY_TIMEOUT_MS,
       params.env.reachabilityPolicy
     );
     if (probe.ok) reachable += 1;
     await params.store.setReachability(item.name, probe.ok, new Date(), {
       status: probe.status,
-      method: probe.method
+      method: probe.method,
+      remoteType: probe.remoteType,
+      url: probe.url
     });
     checked += 1;
     await sleep(REACHABILITY_DELAY_MS);

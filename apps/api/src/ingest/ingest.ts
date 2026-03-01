@@ -1,6 +1,7 @@
 import type { Env, ReachabilityPolicy } from '../env.js';
 import { embedText } from '../rag/embedding.js';
 import { buildSearchText, enrichRag } from '../rag/enrich.js';
+import { inferHasRemoteFromServer } from '../rag/search.js';
 import { fetchUpstreamPage } from './upstream.js';
 import type { IngestMode, RegistryStore } from '../store/types.js';
 import { META_OFFICIAL_KEY, META_PUBLISHER_KEY } from '@ragmap/shared';
@@ -8,6 +9,9 @@ import { META_OFFICIAL_KEY, META_PUBLISHER_KEY } from '@ragmap/shared';
 export const REACHABILITY_TIMEOUT_MS = 5000;
 export const REACHABILITY_DELAY_MS = 800;
 export const REACHABILITY_MAX_PER_RUN = 150;
+
+export type ProbeRemoteType = 'streamable-http' | 'sse';
+export type ProbeTarget = { url: string; remoteType: ProbeRemoteType };
 
 export function getStreamableHttpUrl(server: any): string | null {
   const remotes = server?.remotes;
@@ -19,11 +23,48 @@ export function getStreamableHttpUrl(server: any): string | null {
   const packages = server?.packages;
   if (Array.isArray(packages)) {
     for (const p of packages) {
-      if (p?.transport?.type === 'streamable-http' && typeof p?.transport?.url === 'string')
-        return p.transport.url;
+      if (p?.transport?.type !== 'streamable-http') continue;
+      if (typeof p?.transport?.url === 'string' && p.transport.url) return p.transport.url;
+      if (typeof p?.transport?.endpoint === 'string' && p.transport.endpoint) return p.transport.endpoint;
+      if (typeof p?.url === 'string' && p.url) return p.url;
     }
   }
   return null;
+}
+
+function getSseUrls(server: any): string[] {
+  const out: string[] = [];
+  const remotes = server?.remotes;
+  if (!Array.isArray(remotes)) return out;
+  for (const remote of remotes) {
+    if (remote?.type !== 'sse') continue;
+    if (typeof remote?.url !== 'string') continue;
+    const url = remote.url.trim();
+    if (url) out.push(url);
+  }
+  return out;
+}
+
+export function getProbeTargets(server: any): ProbeTarget[] {
+  const out: ProbeTarget[] = [];
+  const seen = new Set<string>();
+
+  const streamable = getStreamableHttpUrl(server);
+  if (typeof streamable === 'string') {
+    const url = streamable.trim();
+    if (url && !seen.has(url)) {
+      out.push({ url, remoteType: 'streamable-http' });
+      seen.add(url);
+    }
+  }
+
+  for (const sseUrl of getSseUrls(server)) {
+    if (seen.has(sseUrl)) continue;
+    out.push({ url: sseUrl, remoteType: 'sse' });
+    seen.add(sseUrl);
+  }
+
+  return out;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -34,6 +75,7 @@ export type ReachabilityProbeResult = {
   ok: boolean;
   status?: number;
   method?: 'HEAD' | 'GET';
+  remoteType?: ProbeRemoteType;
 };
 
 export function isReachableStatus(status: number, policy: ReachabilityPolicy): boolean {
@@ -50,7 +92,8 @@ export function isReachableStatus(status: number, policy: ReachabilityPolicy): b
 async function requestStatus(
   url: string,
   method: 'HEAD' | 'GET',
-  timeoutMs: number
+  timeoutMs: number,
+  headers?: Record<string, string>
 ): Promise<{ status?: number; method: 'HEAD' | 'GET'; threw: boolean }> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
@@ -58,8 +101,16 @@ async function requestStatus(
     const res = await fetch(url, {
       method,
       signal: controller.signal,
-      redirect: 'manual'
+      redirect: 'manual',
+      headers
     });
+    if (method === 'GET') {
+      try {
+        await res.body?.cancel?.();
+      } catch {
+        // ignore cancellation failures
+      }
+    }
     return { status: res.status, method, threw: false };
   } catch {
     return { status: undefined, method, threw: true };
@@ -75,19 +126,71 @@ export async function probeReachable(
 ): Promise<ReachabilityProbeResult> {
   const head = await requestStatus(url, 'HEAD', timeoutMs);
   if (!head.threw && head.status != null && head.status !== 405) {
-    return { ok: isReachableStatus(head.status, policy), status: head.status, method: 'HEAD' };
+    return {
+      ok: isReachableStatus(head.status, policy),
+      status: head.status,
+      method: 'HEAD',
+      remoteType: 'streamable-http'
+    };
   }
 
   const get = await requestStatus(url, 'GET', timeoutMs);
   if (!get.threw && get.status != null) {
-    return { ok: isReachableStatus(get.status, policy), status: get.status, method: 'GET' };
+    return {
+      ok: isReachableStatus(get.status, policy),
+      status: get.status,
+      method: 'GET',
+      remoteType: 'streamable-http'
+    };
   }
 
   if (!head.threw && head.status != null) {
-    return { ok: isReachableStatus(head.status, policy), status: head.status, method: 'HEAD' };
+    return {
+      ok: isReachableStatus(head.status, policy),
+      status: head.status,
+      method: 'HEAD',
+      remoteType: 'streamable-http'
+    };
   }
 
-  return { ok: false };
+  return { ok: false, remoteType: 'streamable-http' };
+}
+
+export async function probeSseReachable(
+  url: string,
+  timeoutMs: number,
+  policy: ReachabilityPolicy
+): Promise<ReachabilityProbeResult> {
+  const get = await requestStatus(url, 'GET', timeoutMs, { Accept: 'text/event-stream' });
+  if (!get.threw && get.status != null) {
+    return {
+      ok: isReachableStatus(get.status, policy),
+      status: get.status,
+      method: 'GET',
+      remoteType: 'sse'
+    };
+  }
+  return { ok: false, method: 'GET', remoteType: 'sse' };
+}
+
+export type ProbeTargetResult = ReachabilityProbeResult & { url?: string };
+
+export async function probeTargetsReachable(
+  targets: ProbeTarget[],
+  timeoutMs: number,
+  policy: ReachabilityPolicy
+): Promise<ProbeTargetResult> {
+  let last: ProbeTargetResult = { ok: false };
+  for (const target of targets) {
+    const probe =
+      target.remoteType === 'sse'
+        ? await probeSseReachable(target.url, timeoutMs, policy)
+        : await probeReachable(target.url, timeoutMs, policy);
+    const attempt: ProbeTargetResult = { ...probe, url: target.url };
+    last = attempt;
+    if (attempt.ok) return attempt;
+  }
+  return last;
 }
 
 export function shuffleInPlace<T>(items: T[]): void {
@@ -190,26 +293,30 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
 
   let reachabilityChecked = 0;
   if (params.mode === 'full' && params.store.setReachability) {
-    const toCheck: { name: string; url: string }[] = [];
+    const toCheck: Array<{ name: string; probeTargets: ProbeTarget[] }> = [];
     let cursor: string | undefined;
     do {
       const page = await params.store.listLatestServers({ limit: 200, cursor });
       for (const s of page.servers) {
-        const url = getStreamableHttpUrl(s.server);
-        if (url) toCheck.push({ name: s.server.name, url });
+        if (!inferHasRemoteFromServer(s.server as any)) continue;
+        const probeTargets = getProbeTargets(s.server);
+        if (!probeTargets.length) continue;
+        toCheck.push({ name: s.server.name, probeTargets });
       }
       cursor = page.nextCursor;
     } while (cursor);
     shuffleInPlace(toCheck);
-    for (const { name, url } of toCheck.slice(0, REACHABILITY_MAX_PER_RUN)) {
-      const probe = await probeReachable(
-        url,
+    for (const { name, probeTargets } of toCheck.slice(0, REACHABILITY_MAX_PER_RUN)) {
+      const probe = await probeTargetsReachable(
+        probeTargets,
         REACHABILITY_TIMEOUT_MS,
         params.env.reachabilityPolicy
       );
       await params.store.setReachability(name, probe.ok, new Date(), {
         status: probe.status,
-        method: probe.method
+        method: probe.method,
+        remoteType: probe.remoteType,
+        url: probe.url
       });
       reachabilityChecked += 1;
       await sleep(REACHABILITY_DELAY_MS);
