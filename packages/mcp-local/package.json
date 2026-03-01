@@ -1,6 +1,6 @@
 {
   "name": "@khalidsaidi/ragmap-mcp",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Find and filter RAG-capable MCP servers by meaning or keywords. Local stdio MCP bridge to the RAGMap subregistry (semantic search, filters, explainable scores).",
   "keywords": [
     "mcp",
