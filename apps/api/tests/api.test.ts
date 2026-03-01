@@ -706,6 +706,52 @@ test('rag search hasRemote response flag matches hasRemote filter even without e
   await app.close();
 });
 
+test('rag search exposes reachability metadata fields', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/search-reachability-metadata',
+      version: '0.1.0',
+      description: 'metadata-rich retriever',
+      remotes: [{ type: 'sse', url: 'https://example.com/mcp-sse' }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: {
+      categories: ['rag'],
+      ragScore: 65,
+      reasons: ['test'],
+      keywords: ['metadata'],
+      hasRemote: true,
+      reachable: true,
+      reachableCheckedAt: '2026-03-01T00:00:00.000Z',
+      reachableStatus: 200,
+      reachableMethod: 'GET',
+      reachableRemoteType: 'sse',
+      reachableUrl: 'https://example.com/mcp-sse'
+    },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({
+    method: 'GET',
+    url: '/rag/search?q=metadata&hasRemote=true&reachable=true&limit=5'
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.metadata.count, 1);
+  assert.equal(body.results[0].name, 'example/search-reachability-metadata');
+  assert.equal(body.results[0].reachable, true);
+  assert.equal(body.results[0].reachableCheckedAt, '2026-03-01T00:00:00.000Z');
+  assert.equal(body.results[0].reachableStatus, 200);
+  assert.equal(body.results[0].reachableMethod, 'GET');
+  assert.equal(body.results[0].reachableRemoteType, 'sse');
+  assert.equal(body.results[0].reachableUrl, 'https://example.com/mcp-sse');
+  await app.close();
+});
+
 test('rag top returns non-empty recommended retrievers with default filters', async () => {
   const store = new InMemoryStore();
   await store.upsertServerVersion({
@@ -765,6 +811,36 @@ test('rag install returns copy-ready config object', async () => {
   assert.equal(body.transport.hasStdio, true);
   assert.equal(typeof body.genericMcpHostConfig?.json, 'string');
   assert.equal(body.genericMcpHostConfig.json.includes('mcpServers'), true);
+  await app.close();
+});
+
+test('rag install emits SSE transport and endpoint list for SSE-only servers', async () => {
+  const store = new InMemoryStore();
+  await store.upsertServerVersion({
+    runId: 'run_test',
+    at: new Date(),
+    server: {
+      name: 'example/sse-installable',
+      version: '0.3.1',
+      description: 'sse-only remote server',
+      remotes: [{ type: 'sse', url: 'https://example.com/mcp', headers: [{ name: 'Authorization', isSecret: true }] }]
+    },
+    official: { isLatest: true, updatedAt: new Date().toISOString(), publishedAt: new Date().toISOString() },
+    ragmap: { categories: ['rag'], ragScore: 45, reasons: ['test'], keywords: ['sse'], hasRemote: true },
+    hidden: false
+  });
+
+  const app = await buildApp({ env, store });
+  const res = await app.inject({ method: 'GET', url: '/rag/install?name=example/sse-installable' });
+  assert.equal(res.statusCode, 200);
+  const body = res.json() as any;
+  assert.equal(body.serverName, 'example/sse-installable');
+  assert.equal(body.primaryRemoteType, 'sse');
+  assert.equal(body.remote?.type, 'sse');
+  assert.equal(body.remoteEndpoints?.length, 1);
+  assert.equal(body.remoteEndpoints[0].type, 'sse');
+  assert.equal(body.remoteEndpoints[0].url, 'https://example.com/mcp');
+  assert.equal(body.genericMcpHostConfig.object?.mcpServers?.['example_sse-installable']?.transport, 'sse');
   await app.close();
 });
 

@@ -97,6 +97,8 @@ For repository workflows that call `/internal/*` routes:
 - Reachability probes now cover both `streamable-http` and `sse` remotes:
   - `streamable-http`: `HEAD` probe, with `GET` fallback.
   - `sse`: short `GET` with `Accept: text/event-stream`, then immediate body cancel so checks do not hang on streaming responses.
+- `/rag/install` now emits remote configs for both `streamable-http` and `sse` endpoints.  
+  Note: SSE support depends on the MCP host/client; Ragmap only emits the correct transport config.
 
 This applies to both scheduled ingest (`/internal/ingest/run`) and scheduled reachability refresh (`/internal/reachability/run`).
 

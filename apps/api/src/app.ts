@@ -213,40 +213,65 @@ function buildStdioCommand(pkg: any) {
   return { command, args: [...args, target, ...extraArgs] };
 }
 
+type RemoteEndpoint = {
+  type: 'streamable-http' | 'sse';
+  url: string;
+  headers: Array<{
+    name: string;
+    description: string | null;
+    isSecret: boolean;
+    required: boolean;
+  }>;
+};
+
+function mapRemoteHeaders(remote: any): RemoteEndpoint['headers'] {
+  const headers: RemoteEndpoint['headers'] = [];
+  if (Array.isArray(remote?.headers)) {
+    for (const h of remote.headers) {
+      if (!h || typeof h !== 'object') continue;
+      const name = typeof h.name === 'string' ? h.name : '';
+      if (!name) continue;
+      headers.push({
+        name,
+        description: typeof h.description === 'string' ? h.description : null,
+        isSecret: h.isSecret === true,
+        required: h.required !== false
+      });
+    }
+  } else if (remote?.headers && typeof remote.headers === 'object') {
+    for (const [name, value] of Object.entries(remote.headers as Record<string, unknown>)) {
+      headers.push({
+        name,
+        description: null,
+        isSecret: /authorization|token|secret|password|api[-_]?key/i.test(name),
+        required: true
+      });
+      void value;
+    }
+  }
+  return headers;
+}
+
 function mapRemoteEndpoints(server: any) {
-  const endpoints: Array<{ url: string; headers: Array<{ name: string; description: string | null; isSecret: boolean; required: boolean }> }> = [];
+  const streamableHttpEndpoints: RemoteEndpoint[] = [];
+  const sseEndpoints: RemoteEndpoint[] = [];
   const remotes: any[] = Array.isArray(server?.remotes) ? server.remotes : [];
   for (const remote of remotes) {
-    if (remote?.type !== 'streamable-http') continue;
+    if (remote?.type !== 'streamable-http' && remote?.type !== 'sse') continue;
     const url = typeof remote?.url === 'string' ? remote.url : '';
     if (!url) continue;
-    const headers: Array<{ name: string; description: string | null; isSecret: boolean; required: boolean }> = [];
-    if (Array.isArray(remote?.headers)) {
-      for (const h of remote.headers) {
-        if (!h || typeof h !== 'object') continue;
-        const name = typeof h.name === 'string' ? h.name : '';
-        if (!name) continue;
-        headers.push({
-          name,
-          description: typeof h.description === 'string' ? h.description : null,
-          isSecret: h.isSecret === true,
-          required: h.required !== false
-        });
-      }
-    } else if (remote?.headers && typeof remote.headers === 'object') {
-      for (const [name, value] of Object.entries(remote.headers as Record<string, unknown>)) {
-        headers.push({
-          name,
-          description: null,
-          isSecret: /authorization|token|secret|password|api[-_]?key/i.test(name),
-          required: true
-        });
-        void value;
-      }
+    const endpoint: RemoteEndpoint = {
+      type: remote.type,
+      url,
+      headers: mapRemoteHeaders(remote)
+    };
+    if (endpoint.type === 'streamable-http') {
+      streamableHttpEndpoints.push(endpoint);
+    } else {
+      sseEndpoints.push(endpoint);
     }
-    endpoints.push({ url, headers });
   }
-  return endpoints;
+  return [...streamableHttpEndpoints, ...sseEndpoints];
 }
 
 function mapRagHit(hit: { entry: any; kind: string; score: number }) {
@@ -271,6 +296,22 @@ function mapRagHit(hit: { entry: any; kind: string; score: number }) {
     ragScore: ragmap.ragScore ?? 0,
     hasRemote: hasRemoteOut,
     reachable: ragmap.reachable ?? false,
+    reachableCheckedAt:
+      typeof ragmap.reachableCheckedAt === 'string'
+        ? ragmap.reachableCheckedAt
+        : typeof ragmap.lastReachableAt === 'string'
+          ? ragmap.lastReachableAt
+          : null,
+    reachableStatus: typeof ragmap.reachableStatus === 'number' ? ragmap.reachableStatus : null,
+    reachableMethod:
+      ragmap.reachableMethod === 'HEAD' || ragmap.reachableMethod === 'GET'
+        ? ragmap.reachableMethod
+        : null,
+    reachableRemoteType:
+      ragmap.reachableRemoteType === 'streamable-http' || ragmap.reachableRemoteType === 'sse'
+        ? ragmap.reachableRemoteType
+        : null,
+    reachableUrl: typeof ragmap.reachableUrl === 'string' ? ragmap.reachableUrl : null,
     citations: ragmap.citations ?? false,
     localOnly: localOnlyOut,
     serverKind: serverKindOut,
@@ -1276,7 +1317,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         ? {
             mcpServers: {
               [configName]: {
-                transport: 'streamable-http',
+                transport: primaryRemote.type,
                 url: primaryRemote.url,
                 ...(Object.keys(remoteHeadersObject).length ? { headers: remoteHeadersObject } : {})
               }
@@ -1313,6 +1354,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         : null,
       remote: primaryRemote
         ? {
+            type: primaryRemote.type,
             url: primaryRemote.url,
             headers: primaryRemote.headers.map((h) => ({
               name: h.name,
@@ -1323,6 +1365,18 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
             }))
           }
         : null,
+      primaryRemoteType: primaryRemote?.type ?? null,
+      remoteEndpoints: remoteEndpoints.map((endpoint) => ({
+        type: endpoint.type,
+        url: endpoint.url,
+        headers: endpoint.headers.map((h) => ({
+          name: h.name,
+          description: h.description,
+          required: h.required,
+          isSecret: h.isSecret,
+          value: sanitizeHeaderValue(h.name, undefined, h.isSecret)
+        }))
+      })),
       claudeDesktopConfig: {
         object: claudeDesktopConfig,
         json: JSON.stringify(claudeDesktopConfig, null, 2)
