@@ -1,6 +1,11 @@
 # RAGMap (RAG MCP Registry Finder)
 
+[![Release](https://img.shields.io/github/v/release/khalidsaidi/ragmap?display_name=tag&sort=semver)](https://github.com/khalidsaidi/ragmap/releases/latest)
+[![Deploy](https://github.com/khalidsaidi/ragmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/khalidsaidi/ragmap/actions/workflows/deploy.yml)
+[![monitor-freshness](https://github.com/khalidsaidi/ragmap/actions/workflows/monitor-freshness.yml/badge.svg)](https://github.com/khalidsaidi/ragmap/actions/workflows/monitor-freshness.yml)
 [![Glama](https://glama.ai/mcp/servers/@khalidsaidi/ragmap/badge)](https://glama.ai/mcp/servers/@khalidsaidi/ragmap)
+
+**Try it:** https://ragmap-api.web.app/browse/
 
 RAGMap is a lightweight MCP Registry-compatible subregistry + MCP server focused on **RAG-related MCP servers**.
 
