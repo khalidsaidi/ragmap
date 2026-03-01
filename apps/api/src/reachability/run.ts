@@ -36,6 +36,7 @@ export type ReachabilityCandidate = {
   ragScore: number;
   serverKind: ServerKind;
   updatedAtMs: number;
+  reachableCheckedAtMs: number | null;
 };
 
 function getRagmap(entry: RegistryServerEntry): Record<string, unknown> {
@@ -78,10 +79,37 @@ function getOfficialUpdatedAtMs(entry: RegistryServerEntry): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function getReachableCheckedAtMs(entry: RegistryServerEntry): number | null {
+  const ragmap = getRagmap(entry);
+  const rawCheckedAt =
+    typeof ragmap.reachableCheckedAt === 'string'
+      ? ragmap.reachableCheckedAt
+      : typeof ragmap.lastReachableAt === 'string'
+        ? ragmap.lastReachableAt
+        : null;
+  if (!rawCheckedAt) return null;
+  const parsed = Date.parse(rawCheckedAt);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function comparePriority(a: ReachabilityCandidate, b: ReachabilityCandidate): number {
   if (b.ragScore !== a.ragScore) return b.ragScore - a.ragScore;
   if (b.updatedAtMs !== a.updatedAtMs) return b.updatedAtMs - a.updatedAtMs;
   return a.name.localeCompare(b.name);
+}
+
+function comparePriorityA(a: ReachabilityCandidate, b: ReachabilityCandidate): number {
+  const aUnknown = a.reachableCheckedAtMs == null;
+  const bUnknown = b.reachableCheckedAtMs == null;
+  if (aUnknown !== bUnknown) return aUnknown ? -1 : 1;
+
+  if (a.reachableCheckedAtMs != null && b.reachableCheckedAtMs != null) {
+    if (a.reachableCheckedAtMs !== b.reachableCheckedAtMs) {
+      return a.reachableCheckedAtMs - b.reachableCheckedAtMs;
+    }
+  }
+
+  return comparePriority(a, b);
 }
 
 export function selectReachabilityCandidates(
@@ -104,7 +132,7 @@ export function selectReachabilityCandidates(
     bucketC.push(candidate);
   }
 
-  priorityA.sort(comparePriority);
+  priorityA.sort(comparePriorityA);
   priorityB.sort(comparePriority);
   shuffleInPlace(bucketC);
 
@@ -157,7 +185,8 @@ export async function runReachabilityRefresh(params: {
         url,
         ragScore: getRagScore(entry),
         serverKind: inferServerKind(entry),
-        updatedAtMs: getOfficialUpdatedAtMs(entry)
+        updatedAtMs: getOfficialUpdatedAtMs(entry),
+        reachableCheckedAtMs: getReachableCheckedAtMs(entry)
       });
     }
     cursor = page.nextCursor;
