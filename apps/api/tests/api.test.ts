@@ -809,6 +809,9 @@ test('rag install returns copy-ready config object', async () => {
   assert.equal(body.serverName, 'example/installable');
   assert.equal(body.version, '1.2.3');
   assert.equal(body.transport.hasStdio, true);
+  assert.equal(body.primaryRemoteType, null);
+  assert.equal(typeof body.claudeDesktopNote, 'string');
+  assert.equal(body.claudeDesktopNote.includes('claude_desktop_config.json'), true);
   assert.equal(typeof body.genericMcpHostConfig?.json, 'string');
   assert.equal(body.genericMcpHostConfig.json.includes('mcpServers'), true);
   await app.close();
@@ -841,6 +844,8 @@ test('rag install emits SSE transport and endpoint list for SSE-only servers', a
   assert.equal(body.remoteEndpoints[0].type, 'sse');
   assert.equal(body.remoteEndpoints[0].url, 'https://example.com/mcp');
   assert.equal(body.genericMcpHostConfig.object?.mcpServers?.['example_sse-installable']?.transport, 'sse');
+  assert.equal(typeof body.claudeDesktopNote, 'string');
+  assert.equal(body.claudeDesktopNote.includes('Connectors'), true);
   await app.close();
 });
 
@@ -912,6 +917,7 @@ test('rag stats returns freshness and coverage fields', async () => {
   assert.equal(typeof body.totalLatestServers, 'number');
   assert.equal(typeof body.countRagScoreGte1, 'number');
   assert.equal(typeof body.countRagScoreGte25, 'number');
+  assert.equal(body.reachabilityPolicy, env.reachabilityPolicy);
   assert.equal(body.reachabilityCandidates, 2);
   assert.equal(body.reachabilityKnown, 1);
   assert.equal(body.reachabilityTrue, 1);
