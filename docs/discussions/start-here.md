@@ -8,6 +8,7 @@ Ragmap helps you discover MCP servers, especially retrievers/RAG servers, with *
 - A discovery + trust layer for MCP servers.
 - It ingests upstream registry data, enriches it for RAG use cases, and continuously probes remotes.
 - It exposes:
+
   - `/rag/top` for smart defaults.
   - `/rag/search` for discovery.
   - `/rag/install` for copy/paste install configs.
