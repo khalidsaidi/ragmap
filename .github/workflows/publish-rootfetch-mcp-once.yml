@@ -1,0 +1,29 @@
+name: publish-rootfetch-mcp-once
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: khalidsaidi/rootfetch
+          path: rootfetch
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: https://registry.npmjs.org
+      - name: Install package deps
+        run: npm --prefix rootfetch/packages/rootfetch-mcp-local install
+      - name: Build package
+        run: npm --prefix rootfetch/packages/rootfetch-mcp-local run build
+      - name: NPM whoami
+        run: npm whoami
+      - name: Publish rootfetch MCP package
+        run: |
+          cd rootfetch/packages/rootfetch-mcp-local
+          npm publish --access public
