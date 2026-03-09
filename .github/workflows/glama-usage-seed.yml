@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Seed Glama inspector usage
         env:
-          SERVER_PATH: '@khalidsaidi/ragmap'
+          SERVER_PATH: 'khalidsaidi/ragmap'
           INSTANCES: '3'
           CALLS_PER_INSTANCE: '6'
           STATUS_TIMEOUT_SECONDS: '60'
