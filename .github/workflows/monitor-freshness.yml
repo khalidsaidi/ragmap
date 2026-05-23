@@ -61,6 +61,8 @@ jobs:
 
   stale_issue:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Open or update stale-ingest issue when >48h
         env:
