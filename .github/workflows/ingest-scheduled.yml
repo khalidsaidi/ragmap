@@ -27,7 +27,7 @@ jobs:
           BASE="${{ secrets.API_BASE_URL }}"
           BASE="${BASE%/}"
           MODE="${{ inputs.mode || 'incremental' }}"
-          MAX_TIME=600
+          MAX_TIME=1200
           if [[ "$MODE" == "full" ]]; then
             MAX_TIME=1800
           fi
