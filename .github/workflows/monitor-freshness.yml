@@ -103,17 +103,16 @@ jobs:
             exit 0
           fi
 
-          body="$(cat <<EOF
-Ingest freshness check detected stale data.
-
-- \`lastSuccessfulIngestAt\`: \`${last_ingest:-missing}\`
-- computed ingest age (hours): \`${ingest_age_hours}\`
-- checked at (UTC): \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`
-- source: \`https://ragmap-api.web.app/rag/stats\`
-
-This issue is opened by \`.github/workflows/monitor-freshness.yml\` as a passive maintenance flag.
-EOF
-)"
+          checked_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          body="$(printf '%s\n' \
+            'Ingest freshness check detected stale data.' \
+            '' \
+            "- \`lastSuccessfulIngestAt\`: \`${last_ingest:-missing}\`" \
+            "- computed ingest age (hours): \`${ingest_age_hours}\`" \
+            "- checked at (UTC): \`${checked_at}\`" \
+            '- source: \`https://ragmap-api.web.app/rag/stats\`' \
+            '' \
+            'This issue is opened by \`.github/workflows/monitor-freshness.yml\` as a passive maintenance flag.')"
 
           if [[ -n "$existing" ]]; then
             gh issue comment "$existing" --repo "$REPO" --body "$body"
