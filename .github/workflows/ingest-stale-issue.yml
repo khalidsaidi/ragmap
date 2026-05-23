@@ -1,0 +1,78 @@
+name: ingest-stale-issue
+
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check ingest freshness and open issue if stale
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          stats="$(curl --fail-with-body -sS \
+            --retry 3 \
+            --retry-all-errors \
+            --retry-delay 2 \
+            --connect-timeout 10 \
+            --max-time 30 \
+            https://ragmap-api.web.app/rag/stats)"
+          echo "$stats" | jq .
+
+          last_ingest="$(echo "$stats" | jq -r '.lastSuccessfulIngestAt // empty')"
+          if [[ -z "$last_ingest" ]]; then
+            echo "No lastSuccessfulIngestAt in /rag/stats"
+            stale=1
+            age_hours="unknown"
+          else
+            now="$(date +%s)"
+            ingest_epoch="$(date -d "$last_ingest" +%s)"
+            age_sec="$(( now - ingest_epoch ))"
+            age_hours="$(( age_sec / 3600 ))"
+            echo "Ingest age (hours): $age_hours"
+            if (( age_sec > 48 * 3600 )); then
+              stale=1
+            else
+              stale=0
+            fi
+          fi
+
+          if [[ "$stale" -eq 0 ]]; then
+            echo "Ingest is fresh; no issue needed."
+            exit 0
+          fi
+
+          title="Passive alert: ingest stale >48h"
+          existing="$(gh issue list --repo "$REPO" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          body="$(cat <<EOF
+Ingest freshness check detected stale data.
+
+- \`lastSuccessfulIngestAt\`: \`${last_ingest:-missing}\`
+- computed ingest age (hours): \`${age_hours}\`
+- checked at (UTC): \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`
+- source: \`https://ragmap-api.web.app/rag/stats\`
+
+This issue is opened by \`.github/workflows/ingest-stale-issue.yml\` as a passive maintenance flag.
+EOF
+)"
+
+          if [[ -n "$existing" ]]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+            echo "Updated existing stale-ingest issue #$existing"
+          else
+            gh issue create \
+              --repo "$REPO" \
+              --title "$title" \
+              --body "$body" \
+              --label bug
+            echo "Created new stale-ingest issue."
+          fi

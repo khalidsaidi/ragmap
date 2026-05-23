@@ -7,6 +7,15 @@ on:
     # Run daily at 02:00 UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Ingest mode
+        required: false
+        default: incremental
+        type: choice
+        options:
+          - incremental
+          - full
 
 jobs:
   ingest:
@@ -17,14 +26,16 @@ jobs:
           set -euo pipefail
           BASE="${{ secrets.API_BASE_URL }}"
           BASE="${BASE%/}"
+          MODE="${{ inputs.mode || 'incremental' }}"
           echo "API_BASE_URL=$BASE"
+          echo "MODE=$MODE"
 
           status=0
           code=""
           if ! code=$(curl --fail-with-body -sS -X POST "$BASE/internal/ingest/run" \
             -H "Content-Type: application/json" \
             -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
-            -d '{"mode":"incremental"}' \
+            -d "{\"mode\":\"$MODE\"}" \
             --max-time 600 \
             -o /tmp/out.json \
             -w "%{http_code}"); then
