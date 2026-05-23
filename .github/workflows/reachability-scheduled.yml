@@ -20,15 +20,16 @@ jobs:
 
           status=0
           code=""
-          if ! code=$(curl --fail-with-body -sS -X POST "$BASE/internal/reachability/run" \
+          set +e
+          code=$(curl --fail-with-body -sS -X POST "$BASE/internal/reachability/run" \
             -H "Content-Type: application/json" \
             -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
             -d '{"limit":150}' \
             --max-time 600 \
             -o /tmp/out.json \
-            -w "%{http_code}"); then
-            status=$?
-          fi
+            -w "%{http_code}")
+          status=$?
+          set -e
 
           cat /tmp/out.json || true
           echo

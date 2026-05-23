@@ -37,15 +37,16 @@ jobs:
 
           status=0
           code=""
-          if ! code=$(curl --fail-with-body -sS -X POST "$BASE/internal/ingest/run" \
+          set +e
+          code=$(curl --fail-with-body -sS -X POST "$BASE/internal/ingest/run" \
             -H "Content-Type: application/json" \
             -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
             -d "{\"mode\":\"$MODE\"}" \
             --max-time "$MAX_TIME" \
             -o /tmp/out.json \
-            -w "%{http_code}"); then
-            status=$?
-          fi
+            -w "%{http_code}")
+          status=$?
+          set -e
 
           cat /tmp/out.json || true
           echo

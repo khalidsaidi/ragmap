@@ -6,6 +6,10 @@ on:
     - cron: "30 */6 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -45,12 +49,78 @@ jobs:
           echo "Ingest age (hours): $ingestAgeHours"
           echo "Reachability age (hours): $reachAgeHours"
 
-          if (( ingestAgeSec > 36 * 3600 )); then
-            echo "ERROR: ingest stale (>36h)"
+          if (( ingestAgeSec > 48 * 3600 )); then
+            echo "ERROR: ingest stale (>48h)"
             exit 1
           fi
 
           if (( reachAgeSec > 18 * 3600 )); then
             echo "ERROR: reachability stale (>18h)"
             exit 1
+          fi
+
+  stale_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update stale-ingest issue when >48h
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          stats="$(curl --fail-with-body -sS \
+            --retry 3 \
+            --retry-all-errors \
+            --retry-delay 2 \
+            --connect-timeout 10 \
+            --max-time 30 \
+            https://ragmap-api.web.app/rag/stats)"
+
+          last_ingest="$(echo "$stats" | jq -r '.lastSuccessfulIngestAt // empty')"
+          if [[ -z "$last_ingest" ]]; then
+            stale=1
+            ingest_age_hours="unknown"
+          else
+            now="$(date +%s)"
+            ingest_epoch="$(date -d "$last_ingest" +%s)"
+            ingest_age_sec="$(( now - ingest_epoch ))"
+            ingest_age_hours="$(( ingest_age_sec / 3600 ))"
+            if (( ingest_age_sec > 48 * 3600 )); then
+              stale=1
+            else
+              stale=0
+            fi
+          fi
+
+          title="Passive alert: ingest stale >48h"
+          existing="$(gh issue list --repo "$REPO" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+
+          if [[ "$stale" -eq 0 ]]; then
+            if [[ -n "$existing" ]]; then
+              gh issue comment "$existing" --repo "$REPO" --body "Ingest freshness recovered at $(date -u +%Y-%m-%dT%H:%M:%SZ). lastSuccessfulIngestAt=\`$last_ingest\`."
+              gh issue close "$existing" --repo "$REPO" --comment "Closing auto-opened stale-ingest issue after recovery."
+            fi
+            exit 0
+          fi
+
+          body="$(cat <<EOF
+Ingest freshness check detected stale data.
+
+- \`lastSuccessfulIngestAt\`: \`${last_ingest:-missing}\`
+- computed ingest age (hours): \`${ingest_age_hours}\`
+- checked at (UTC): \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`
+- source: \`https://ragmap-api.web.app/rag/stats\`
+
+This issue is opened by \`.github/workflows/monitor-freshness.yml\` as a passive maintenance flag.
+EOF
+)"
+
+          if [[ -n "$existing" ]]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+          else
+            gh issue create \
+              --repo "$REPO" \
+              --title "$title" \
+              --body "$body" \
+              --label bug
           fi
