@@ -1,0 +1,20 @@
+name: publish-registry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MCP publisher
+        run: ./scripts/install-mcp-publisher.sh
+      - name: Authenticate with GitHub OIDC
+        run: ./bin/mcp-publisher login github-oidc
+      - name: Publish server.json to MCP Registry
+        run: ./bin/mcp-publisher publish packages/mcp-local/server.json
