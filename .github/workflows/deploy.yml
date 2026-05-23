@@ -94,7 +94,7 @@ jobs:
             --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
             --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=1.0.1,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,${EMBED},CAPTURE_AGENT_PAYLOADS=${{ env.CAPTURE_AGENT_PAYLOADS }},GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},ADMIN_DASH_USER=${{ env.ADMIN_DASH_USER }}" \
             --set-secrets "$SECRETS" \
-            --timeout=900 \
+            --timeout=3600 \
             --allow-unauthenticated
 
       - name: Deploy Cloud Run (MCP)

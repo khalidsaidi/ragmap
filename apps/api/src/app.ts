@@ -1,4 +1,5 @@
 import Fastify from 'fastify';
+import type { FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
@@ -675,8 +676,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     };
   });
 
-  // Public usage graph page: fetches /api/stats and draws a simple bar chart
-  fastify.get('/usage-graph', async (_request, reply) => {
+  const sendUsageGraphPage = async (reply: FastifyReply) => {
     reply.header('Cache-Control', 'public, max-age=60');
     reply.type('text/html').send(`<!DOCTYPE html>
 <html lang="en">
@@ -740,10 +740,13 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   </script>
 </body>
 </html>`);
-  });
+  };
+
+  // Public usage graph page: fetches /api/stats and draws a simple bar chart
+  fastify.get('/usage-graph', async (_request, reply) => sendUsageGraphPage(reply));
 
   fastify.get('/api/usage-graph', async (_request, reply) => {
-    reply.code(307).redirect('/usage-graph');
+    return sendUsageGraphPage(reply);
   });
 
   // Admin dashboard (Basic Auth protected)
