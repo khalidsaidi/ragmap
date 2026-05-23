@@ -676,7 +676,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   });
 
   // Public usage graph page: fetches /api/stats and draws a simple bar chart
-  fastify.get('/api/usage-graph', async (_request, reply) => {
+  fastify.get('/usage-graph', async (_request, reply) => {
     reply.header('Cache-Control', 'public, max-age=60');
     reply.type('text/html').send(`<!DOCTYPE html>
 <html lang="en">
@@ -740,6 +740,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   </script>
 </body>
 </html>`);
+  });
+
+  fastify.get('/api/usage-graph', async (_request, reply) => {
+    reply.code(307).redirect('/usage-graph');
   });
 
   // Admin dashboard (Basic Auth protected)
