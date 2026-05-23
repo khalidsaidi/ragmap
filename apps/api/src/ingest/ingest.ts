@@ -244,6 +244,7 @@ export async function runIngest(params: { env: Env; store: RegistryStore; mode: 
 
       // Only hide upstream-deleted entries from public listings.
       // Deprecated entries should remain visible (with official status preserved in _meta).
+      // Ops note: compare catalog size to upstream `isLatest=true` and non-`deleted`; full ingest + hide-not-seen will drop stale legacy rows and can cause sharp count resets.
       const status = typeof official?.status === 'string' ? official.status : '';
       const hidden = status.toLowerCase() === 'deleted';
 
