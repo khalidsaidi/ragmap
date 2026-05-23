@@ -27,8 +27,13 @@ jobs:
           BASE="${{ secrets.API_BASE_URL }}"
           BASE="${BASE%/}"
           MODE="${{ inputs.mode || 'incremental' }}"
+          MAX_TIME=600
+          if [[ "$MODE" == "full" ]]; then
+            MAX_TIME=1800
+          fi
           echo "API_BASE_URL=$BASE"
           echo "MODE=$MODE"
+          echo "MAX_TIME=$MAX_TIME"
 
           status=0
           code=""
@@ -36,7 +41,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "X-Ingest-Token: ${{ secrets.INGEST_TOKEN }}" \
             -d "{\"mode\":\"$MODE\"}" \
-            --max-time 600 \
+            --max-time "$MAX_TIME" \
             -o /tmp/out.json \
             -w "%{http_code}"); then
             status=$?
