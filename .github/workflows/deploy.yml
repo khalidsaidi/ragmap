@@ -92,7 +92,7 @@ jobs:
             --region "${{ env.GCP_REGION }}" \
             --image "$API_IMAGE" \
             --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
-            --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=0.1.0,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,${EMBED},CAPTURE_AGENT_PAYLOADS=${{ env.CAPTURE_AGENT_PAYLOADS }},GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},ADMIN_DASH_USER=${{ env.ADMIN_DASH_USER }}" \
+            --set-env-vars "RAGMAP_STORAGE=firestore,SERVICE_VERSION=1.0.1,LOG_LEVEL=info,REGISTRY_BASE_URL=https://registry.modelcontextprotocol.io,INGEST_PAGE_LIMIT=100,${EMBED},CAPTURE_AGENT_PAYLOADS=${{ env.CAPTURE_AGENT_PAYLOADS }},GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},ADMIN_DASH_USER=${{ env.ADMIN_DASH_USER }}" \
             --set-secrets "$SECRETS" \
             --timeout=900 \
             --allow-unauthenticated
@@ -106,7 +106,7 @@ jobs:
             --region "${{ env.GCP_REGION }}" \
             --image "$MCP_IMAGE" \
             --service-account "${{ env.RUNTIME_SA_EMAIL }}" \
-            --set-env-vars "API_BASE_URL=${API_URL},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},PUBLIC_MCP_URL=${{ env.MCP_PUBLIC_URL }},SERVICE_VERSION=0.1.0" \
+            --set-env-vars "API_BASE_URL=${API_URL},PUBLIC_BASE_URL=${{ env.API_PUBLIC_URL }},PUBLIC_MCP_URL=${{ env.MCP_PUBLIC_URL }},SERVICE_VERSION=1.0.1" \
             --timeout=300 \
             --allow-unauthenticated
 

@@ -59,7 +59,7 @@ export function loadEnv(): Env {
   const nodeEnv = process.env.NODE_ENV ?? 'development';
   const port = parseIntStrict(process.env.PORT, 3000);
   const publicBaseUrl = process.env.PUBLIC_BASE_URL ?? '';
-  const serviceVersion = process.env.SERVICE_VERSION ?? '0.1.0';
+  const serviceVersion = process.env.SERVICE_VERSION ?? '1.0.1';
   const logLevel = process.env.LOG_LEVEL ?? 'info';
   const logNoise = parseBool(process.env.LOG_NOISE, false);
 

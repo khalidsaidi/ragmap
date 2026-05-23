@@ -8,7 +8,7 @@ import { z } from 'zod';
 const API_BASE_URL =
   process.env.RAGMAP_API_BASE_URL ?? process.env.API_BASE_URL ?? 'https://ragmap-api.web.app';
 const MCP_AGENT_NAME = process.env.MCP_AGENT_NAME ?? 'ragmap-mcp-local';
-const SERVICE_VERSION = process.env.SERVICE_VERSION ?? '0.1.0';
+const SERVICE_VERSION = process.env.SERVICE_VERSION ?? '1.0.1';
 
 async function apiGet(path: string, params?: Record<string, string>) {
   const url = new URL(path, API_BASE_URL);

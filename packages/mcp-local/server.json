@@ -3,7 +3,7 @@
   "name": "io.github.khalidsaidi/ragmap",
   "title": "RAGMap MCP",
   "description": "Discover and recommend retriever MCP servers. Includes top picks and install config tools.",
-  "version": "0.1.4",
+  "version": "1.0.1",
   "repository": {
     "id": "1153981814",
     "url": "https://github.com/khalidsaidi/ragmap",
@@ -16,7 +16,7 @@
     {
       "registryType": "npm",
       "identifier": "@khalidsaidi/ragmap-mcp",
-      "version": "0.1.4",
+      "version": "1.0.1",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
