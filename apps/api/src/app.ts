@@ -412,13 +412,13 @@ function isNoiseEvent(entry: { method: string; route: string; status: number }) 
   return false;
 }
 
-function agentCard(baseUrl: string) {
+function agentCard(baseUrl: string, serviceVersion: string) {
   return {
     name: 'RAGMap',
     description:
-      'Discover and filter RAG-capable MCP servers. Semantic + keyword search over retrieval servers. Use for Cursor, Claude, or any agent that needs to find the right retrieval MCP (by meaning, remote-only, citations, local-only).',
+      'Discover and filter RAG-capable MCP servers. Semantic + keyword search over retrieval servers with reachability freshness and install metadata.',
     url: baseUrl,
-    version: '0.1.0',
+    version: serviceVersion,
     protocolVersion: '0.1',
     skills: [
       { id: 'rag_find_servers', name: 'Find servers', description: 'Search/filter RAG-related MCP servers. Params: query (q), limit, hasRemote, reachable, citations, localOnly, minScore, categories, serverKind.' },
@@ -1143,8 +1143,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return { status: 'ready' };
   });
 
-  fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request) => agentCard(getBaseUrl(params.env, request)));
-  fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request) => agentCard(getBaseUrl(params.env, request)));
+  fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request) => agentCard(getBaseUrl(params.env, request), params.env.serviceVersion));
+  fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request) => agentCard(getBaseUrl(params.env, request), params.env.serviceVersion));
 
   fastify.get('/favicon.ico', async (_req, reply) => reply.code(204).send());
   fastify.get('/.well-known/mcp', async (request, reply) => {
