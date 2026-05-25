@@ -671,13 +671,12 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const totalRequests = usageSummary.total || 0;
     const agentSharePct = totalRequests > 0 ? (agentRequests / totalRequests) * 100 : 0;
     const scraperSharePct = totalRequests > 0 ? (scraperRequests / totalRequests) * 100 : 0;
-    const indexedCoveragePct =
-      coverage.totalLatestServers > 0 ? (coverage.countRagScoreGte1 / coverage.totalLatestServers) * 100 : 0;
+    const indexedCoveragePct = coverage.totalLatestServers > 0 ? 100 : 0;
 
     return {
       project: 'ragmap',
       generated_at_utc: new Date().toISOString(),
-      servers_indexed: coverage.countRagScoreGte1,
+      servers_indexed: coverage.totalLatestServers,
       servers_total: coverage.totalLatestServers,
       indexed_coverage_pct: Number(indexedCoveragePct.toFixed(3)),
       last_ingest_at: coverage.lastSuccessfulIngestAt,
@@ -815,7 +814,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       </tbody>
     </table>
     <p class="muted">Bulk scraper IPs: <code>${escapeHtml(stats.bulk_scrapers.map((row) => row.ip).join(', ') || 'none')}</code></p>
-    <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a></p>
+    <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a> · <a href="https://a2abench-api.web.app/stats">A2ABench stats</a> · <a href="https://rootfetch.com/stats">Rootfetch stats</a></p>
   </body>
 </html>`;
   }
