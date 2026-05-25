@@ -457,6 +457,55 @@ function parse<T>(schema: z.ZodSchema<T>, input: unknown, reply: any) {
   return result.data;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function formatInt(value: number): string {
+  return new Intl.NumberFormat('en-US').format(Math.trunc(value));
+}
+
+function formatPct(value: number): string {
+  return `${value.toFixed(1)}%`;
+}
+
+type RagCoverageSnapshot = {
+  totalLatestServers: number;
+  countRagScoreGte1: number;
+  countRagScoreGte25: number;
+  reachabilityPolicy: string;
+  reachabilityCandidates: number;
+  reachabilityKnown: number;
+  reachabilityTrue: number;
+  reachabilityUnknown: number;
+  lastSuccessfulIngestAt: string | null;
+  lastReachabilityRunAt: string | null;
+};
+
+type RagPublicStatsPayload = {
+  project: 'ragmap';
+  generated_at_utc: string;
+  servers_indexed: number;
+  servers_total: number;
+  indexed_coverage_pct: number;
+  last_ingest_at: string | null;
+  weekly_query_count: number;
+  weekly_distinct_callers: number;
+  weekly_distinct_callers_excluding_bulk_scrapers: number;
+  weekly_agent_requests: number;
+  weekly_scraper_requests: number;
+  weekly_agent_share_pct: number;
+  weekly_scraper_share_pct: number;
+  bulk_scrapers: Array<{ ip: string; count: number }>;
+  api_stats_url: string;
+  rag_stats_url: string;
+};
+
 const ListServersQuerySchema = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(200).optional(),
@@ -544,6 +593,250 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     '/rag/categories',
     '/rag/servers/*'
   ]);
+
+  const cacheControlPublic = 'public, max-age=60';
+
+  async function loadRagCoverageSnapshot(): Promise<RagCoverageSnapshot> {
+    let totalLatestServers = 0;
+    let countRagScoreGte1 = 0;
+    let countRagScoreGte25 = 0;
+    let reachabilityCandidates = 0;
+    let reachabilityKnown = 0;
+    let reachabilityTrue = 0;
+    let cursor: string | undefined;
+    do {
+      const page = await params.store.listLatestServers({ limit: 200, cursor });
+      for (const entry of page.servers) {
+        totalLatestServers += 1;
+        const ragmap = (entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
+        const ragScore = Number(ragmap?.ragScore ?? 0);
+        if (ragScore >= 1) countRagScoreGte1 += 1;
+        if (ragScore >= 25) countRagScoreGte25 += 1;
+
+        const inferredHasRemote =
+          typeof ragmap?.hasRemote === 'boolean'
+            ? ragmap.hasRemote
+            : inferHasRemoteFromServer(entry.server as any);
+        const probeTargets = getProbeTargets(entry.server);
+        if (inferredHasRemote && probeTargets.length > 0) {
+          reachabilityCandidates += 1;
+          const hasReachabilityMetadata =
+            typeof ragmap?.lastReachableAt === 'string' ||
+            typeof ragmap?.reachableCheckedAt === 'string' ||
+            typeof ragmap?.reachableStatus === 'number' ||
+            typeof ragmap?.reachableMethod === 'string' ||
+            typeof ragmap?.reachableRemoteType === 'string' ||
+            typeof ragmap?.reachableUrl === 'string';
+          if (typeof ragmap?.reachable === 'boolean' || hasReachabilityMetadata) {
+            reachabilityKnown += 1;
+          }
+          if (ragmap?.reachable === true) {
+            reachabilityTrue += 1;
+          }
+        }
+      }
+      cursor = page.nextCursor;
+    } while (cursor);
+
+    const lastSuccessfulIngestAt = await params.store.getLastSuccessfulIngestAt();
+    const lastReachabilityRunAt = params.store.getLastReachabilityRunAt
+      ? await params.store.getLastReachabilityRunAt()
+      : null;
+
+    return {
+      totalLatestServers,
+      countRagScoreGte1,
+      countRagScoreGte25,
+      reachabilityPolicy: params.env.reachabilityPolicy,
+      reachabilityCandidates,
+      reachabilityKnown,
+      reachabilityTrue,
+      reachabilityUnknown: Math.max(0, reachabilityCandidates - reachabilityKnown),
+      lastSuccessfulIngestAt: isoOrNull(lastSuccessfulIngestAt),
+      lastReachabilityRunAt: isoOrNull(lastReachabilityRunAt)
+    };
+  }
+
+  async function loadPublicStatsPayload(baseUrl: string): Promise<RagPublicStatsPayload> {
+    const [usageSummary, coverage] = await Promise.all([
+      params.store.getUsageSummary(7, false, false),
+      loadRagCoverageSnapshot()
+    ]);
+
+    const trafficClassCounts = new Map(
+      usageSummary.byTrafficClass.map((row) => [row.trafficClass, row.count] as const)
+    );
+    const agentRequests = Number(trafficClassCounts.get('product_api') ?? 0);
+    const scraperRequests = Number(trafficClassCounts.get('crawler_probe') ?? 0);
+    const totalRequests = usageSummary.total || 0;
+    const agentSharePct = totalRequests > 0 ? (agentRequests / totalRequests) * 100 : 0;
+    const scraperSharePct = totalRequests > 0 ? (scraperRequests / totalRequests) * 100 : 0;
+    const indexedCoveragePct =
+      coverage.totalLatestServers > 0 ? (coverage.countRagScoreGte1 / coverage.totalLatestServers) * 100 : 0;
+
+    return {
+      project: 'ragmap',
+      generated_at_utc: new Date().toISOString(),
+      servers_indexed: coverage.countRagScoreGte1,
+      servers_total: coverage.totalLatestServers,
+      indexed_coverage_pct: Number(indexedCoveragePct.toFixed(3)),
+      last_ingest_at: coverage.lastSuccessfulIngestAt,
+      weekly_query_count: usageSummary.total,
+      weekly_distinct_callers: usageSummary.uniqueIpCount,
+      weekly_distinct_callers_excluding_bulk_scrapers: usageSummary.uniqueIpCountExcludingBulkScrapers,
+      weekly_agent_requests: agentRequests,
+      weekly_scraper_requests: scraperRequests,
+      weekly_agent_share_pct: Number(agentSharePct.toFixed(3)),
+      weekly_scraper_share_pct: Number(scraperSharePct.toFixed(3)),
+      bulk_scrapers: usageSummary.bulkScraperIps,
+      api_stats_url: `${baseUrl}/api/stats`,
+      rag_stats_url: `${baseUrl}/rag/stats`
+    };
+  }
+
+  function renderHomepageHtml(baseUrl: string, stats: RagPublicStatsPayload): string {
+    const ingest = stats.last_ingest_at ? escapeHtml(stats.last_ingest_at) : 'n/a';
+    const bulk = stats.bulk_scrapers.length
+      ? `${stats.bulk_scrapers.length} bulk scraper${stats.bulk_scrapers.length === 1 ? '' : 's'} (${escapeHtml(
+          stats.bulk_scrapers.map((row) => row.ip).join(', ')
+        )})`
+      : '0 bulk scrapers detected';
+
+    return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAGMap API</title>
+    <meta name="description" content="RAGMap indexes ${formatInt(stats.servers_indexed)} of ${formatInt(
+      stats.servers_total
+    )} servers (${formatPct(stats.indexed_coverage_pct)}). Weekly queries: ${formatInt(stats.weekly_query_count)}." />
+    <link rel="canonical" href="${escapeHtml(baseUrl)}/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${escapeHtml(baseUrl)}/" />
+    <meta property="og:title" content="RAGMap — RAG-focused MCP subregistry" />
+    <meta property="og:description" content="Live: ${formatInt(stats.servers_indexed)}/${formatInt(
+      stats.servers_total
+    )} indexed (${formatPct(stats.indexed_coverage_pct)}), ${formatInt(stats.weekly_query_count)} weekly queries." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RAGMap — RAG-focused MCP subregistry" />
+    <meta name="twitter:description" content="Live: ${formatInt(stats.servers_indexed)}/${formatInt(
+      stats.servers_total
+    )} indexed (${formatPct(stats.indexed_coverage_pct)}), ${formatInt(stats.weekly_query_count)} weekly queries." />
+    <style>
+      body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 24px; background: #f7f8fb; color: #0f172a; }
+      main { max-width: 980px; margin: 0 auto; }
+      .card { background: #fff; border: 1px solid #dbe3ef; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+      .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .k { font-size: 12px; color: #4b5563; text-transform: uppercase; letter-spacing: .04em; }
+      .v { margin-top: 6px; font-size: 24px; font-weight: 700; }
+      .links { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+      a { color: #0b57d0; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .muted { color: #4b5563; font-size: 14px; }
+      code { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1 style="margin:0 0 8px;">RAGMap API</h1>
+        <p class="muted">MCP subregistry API + RAG-focused search for MCP servers. Find the right retrieval server by meaning, category, or filters.</p>
+        <div class="links">
+          <a href="/.well-known/agent.json">Agent card (JSON)</a>
+          <a href="/mcp">Connect MCP endpoint</a>
+          <a href="/stats">Public stats (HTML)</a>
+          <a href="/stats.json">Public stats (JSON)</a>
+          <a href="/rag/stats">RAG coverage JSON</a>
+          <a href="/api/stats">Usage JSON</a>
+          <a href="/browse">Browse servers</a>
+          <a href="/docs">Swagger UI</a>
+          <a href="https://a2abench-api.web.app/stats">A2ABench stats</a>
+          <a href="https://rootfetch.com/stats">Rootfetch stats</a>
+        </div>
+      </section>
+      <section class="card">
+        <p class="k">Coverage &amp; usage</p>
+        <div class="grid">
+          <div><div class="k">Servers indexed</div><div class="v">${formatInt(stats.servers_indexed)} / ${formatInt(
+      stats.servers_total
+    )}</div><div class="muted">${formatPct(stats.indexed_coverage_pct)}</div></div>
+          <div><div class="k">Last ingest</div><div class="v" style="font-size:18px;">${ingest}</div></div>
+          <div><div class="k">Weekly distinct callers</div><div class="v">${formatInt(
+      stats.weekly_distinct_callers_excluding_bulk_scrapers
+    )}</div><div class="muted">excluding bulk scrapers (e.g. 34.83.14.80)</div></div>
+          <div><div class="k">Weekly query count</div><div class="v">${formatInt(stats.weekly_query_count)}</div></div>
+          <div><div class="k">Automated agents</div><div class="v">${formatPct(stats.weekly_agent_share_pct)}</div></div>
+          <div><div class="k">Unattributed scrapers</div><div class="v">${formatPct(stats.weekly_scraper_share_pct)}</div></div>
+        </div>
+        <p class="muted" style="margin-top:12px;">${bulk}. Unique callers raw: ${formatInt(
+      stats.weekly_distinct_callers
+    )}, excluding bulk scrapers: ${formatInt(stats.weekly_distinct_callers_excluding_bulk_scrapers)}.</p>
+      </section>
+    </main>
+  </body>
+</html>`;
+  }
+
+  function renderStatsHtml(baseUrl: string, stats: RagPublicStatsPayload): string {
+    return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAGMap stats</title>
+    <style>
+      body { margin: 28px auto; max-width: 920px; padding: 0 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #111827; }
+      table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+      th, td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; }
+      th { background: #f3f4f6; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .muted { color: #6b7280; }
+      code { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }
+      a { color: #0b57d0; }
+    </style>
+  </head>
+  <body>
+    <h1>RAGMap stats</h1>
+    <p class="muted">Generated ${escapeHtml(stats.generated_at_utc)} · JSON: <a href="/stats.json">/stats.json</a></p>
+    <table>
+      <tbody>
+        <tr><th>Servers indexed</th><td class="num">${formatInt(stats.servers_indexed)}</td></tr>
+        <tr><th>Servers total</th><td class="num">${formatInt(stats.servers_total)}</td></tr>
+        <tr><th>Indexed coverage</th><td class="num">${formatPct(stats.indexed_coverage_pct)}</td></tr>
+        <tr><th>Last ingest</th><td>${stats.last_ingest_at ? escapeHtml(stats.last_ingest_at) : 'n/a'}</td></tr>
+        <tr><th>Weekly query count</th><td class="num">${formatInt(stats.weekly_query_count)}</td></tr>
+        <tr><th>Weekly distinct callers (raw)</th><td class="num">${formatInt(stats.weekly_distinct_callers)}</td></tr>
+        <tr><th>Weekly distinct callers (excluding bulk scrapers)</th><td class="num">${formatInt(
+          stats.weekly_distinct_callers_excluding_bulk_scrapers
+        )}</td></tr>
+        <tr><th>Automated agent traffic</th><td class="num">${formatPct(stats.weekly_agent_share_pct)}</td></tr>
+        <tr><th>Unattributed scraper traffic</th><td class="num">${formatPct(stats.weekly_scraper_share_pct)}</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">Bulk scraper IPs: <code>${escapeHtml(stats.bulk_scrapers.map((row) => row.ip).join(', ') || 'none')}</code></p>
+    <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a></p>
+  </body>
+</html>`;
+  }
+
+  function sitemapXml(baseUrl: string): string {
+    const now = new Date().toISOString();
+    const urls = [
+      '/',
+      '/stats',
+      '/stats.json',
+      '/rag/stats',
+      '/api/stats',
+      '/.well-known/agent.json',
+      '/browse',
+      '/docs'
+    ];
+    const body = urls
+      .map((url) => `  <url><loc>${escapeHtml(`${baseUrl}${url}`)}</loc><lastmod>${now}</lastmod></url>`)
+      .join('\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+  }
 
   fastify.addHook('onRequest', async (request, reply) => {
     (request as { startTimeNs?: bigint }).startTimeNs = process.hrtime.bigint();
@@ -660,15 +953,77 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   fastify.get('/api/openapi.json', async () => fastify.swagger());
 
+  fastify.get('/', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    const stats = await loadPublicStatsPayload(baseUrl);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('text/html').send(renderHomepageHtml(baseUrl, stats));
+  });
+
+  fastify.get('/stats.json', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    const stats = await loadPublicStatsPayload(baseUrl);
+    const bulkScraperCallers = stats.bulk_scrapers.length;
+    const bulkScraperCalls = stats.bulk_scrapers.reduce((sum, row) => sum + Number(row.count || 0), 0);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('application/json').send({
+      servers_indexed: stats.servers_indexed,
+      upstream_total: stats.servers_total,
+      coverage_pct: stats.indexed_coverage_pct,
+      last_ingest_ts: stats.last_ingest_at,
+      weekly_distinct_callers: stats.weekly_distinct_callers_excluding_bulk_scrapers,
+      weekly_queries: stats.weekly_query_count,
+      bulk_scraper_callers: bulkScraperCallers,
+      bulk_scraper_calls: bulkScraperCalls,
+      generated_at: stats.generated_at_utc,
+      weekly_distinct_callers_raw: stats.weekly_distinct_callers,
+      weekly_agent_requests: stats.weekly_agent_requests,
+      weekly_scraper_requests: stats.weekly_scraper_requests,
+      weekly_agent_share_pct: stats.weekly_agent_share_pct,
+      weekly_scraper_share_pct: stats.weekly_scraper_share_pct,
+      bulk_scrapers: stats.bulk_scrapers,
+      api_stats_url: stats.api_stats_url,
+      rag_stats_url: stats.rag_stats_url
+    });
+  });
+
+  fastify.get('/stats', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    const stats = await loadPublicStatsPayload(baseUrl);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('text/html').send(renderStatsHtml(baseUrl, stats));
+  });
+
+  fastify.get('/robots.txt', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('text/plain').send(
+      `User-agent: *\n` +
+        `Allow: /\n` +
+        `Allow: /stats\n` +
+        `Allow: /stats.json\n` +
+        `Sitemap: ${baseUrl}/sitemap.xml\n`
+    );
+  });
+
+  fastify.get('/sitemap.xml', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('application/xml').send(sitemapXml(baseUrl));
+  });
+
   // Public usage stats (aggregates only, no PII) — so you can see "is it used" without admin login
   fastify.get('/api/stats', async (_request, reply) => {
-    reply.header('Cache-Control', 'public, max-age=60');
+    reply.header('Cache-Control', cacheControlPublic);
     const summary = await params.store.getUsageSummary(7, false, false);
     return {
       days: summary.days,
       since: summary.since,
       total: summary.total,
       last24h: summary.last24h,
+      uniqueIpCount: summary.uniqueIpCount,
+      uniqueIpCountExcludingBulkScrapers: summary.uniqueIpCountExcludingBulkScrapers,
+      bulkScraperIps: summary.bulkScraperIps,
       byRoute: summary.byRoute,
       daily: summary.daily,
       byTrafficClass: summary.byTrafficClass,
@@ -1427,64 +1782,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   });
 
   fastify.get('/rag/stats', async () => {
-    let totalLatestServers = 0;
-    let countRagScoreGte1 = 0;
-    let countRagScoreGte25 = 0;
-    let reachabilityCandidates = 0;
-    let reachabilityKnown = 0;
-    let reachabilityTrue = 0;
-    let cursor: string | undefined;
-    do {
-      const page = await params.store.listLatestServers({ limit: 200, cursor });
-      for (const entry of page.servers) {
-        totalLatestServers += 1;
-        const ragmap = (entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
-        const ragScore = Number(ragmap?.ragScore ?? 0);
-        if (ragScore >= 1) countRagScoreGte1 += 1;
-        if (ragScore >= 25) countRagScoreGte25 += 1;
-
-        const inferredHasRemote =
-          typeof ragmap?.hasRemote === 'boolean'
-            ? ragmap.hasRemote
-            : inferHasRemoteFromServer(entry.server as any);
-        const probeTargets = getProbeTargets(entry.server);
-        if (inferredHasRemote && probeTargets.length > 0) {
-          reachabilityCandidates += 1;
-          const hasReachabilityMetadata =
-            typeof ragmap?.lastReachableAt === 'string' ||
-            typeof ragmap?.reachableCheckedAt === 'string' ||
-            typeof ragmap?.reachableStatus === 'number' ||
-            typeof ragmap?.reachableMethod === 'string' ||
-            typeof ragmap?.reachableRemoteType === 'string' ||
-            typeof ragmap?.reachableUrl === 'string';
-          if (typeof ragmap?.reachable === 'boolean' || hasReachabilityMetadata) {
-            reachabilityKnown += 1;
-          }
-          if (ragmap?.reachable === true) {
-            reachabilityTrue += 1;
-          }
-        }
-      }
-      cursor = page.nextCursor;
-    } while (cursor);
-
-    const lastSuccessfulIngestAt = await params.store.getLastSuccessfulIngestAt();
-    const lastReachabilityRunAt = params.store.getLastReachabilityRunAt
-      ? await params.store.getLastReachabilityRunAt()
-      : null;
-
-    return {
-      totalLatestServers,
-      countRagScoreGte1,
-      countRagScoreGte25,
-      reachabilityPolicy: params.env.reachabilityPolicy,
-      reachabilityCandidates,
-      reachabilityKnown,
-      reachabilityTrue,
-      reachabilityUnknown: Math.max(0, reachabilityCandidates - reachabilityKnown),
-      lastSuccessfulIngestAt: isoOrNull(lastSuccessfulIngestAt),
-      lastReachabilityRunAt: isoOrNull(lastReachabilityRunAt)
-    };
+    return loadRagCoverageSnapshot();
   });
 
   // Internal ingestion (protected by token). Not exposed on public Hosting; call Cloud Run URL directly.
