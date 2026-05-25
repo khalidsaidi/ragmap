@@ -742,7 +742,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         <h1 style="margin:0 0 8px;">RAGMap API</h1>
         <p class="muted">MCP subregistry API + RAG-focused search for MCP servers. Find the right retrieval server by meaning, category, or filters.</p>
         <div class="links">
-          <a href="/.well-known/agent.json">Agent card (JSON)</a>
+          <a href="/.well-known/agent.json">/.well-known/agent.json</a>
           <a href="/mcp">Connect MCP endpoint</a>
           <a href="/stats">Public stats (HTML)</a>
           <a href="/stats.json">Public stats (JSON)</a>
