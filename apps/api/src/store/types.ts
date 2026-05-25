@@ -70,6 +70,9 @@ export type UsageSummary = {
   since: string;
   total: number;
   last24h: number;
+  uniqueIpCount: number;
+  uniqueIpCountExcludingBulkScrapers: number;
+  bulkScraperIps: Array<{ ip: string; count: number }>;
   byRoute: Array<{ route: string; count: number }>;
   byStatus: Array<{ status: number; count: number }>;
   byIp: Array<{ ip: string; count: number }>;

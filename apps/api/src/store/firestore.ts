@@ -686,15 +686,30 @@ export class FirestoreStore implements RegistryStore {
       return rows.slice(0, limit);
     }
 
+    function isBulkScraperIp(ip: string, count: number) {
+      if (ip === '34.83.14.80') return true;
+      return count >= 10_000;
+    }
+
     const dailyRows = Array.from(daily.entries())
       .map(([day, count]) => ({ day, count }))
       .sort((a, b) => a.day.localeCompare(b.day));
+
+    const bulkScraperIps = Array.from(byIp.entries())
+      .filter(([ip, count]) => isBulkScraperIp(ip, count))
+      .map(([ip, count]) => ({ ip, count }))
+      .sort((a, b) => b.count - a.count);
+    const uniqueIpCount = byIp.size;
+    const uniqueIpCountExcludingBulkScrapers = Math.max(0, uniqueIpCount - bulkScraperIps.length);
 
     return {
       days,
       since: since.toISOString(),
       total,
       last24h: lastDay,
+      uniqueIpCount,
+      uniqueIpCountExcludingBulkScrapers,
+      bulkScraperIps,
       byRoute: topK(byRoute, 10).map((row) => ({ route: String(row.key), count: row.count })),
       byStatus: topK(byStatus, 100).map((row) => ({ status: Number(row.key), count: row.count })),
       byIp: topK(byIp, 10).map((row) => ({ ip: String(row.key), count: row.count })),
