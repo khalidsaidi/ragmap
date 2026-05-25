@@ -11,6 +11,41 @@
       "redirects": [],
       "rewrites": [
         {
+          "source": "/",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/stats",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/stats.json",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/robots.txt",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "/sitemap.xml",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
           "source": "/browse",
           "destination": "/browse/index.html"
         },
