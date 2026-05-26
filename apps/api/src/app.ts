@@ -577,6 +577,34 @@ type RagPublicStatsPayload = {
   rag_stats_url: string;
 };
 
+type AgentabilityReportSummary = {
+  score: number | null;
+  grade: string | null;
+};
+
+async function fetchAgentabilityReportSummary(): Promise<AgentabilityReportSummary> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 1500);
+  try {
+    const response = await fetch(
+      `${SIBLING_AGENTABILITY_URL}/v1/evaluations/${encodeURIComponent('ragmap-api.web.app')}/latest.json`,
+      { method: 'GET', signal: controller.signal, headers: { accept: 'application/json' } }
+    );
+    if (!response.ok) {
+      return { score: null, grade: null };
+    }
+    const payload = (await response.json()) as Record<string, unknown>;
+    return {
+      score: typeof payload.score === 'number' ? payload.score : null,
+      grade: typeof payload.grade === 'string' ? payload.grade : null
+    };
+  } catch {
+    return { score: null, grade: null };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const ListServersQuerySchema = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(200).optional(),
@@ -764,13 +792,17 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     };
   }
 
-  function renderHomepageHtml(baseUrl: string, stats: RagPublicStatsPayload): string {
+  function renderHomepageHtml(baseUrl: string, stats: RagPublicStatsPayload, audit: AgentabilityReportSummary): string {
     const ingest = stats.last_ingest_at ? escapeHtml(stats.last_ingest_at) : 'n/a';
     const bulk = stats.bulk_scrapers.length
       ? `${stats.bulk_scrapers.length} bulk scraper${stats.bulk_scrapers.length === 1 ? '' : 's'} (${escapeHtml(
           stats.bulk_scrapers.map((row) => row.ip).join(', ')
         )})`
       : '0 bulk scrapers detected';
+    const auditLabel =
+      typeof audit.score === 'number'
+        ? `Audited by Agentability - score ${audit.score.toFixed(1)}/100${audit.grade ? ` (${escapeHtml(audit.grade)})` : ''} (full report ->)`
+        : 'Audited by Agentability (full report ->)';
 
     return `<!doctype html>
 <html lang="en">
@@ -825,6 +857,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           <a href="https://a2abench-api.web.app/stats">A2ABench stats</a>
           <a href="https://rootfetch.com/stats">Rootfetch stats</a>
           <a href="https://agentability.org/stats">Agentability stats</a>
+          <a href="https://agentability.org/reports/ragmap-api.web.app" aria-label="Agentability report for Ragmap">${auditLabel}</a>
         </div>
       </section>
       <section class="card">
@@ -888,6 +921,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     </table>
     <p class="muted">Bulk scraper IPs: <code>${escapeHtml(stats.bulk_scrapers.map((row) => row.ip).join(', ') || 'none')}</code></p>
     <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a> · <a href="https://a2abench-api.web.app/stats">A2ABench stats</a> · <a href="https://rootfetch.com/stats">Rootfetch stats</a> · <a href="https://agentability.org/stats">Agentability stats</a></p>
+    ${crossProjectFooterHtml()}
   </body>
 </html>`;
   }
@@ -1034,9 +1068,9 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   fastify.get('/', async (request, reply) => {
     const baseUrl = getBaseUrl(params.env, request);
-    const stats = await loadPublicStatsPayload(baseUrl);
+    const [stats, audit] = await Promise.all([loadPublicStatsPayload(baseUrl), fetchAgentabilityReportSummary()]);
     reply.header('Cache-Control', cacheControlPublic);
-    reply.type('text/html').send(renderHomepageHtml(baseUrl, stats));
+    reply.type('text/html').send(renderHomepageHtml(baseUrl, stats, audit));
   });
 
   fastify.get('/stats.json', async (request, reply) => {
