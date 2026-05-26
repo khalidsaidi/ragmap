@@ -33,6 +33,13 @@
           }
         },
         {
+          "source": "/llms.txt",
+          "run": {
+            "serviceId": "ragmap-api",
+            "region": "us-central1"
+          }
+        },
+        {
           "source": "/robots.txt",
           "run": {
             "serviceId": "ragmap-api",
