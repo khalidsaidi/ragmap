@@ -1582,8 +1582,14 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return { status: 'ready' };
   });
 
-  fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request) => agentCard(getBaseUrl(params.env, request), params.env.serviceVersion));
-  fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request) => agentCard(getBaseUrl(params.env, request), params.env.serviceVersion));
+  fastify.get(CANONICAL_DISCOVERY_PATHS[0], async (request, reply) => {
+    reply.header('Cache-Control', cacheControlPublic);
+    return agentCard(getBaseUrl(params.env, request), params.env.serviceVersion);
+  });
+  fastify.get(CANONICAL_DISCOVERY_PATHS[1], async (request, reply) => {
+    reply.header('Cache-Control', cacheControlPublic);
+    return agentCard(getBaseUrl(params.env, request), params.env.serviceVersion);
+  });
 
   fastify.get('/favicon.ico', async (_req, reply) => reply.code(204).send());
   fastify.get('/.well-known/mcp', async (request, reply) => {
@@ -1669,6 +1675,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get('/rag/search', async (request, reply) => {
     const query = parse(RagSearchQuerySchema, (request as any).query, reply);
     if (!query) return;
+    reply.header('Cache-Control', 'no-store');
 
     const q = (query.q ?? '').trim() || 'rag';
     const limit = query.limit ?? 10;
