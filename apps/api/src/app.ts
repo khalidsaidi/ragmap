@@ -33,6 +33,7 @@ type UsageTrafficClass = 'product_api' | 'crawler_probe';
 const CANONICAL_DISCOVERY_PATHS = ['/.well-known/agent.json', '/.well-known/agent-card.json'] as const;
 const SIBLING_A2ABENCH_URL = 'https://a2abench-api.web.app';
 const SIBLING_ROOTFETCH_URL = 'https://rootfetch.com';
+const SIBLING_AGENTABILITY_URL = 'https://agentability.org';
 
 type SiblingStatsLink = {
   name: string;
@@ -57,6 +58,13 @@ function siblingLinksForStats(): Record<string, SiblingStatsLink> {
       stats_url: `${SIBLING_ROOTFETCH_URL}/stats`,
       stats_json_url: `${SIBLING_ROOTFETCH_URL}/stats.json`,
       agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`
+    },
+    agentability: {
+      name: 'Agentability',
+      url: SIBLING_AGENTABILITY_URL,
+      stats_url: `${SIBLING_AGENTABILITY_URL}/stats`,
+      stats_json_url: `${SIBLING_AGENTABILITY_URL}/stats.json`,
+      agent_card_url: `${SIBLING_AGENTABILITY_URL}/.well-known/agent.json`
     }
   };
 }
@@ -74,12 +82,18 @@ function relatedProjectsForAgentCard() {
       url: SIBLING_ROOTFETCH_URL,
       agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
       description: 'DNS delegation intelligence with MCP telemetry.'
+    },
+    {
+      name: 'Agentability',
+      url: SIBLING_AGENTABILITY_URL,
+      agent_card_url: `${SIBLING_AGENTABILITY_URL}/.well-known/agent.json`,
+      description: 'Agent-readiness audit and evidence-backed report publishing.'
     }
   ];
 }
 
 function crossProjectFooterHtml() {
-  return `<footer data-cross-project-footer style="margin-top:28px;padding-top:14px;border-top:1px solid #dbe3ef;color:#4b5563;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> — benchmark · DNS delegation</footer>`;
+  return `<footer data-cross-project-footer style="margin-top:28px;padding-top:14px;border-top:1px solid #dbe3ef;color:#4b5563;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> · <a href="${SIBLING_AGENTABILITY_URL}/stats">Agentability</a> — benchmark · DNS delegation · agent-readiness audit</footer>`;
 }
 
 function attachCrossProjectFooter(html: string) {
@@ -810,6 +824,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           <a href="/docs">Swagger UI</a>
           <a href="https://a2abench-api.web.app/stats">A2ABench stats</a>
           <a href="https://rootfetch.com/stats">Rootfetch stats</a>
+          <a href="https://agentability.org/stats">Agentability stats</a>
         </div>
       </section>
       <section class="card">
@@ -872,7 +887,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       </tbody>
     </table>
     <p class="muted">Bulk scraper IPs: <code>${escapeHtml(stats.bulk_scrapers.map((row) => row.ip).join(', ') || 'none')}</code></p>
-    <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a> · <a href="https://a2abench-api.web.app/stats">A2ABench stats</a> · <a href="https://rootfetch.com/stats">Rootfetch stats</a></p>
+    <p><a href="/">Back to homepage</a> · <a href="${escapeHtml(baseUrl)}/.well-known/agent.json">Agent card</a> · <a href="https://a2abench-api.web.app/stats">A2ABench stats</a> · <a href="https://rootfetch.com/stats">Rootfetch stats</a> · <a href="https://agentability.org/stats">Agentability stats</a></p>
   </body>
 </html>`;
   }
@@ -1092,7 +1107,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         `- ${baseUrl}/.well-known/agent.json\n\n` +
         `## Related projects\n` +
         `- A2ABench: ${SIBLING_A2ABENCH_URL} (stats: ${SIBLING_A2ABENCH_URL}/stats)\n` +
-        `- Rootfetch: ${SIBLING_ROOTFETCH_URL} (stats: ${SIBLING_ROOTFETCH_URL}/stats)\n`
+        `- Rootfetch: ${SIBLING_ROOTFETCH_URL} (stats: ${SIBLING_ROOTFETCH_URL}/stats)\n` +
+        `- Agentability: ${SIBLING_AGENTABILITY_URL} (stats: ${SIBLING_AGENTABILITY_URL}/stats)\n`
     );
   });
 
