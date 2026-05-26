@@ -31,6 +31,62 @@ type RouteRequest = {
 type UsageTrafficClass = 'product_api' | 'crawler_probe';
 
 const CANONICAL_DISCOVERY_PATHS = ['/.well-known/agent.json', '/.well-known/agent-card.json'] as const;
+const SIBLING_A2ABENCH_URL = 'https://a2abench-api.web.app';
+const SIBLING_ROOTFETCH_URL = 'https://rootfetch.com';
+
+type SiblingStatsLink = {
+  name: string;
+  url: string;
+  stats_url: string;
+  stats_json_url: string;
+  agent_card_url: string;
+};
+
+function siblingLinksForStats(): Record<string, SiblingStatsLink> {
+  return {
+    a2abench: {
+      name: 'A2ABench',
+      url: SIBLING_A2ABENCH_URL,
+      stats_url: `${SIBLING_A2ABENCH_URL}/stats`,
+      stats_json_url: `${SIBLING_A2ABENCH_URL}/stats.json`,
+      agent_card_url: `${SIBLING_A2ABENCH_URL}/.well-known/agent.json`
+    },
+    rootfetch: {
+      name: 'Rootfetch',
+      url: SIBLING_ROOTFETCH_URL,
+      stats_url: `${SIBLING_ROOTFETCH_URL}/stats`,
+      stats_json_url: `${SIBLING_ROOTFETCH_URL}/stats.json`,
+      agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`
+    }
+  };
+}
+
+function relatedProjectsForAgentCard() {
+  return [
+    {
+      name: 'A2ABench',
+      url: SIBLING_A2ABENCH_URL,
+      agent_card_url: `${SIBLING_A2ABENCH_URL}/.well-known/agent.json`,
+      description: 'Public benchmark for agent Q&A performance.'
+    },
+    {
+      name: 'Rootfetch',
+      url: SIBLING_ROOTFETCH_URL,
+      agent_card_url: `${SIBLING_ROOTFETCH_URL}/.well-known/agent.json`,
+      description: 'DNS delegation intelligence with MCP telemetry.'
+    }
+  ];
+}
+
+function crossProjectFooterHtml() {
+  return `<footer data-cross-project-footer style="margin-top:28px;padding-top:14px;border-top:1px solid #dbe3ef;color:#4b5563;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> — benchmark · DNS delegation</footer>`;
+}
+
+function attachCrossProjectFooter(html: string) {
+  if (!html.toLowerCase().includes('</body>')) return html;
+  if (html.includes('data-cross-project-footer')) return html;
+  return html.replace(/<\/body>/i, `${crossProjectFooterHtml()}\n</body>`);
+}
 
 function normalizeHeader(value: string | string[] | undefined) {
   if (value == null) return '';
@@ -444,7 +500,8 @@ function agentCard(baseUrl: string, serviceVersion: string) {
     },
     mcpInstall: 'npx -y @khalidsaidi/ragmap-mcp@latest',
     mcpUrl: `${baseUrl}/mcp`,
-    keywords: ['mcp', 'rag', 'retrieval', 'discovery', 'cursor', 'claude', 'registry', 'search']
+    keywords: ['mcp', 'rag', 'retrieval', 'discovery', 'cursor', 'claude', 'registry', 'search'],
+    related: relatedProjectsForAgentCard()
   };
 }
 
@@ -873,6 +930,13 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     return payload;
   });
 
+  fastify.addHook('onSend', async (_request, reply, payload) => {
+    const contentType = String(reply.getHeader('content-type') ?? '').toLowerCase();
+    if (!contentType.includes('text/html')) return payload;
+    if (typeof payload !== 'string') return payload;
+    return attachCrossProjectFooter(payload);
+  });
+
   fastify.addHook('onResponse', async (request, reply) => {
     if (request.method === 'OPTIONS') return;
     const startNs = (request as { startTimeNs?: bigint }).startTimeNs;
@@ -982,7 +1046,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       weekly_scraper_share_pct: stats.weekly_scraper_share_pct,
       bulk_scrapers: stats.bulk_scrapers,
       api_stats_url: stats.api_stats_url,
-      rag_stats_url: stats.rag_stats_url
+      rag_stats_url: stats.rag_stats_url,
+      siblings: siblingLinksForStats()
     });
   });
 
@@ -1009,6 +1074,25 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const baseUrl = getBaseUrl(params.env, request);
     reply.header('Cache-Control', cacheControlPublic);
     reply.type('application/xml').send(sitemapXml(baseUrl));
+  });
+
+  fastify.get('/llms.txt', async (request, reply) => {
+    const baseUrl = getBaseUrl(params.env, request);
+    reply.header('Cache-Control', cacheControlPublic);
+    reply.type('text/plain').send(
+      `# Ragmap\n\n` +
+        `Ragmap is a public MCP subregistry and search API for RAG-capable servers.\n\n` +
+        `## Public endpoints\n` +
+        `- ${baseUrl}/stats\n` +
+        `- ${baseUrl}/stats.json\n` +
+        `- ${baseUrl}/rag/search?q=...\n` +
+        `- ${baseUrl}/rag/stats\n` +
+        `- ${baseUrl}/api/stats\n` +
+        `- ${baseUrl}/.well-known/agent.json\n\n` +
+        `## Related projects\n` +
+        `- A2ABench: ${SIBLING_A2ABENCH_URL} (stats: ${SIBLING_A2ABENCH_URL}/stats)\n` +
+        `- Rootfetch: ${SIBLING_ROOTFETCH_URL} (stats: ${SIBLING_ROOTFETCH_URL}/stats)\n`
+    );
   });
 
   // Public usage stats (aggregates only, no PII) — so you can see "is it used" without admin login
