@@ -803,6 +803,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           <a href="/mcp">Connect MCP endpoint</a>
           <a href="/stats">Public stats (HTML)</a>
           <a href="/stats.json">Public stats (JSON)</a>
+          <a href="/llms.txt">LLMs.txt</a>
           <a href="/rag/stats">RAG coverage JSON</a>
           <a href="/api/stats">Usage JSON</a>
           <a href="/browse">Browse servers</a>
