@@ -1,0 +1,16 @@
+name: warm-stats
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm public stats pages
+        run: |
+          set -euo pipefail
+          curl -fsS "https://ragmap-api.web.app/stats" >/dev/null
+          curl -fsS "https://ragmap-api.web.app/stats.json" >/dev/null
