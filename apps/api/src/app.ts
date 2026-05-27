@@ -998,8 +998,13 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.addHook('onSend', async (_request, reply, payload) => {
     const contentType = String(reply.getHeader('content-type') ?? '').toLowerCase();
     if (!contentType.includes('text/html')) return payload;
-    if (typeof payload !== 'string') return payload;
-    return attachCrossProjectFooter(payload);
+    if (typeof payload === 'string') {
+      return attachCrossProjectFooter(payload);
+    }
+    if (Buffer.isBuffer(payload)) {
+      return attachCrossProjectFooter(payload.toString('utf8'));
+    }
+    return payload;
   });
 
   fastify.addHook('onResponse', async (request, reply) => {
