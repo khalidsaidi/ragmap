@@ -121,6 +121,7 @@ export interface RegistryStore {
 
   beginIngestRun(mode: IngestMode): Promise<{ runId: string; startedAt: Date }>;
   getLastSuccessfulIngestAt(): Promise<Date | null>;
+  countLatestServers(): Promise<number>;
   setLastSuccessfulIngestAt(at: Date): Promise<void>;
   getLastReachabilityRunAt?(): Promise<Date | null>;
   setLastReachabilityRunAt?(at: Date): Promise<void>;

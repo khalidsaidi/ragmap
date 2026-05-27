@@ -192,6 +192,29 @@ export class FirestoreStore implements RegistryStore {
     return null;
   }
 
+  async countLatestServers(): Promise<number> {
+    try {
+      const aggregate = await this.serversCol().where('hidden', '==', false).count().get();
+      const count = aggregate.data().count;
+      if (typeof count === 'number') return count;
+    } catch {
+      // Fall through to scan-based fallback for emulator/older backends.
+    }
+
+    let total = 0;
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = this.serversCol().where('hidden', '==', false).orderBy('name').limit(500);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+      total += snap.size;
+      if (snap.size < 500) break;
+      last = snap.docs[snap.docs.length - 1];
+    }
+    return total;
+  }
+
   async setLastSuccessfulIngestAt(at: Date) {
     await this.metaDoc().set({ lastSuccessfulIngestAt: Timestamp.fromDate(at) }, { merge: true });
   }

@@ -71,6 +71,14 @@ export class InMemoryStore implements RegistryStore {
     return this.lastIngestAt;
   }
 
+  async countLatestServers() {
+    let total = 0;
+    for (const server of this.servers.values()) {
+      if (!server.hidden) total += 1;
+    }
+    return total;
+  }
+
   async setLastSuccessfulIngestAt(at: Date) {
     this.lastIngestAt = at;
   }

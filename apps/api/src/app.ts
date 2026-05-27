@@ -708,6 +708,9 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   ]);
 
   const cacheControlPublic = 'public, max-age=60';
+  const publicStatsCacheTtlMs = 60_000;
+  let publicStatsCache: { fetchedAt: number; payload: RagPublicStatsPayload } | null = null;
+  let publicStatsInFlight: Promise<RagPublicStatsPayload> | null = null;
 
   async function loadRagCoverageSnapshot(): Promise<RagCoverageSnapshot> {
     let totalLatestServers = 0;
@@ -771,9 +774,10 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   }
 
   async function loadPublicStatsPayload(baseUrl: string): Promise<RagPublicStatsPayload> {
-    const [usageSummary, coverage] = await Promise.all([
+    const [usageSummary, latestServersCount, lastSuccessfulIngestAt] = await Promise.all([
       params.store.getUsageSummary(7, false, false),
-      loadRagCoverageSnapshot()
+      params.store.countLatestServers(),
+      params.store.getLastSuccessfulIngestAt()
     ]);
 
     const trafficClassCounts = new Map(
@@ -784,15 +788,15 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const totalRequests = usageSummary.total || 0;
     const agentSharePct = totalRequests > 0 ? (agentRequests / totalRequests) * 100 : 0;
     const scraperSharePct = totalRequests > 0 ? (scraperRequests / totalRequests) * 100 : 0;
-    const indexedCoveragePct = coverage.totalLatestServers > 0 ? 100 : 0;
+    const indexedCoveragePct = latestServersCount > 0 ? 100 : 0;
 
     return {
       project: 'ragmap',
       generated_at_utc: new Date().toISOString(),
-      servers_indexed: coverage.totalLatestServers,
-      servers_total: coverage.totalLatestServers,
+      servers_indexed: latestServersCount,
+      servers_total: latestServersCount,
       indexed_coverage_pct: Number(indexedCoveragePct.toFixed(3)),
-      last_ingest_at: coverage.lastSuccessfulIngestAt,
+      last_ingest_at: isoOrNull(lastSuccessfulIngestAt),
       weekly_query_count: usageSummary.total,
       weekly_distinct_callers: usageSummary.uniqueIpCount,
       weekly_distinct_callers_excluding_bulk_scrapers: usageSummary.uniqueIpCountExcludingBulkScrapers,
@@ -804,6 +808,24 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       api_stats_url: `${baseUrl}/api/stats`,
       rag_stats_url: `${baseUrl}/rag/stats`
     };
+  }
+
+  async function getPublicStatsPayload(baseUrl: string): Promise<RagPublicStatsPayload> {
+    const now = Date.now();
+    if (publicStatsCache && now - publicStatsCache.fetchedAt < publicStatsCacheTtlMs) {
+      return publicStatsCache.payload;
+    }
+    if (!publicStatsInFlight) {
+      publicStatsInFlight = loadPublicStatsPayload(baseUrl)
+        .then((payload) => {
+          publicStatsCache = { fetchedAt: Date.now(), payload };
+          return payload;
+        })
+        .finally(() => {
+          publicStatsInFlight = null;
+        });
+    }
+    return publicStatsInFlight;
   }
 
   function renderHomepageHtml(baseUrl: string, stats: RagPublicStatsPayload, audit: AgentabilityReportSummary): string {
@@ -968,8 +990,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       const redirectTarget = getDiscoveryRedirectTarget(rawUrl);
       if (redirectTarget) {
         (request as { usageTrafficClass?: UsageTrafficClass }).usageTrafficClass = 'crawler_probe';
-        reply.redirect(redirectTarget, 301);
-        return;
+        return reply.redirect(redirectTarget, 301);
       }
     }
   });
@@ -1088,14 +1109,14 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   fastify.get('/', async (request, reply) => {
     const baseUrl = getBaseUrl(params.env, request);
-    const [stats, audit] = await Promise.all([loadPublicStatsPayload(baseUrl), fetchAgentabilityReportSummary()]);
+    const [stats, audit] = await Promise.all([getPublicStatsPayload(baseUrl), fetchAgentabilityReportSummary()]);
     reply.header('Cache-Control', cacheControlPublic);
     reply.type('text/html').send(renderHomepageHtml(baseUrl, stats, audit));
   });
 
   fastify.get('/stats.json', async (request, reply) => {
     const baseUrl = getBaseUrl(params.env, request);
-    const stats = await loadPublicStatsPayload(baseUrl);
+    const stats = await getPublicStatsPayload(baseUrl);
     const bulkScraperCallers = stats.bulk_scrapers.length;
     const bulkScraperCalls = stats.bulk_scrapers.reduce((sum, row) => sum + Number(row.count || 0), 0);
     reply.header('Cache-Control', cacheControlPublic);
@@ -1123,7 +1144,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
 
   fastify.get('/stats', async (request, reply) => {
     const baseUrl = getBaseUrl(params.env, request);
-    const stats = await loadPublicStatsPayload(baseUrl);
+    const stats = await getPublicStatsPayload(baseUrl);
     reply.header('Cache-Control', cacheControlPublic);
     reply.type('text/html').send(renderStatsHtml(baseUrl, stats));
   });
@@ -1274,7 +1295,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get('/admin/usage', async (request, reply) => {
     if (!(await requireAdminDashboard(params.env, request, reply))) return;
     const baseUrl = getBaseUrl(params.env, request);
-    reply.type('text/html').send(`<!doctype html>
+    return reply.type('text/html').send(`<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -1517,7 +1538,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
   fastify.get('/admin/agent-events', async (request, reply) => {
     if (!(await requireAdminDashboard(params.env, request, reply))) return;
     const baseUrl = getBaseUrl(params.env, request);
-    reply.type('text/html').send(`<!doctype html>
+    return reply.type('text/html').send(`<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -1999,6 +2020,13 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     });
 
     reply.code(200).send({ ok: true });
+  });
+
+  // Pre-warm the cached public stats snapshot so first external hits do not
+  // trigger the expensive usage/coverage aggregation path.
+  const prewarmBaseUrl = params.env.publicBaseUrl || 'https://ragmap-api.web.app';
+  void getPublicStatsPayload(prewarmBaseUrl).catch((err) => {
+    fastify.log.warn({ err }, 'public stats prewarm failed');
   });
 
   return fastify;

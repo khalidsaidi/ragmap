@@ -346,6 +346,26 @@ test('malformed well-known discovery path redirects to canonical and preserves q
   await app.close();
 });
 
+test('malformed well-known redirect path is stable under repeated requests', async () => {
+  const store = new InMemoryStore();
+  const app = await buildApp({ env, store });
+
+  for (let i = 0; i < 20; i += 1) {
+    const redirected = await app.inject({
+      method: 'GET',
+      url: `/foo/bar/.well-known/agent.json?source=crawler&n=${i}`
+    });
+    assert.equal(redirected.statusCode, 301);
+    assert.equal(redirected.headers.location, `/.well-known/agent.json?source=crawler&n=${i}`);
+  }
+
+  const canonical = await app.inject({ method: 'GET', url: '/.well-known/agent.json' });
+  assert.equal(canonical.statusCode, 200);
+  assert.match(canonical.headers['content-type'] ?? '', /application\/json/);
+
+  await app.close();
+});
+
 test('recent errors hide crawler probes by default and can include them via toggle', async () => {
   const store = new InMemoryStore();
   const app = await buildApp({ env, store });
