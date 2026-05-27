@@ -34,6 +34,7 @@ const CANONICAL_DISCOVERY_PATHS = ['/.well-known/agent.json', '/.well-known/agen
 const SIBLING_A2ABENCH_URL = 'https://a2abench-api.web.app';
 const SIBLING_ROOTFETCH_URL = 'https://rootfetch.com';
 const SIBLING_AGENTABILITY_URL = 'https://agentability.org';
+const SIBLING_RELAYORB_URL = 'https://relayorb.com';
 
 type SiblingStatsLink = {
   name: string;
@@ -65,6 +66,13 @@ function siblingLinksForStats(): Record<string, SiblingStatsLink> {
       stats_url: `${SIBLING_AGENTABILITY_URL}/stats`,
       stats_json_url: `${SIBLING_AGENTABILITY_URL}/stats.json`,
       agent_card_url: `${SIBLING_AGENTABILITY_URL}/.well-known/agent.json`
+    },
+    relayorb: {
+      name: 'RelayOrb',
+      url: SIBLING_RELAYORB_URL,
+      stats_url: `${SIBLING_RELAYORB_URL}/stats`,
+      stats_json_url: `${SIBLING_RELAYORB_URL}/stats.json`,
+      agent_card_url: `${SIBLING_RELAYORB_URL}/.well-known/agent.json`
     }
   };
 }
@@ -88,12 +96,18 @@ function relatedProjectsForAgentCard() {
       url: SIBLING_AGENTABILITY_URL,
       agent_card_url: `${SIBLING_AGENTABILITY_URL}/.well-known/agent.json`,
       description: 'Agent-readiness audit and evidence-backed report publishing.'
+    },
+    {
+      name: 'RelayOrb',
+      url: SIBLING_RELAYORB_URL,
+      agent_card_url: `${SIBLING_RELAYORB_URL}/.well-known/agent.json`,
+      description: 'Tool control plane for AI agents with contract-first routing.'
     }
   ];
 }
 
 function crossProjectFooterHtml() {
-  return `<footer data-cross-project-footer style="margin-top:28px;padding-top:14px;border-top:1px solid #dbe3ef;color:#4b5563;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> · <a href="${SIBLING_AGENTABILITY_URL}/stats">Agentability</a> — benchmark · DNS delegation · agent-readiness audit</footer>`;
+  return `<footer data-cross-project-footer style="margin-top:28px;padding-top:14px;border-top:1px solid #dbe3ef;color:#4b5563;font-size:13px">Cross-project: <a href="${SIBLING_A2ABENCH_URL}/stats">A2ABench</a> · <a href="${SIBLING_ROOTFETCH_URL}/stats">Rootfetch</a> · <a href="${SIBLING_AGENTABILITY_URL}/stats">Agentability</a> · <a href="${SIBLING_RELAYORB_URL}/stats">RelayOrb</a> — benchmark · DNS delegation · agent-readiness audit · tool control plane</footer>`;
 }
 
 function attachCrossProjectFooter(html: string) {
@@ -857,6 +871,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
           <a href="https://a2abench-api.web.app/stats">A2ABench stats</a>
           <a href="https://rootfetch.com/stats">Rootfetch stats</a>
           <a href="https://agentability.org/stats">Agentability stats</a>
+          <a href="https://relayorb.com/stats">RelayOrb stats</a>
           <a href="https://agentability.org/reports/ragmap-api.web.app" aria-label="Agentability report for Ragmap">${auditLabel}</a>
         </div>
       </section>
@@ -1142,7 +1157,8 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
         `## Related projects\n` +
         `- A2ABench: ${SIBLING_A2ABENCH_URL} (stats: ${SIBLING_A2ABENCH_URL}/stats)\n` +
         `- Rootfetch: ${SIBLING_ROOTFETCH_URL} (stats: ${SIBLING_ROOTFETCH_URL}/stats)\n` +
-        `- Agentability: ${SIBLING_AGENTABILITY_URL} (stats: ${SIBLING_AGENTABILITY_URL}/stats)\n`
+        `- Agentability: ${SIBLING_AGENTABILITY_URL} (stats: ${SIBLING_AGENTABILITY_URL}/stats)\n` +
+        `- RelayOrb: ${SIBLING_RELAYORB_URL} (stats: ${SIBLING_RELAYORB_URL}/stats)\n`
     );
   });
 
