@@ -635,9 +635,6 @@ export class FirestoreStore implements RegistryStore {
 
     let total = 0;
     let lastDay = 0;
-    let truncated = false;
-    const maxDocs = 50_000;
-
     const col = this.usageEventsCol();
     let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
     for (;;) {
@@ -694,13 +691,7 @@ export class FirestoreStore implements RegistryStore {
           });
         }
 
-        if (total >= maxDocs) {
-          truncated = true;
-          break;
-        }
       }
-
-      if (truncated) break;
     }
 
     function topK<K>(map: Map<K, number>, limit: number) {
@@ -741,8 +732,7 @@ export class FirestoreStore implements RegistryStore {
       byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
       byTrafficClass: topK(byTrafficClass, 10).map((row) => ({ trafficClass: String(row.key), count: row.count })),
       recentErrors,
-      daily: dailyRows,
-      ...(truncated ? { truncated: true } : {})
+      daily: dailyRows
     };
   }
 

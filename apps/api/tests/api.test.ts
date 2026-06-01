@@ -261,6 +261,66 @@ test('health endpoint', async () => {
   await app.close();
 });
 
+test('public stats report uncapped weekly queries and omit truncated flag', async () => {
+  const store = new InMemoryStore();
+  const now = new Date();
+  await store.writeUsageEvent({
+    createdAt: now,
+    method: 'GET',
+    route: '/rag/search',
+    status: 200,
+    durationMs: 8,
+    userAgent: 'Mozilla/5.0',
+    ip: '198.51.100.1',
+    referer: 'https://example.com',
+    agentName: null,
+    trafficClass: 'product_api'
+  });
+  await store.writeUsageEvent({
+    createdAt: now,
+    method: 'GET',
+    route: '/rag/search',
+    status: 200,
+    durationMs: 7,
+    userAgent: 'Mozilla/5.0',
+    ip: '198.51.100.2',
+    referer: 'https://example.com',
+    agentName: null,
+    trafficClass: 'product_api'
+  });
+  await store.writeUsageEvent({
+    createdAt: now,
+    method: 'GET',
+    route: '/rag/search',
+    status: 200,
+    durationMs: 9,
+    userAgent: 'Mozilla/5.0',
+    ip: '198.51.100.3',
+    referer: 'https://example.com',
+    agentName: null,
+    trafficClass: 'product_api'
+  });
+
+  const app = await buildApp({ env, store });
+
+  const statsJsonRes = await app.inject({ method: 'GET', url: '/stats.json' });
+  assert.equal(statsJsonRes.statusCode, 200);
+  const statsJsonBody = statsJsonRes.json() as any;
+
+  const apiStatsRes = await app.inject({ method: 'GET', url: '/api/stats' });
+  assert.equal(apiStatsRes.statusCode, 200);
+  const apiStatsBody = apiStatsRes.json() as any;
+
+  assert.equal(typeof statsJsonBody.weekly_queries, 'number');
+  assert.equal(typeof apiStatsBody.total, 'number');
+  assert.equal(statsJsonBody.weekly_queries >= 3, true);
+  const delta = apiStatsBody.total - statsJsonBody.weekly_queries;
+  assert.equal(delta === 0 || delta === 1, true);
+  assert.equal(Object.prototype.hasOwnProperty.call(apiStatsBody, 'truncated'), false);
+
+  await app.close();
+});
+
 test('admin usage is protected by basic auth', async () => {
   const store = new InMemoryStore();
   const app = await buildApp({ env, store });

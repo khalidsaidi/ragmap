@@ -1134,7 +1134,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
     const bulkScraperCallers = stats.bulk_scrapers.length;
     const bulkScraperCalls = stats.bulk_scrapers.reduce((sum, row) => sum + Number(row.count || 0), 0);
     reply.header('Cache-Control', cacheControlPublic);
-    reply.type('application/json').send({
+    return reply.type('application/json').send({
       servers_indexed: stats.servers_indexed,
       upstream_total: stats.servers_total,
       coverage_pct: stats.indexed_coverage_pct,
@@ -1217,8 +1217,7 @@ export async function buildApp(params: { env: Env; store: RegistryStore }) {
       bulkScraperIps: summary.bulkScraperIps,
       byRoute: summary.byRoute,
       daily: summary.daily,
-      byTrafficClass: summary.byTrafficClass,
-      truncated: summary.truncated ?? false
+      byTrafficClass: summary.byTrafficClass
     };
   });
 

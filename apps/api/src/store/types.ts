@@ -91,7 +91,6 @@ export type UsageSummary = {
     trafficClass: string;
   }>;
   daily: Array<{ day: string; count: number }>;
-  truncated?: boolean;
 };
 
 export type AgentPayloadEventInput = {
