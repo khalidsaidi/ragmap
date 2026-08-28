@@ -2,16 +2,15 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.khalidsaidi/ragmap",
   "title": "RAGMap MCP",
-  "description": "Discover and recommend retriever MCP servers. Includes top picks and install config tools.",
-  "version": "1.0.1",
+  "description": "DEPRECATED: hosted backend discontinued; npm package deprecated. Formerly a retriever-MCP finder.",
+  "version": "1.0.2",
   "repository": {
     "id": "1153981814",
     "url": "https://github.com/khalidsaidi/ragmap",
     "source": "github",
     "subfolder": "packages/mcp-local"
   },
-  "websiteUrl": "https://ragmap-api.web.app",
-  "discoveryService": "https://ragmap-api.web.app",
+  "websiteUrl": "https://github.com/khalidsaidi/ragmap",
   "packages": [
     {
       "registryType": "npm",
@@ -27,12 +26,6 @@
           "value": "ragmap-mcp"
         }
       ]
-    }
-  ],
-  "remotes": [
-    {
-      "type": "streamable-http",
-      "url": "https://ragmap-api.web.app/mcp"
     }
   ]
 }

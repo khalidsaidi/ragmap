@@ -18,3 +18,17 @@ jobs:
         run: ./bin/mcp-publisher login github-oidc
       - name: Publish server.json to MCP Registry
         run: ./bin/mcp-publisher publish packages/mcp-local/server.json
+      # RAGMap is retired: the hosted backend is gone and the npm package is
+      # deprecated. Keep every registry version marked deprecated so clients
+      # see the warning. Remove this step if the project is ever revived.
+      - name: Mark all registry versions deprecated
+        run: |
+          set -euo pipefail
+          versions=$(curl -fsS "https://registry.modelcontextprotocol.io/v0/servers/io.github.khalidsaidi%2Fragmap/versions" \
+            | jq -r '.servers[].server.version')
+          for v in $versions; do
+            echo "Deprecating io.github.khalidsaidi/ragmap@$v"
+            ./bin/mcp-publisher status --status deprecated \
+              --message "Hosted backend discontinued; npm package deprecated." \
+              io.github.khalidsaidi/ragmap "$v"
+          done
