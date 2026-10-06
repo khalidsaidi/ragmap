@@ -24,11 +24,11 @@ It indexes **RAG-capable MCP servers**, enriches them with structured metadata, 
 MapRag does **not** do RAG itself.
 It helps you choose the best *RAG tool/server* to do the retrieval.
 
-**Status (v0.1)**
+**Status (v1.0)**
 - Ingests the official MCP Registry (read-only) and enriches server records for retrieval use-cases.
 - **Semantic + keyword search** when the API has embeddings enabled (OpenAI key); otherwise keyword-only.
-- Enrichment: `categories`, `ragScore`, `reasons`, **`hasRemote`** (callable over HTTP).
-- Filters: `query`, `categories`, `minScore`, `transport`, `registryType`, **`hasRemote`**.
+- Enrichment: `categories`, `ragScore`, `reasons`, **`hasRemote`**, and reachability metadata for remote transports.
+- Filters: `query`, `categories`, `minScore`, `transport`, `registryType`, **`hasRemote`**, **`reachable`**, and `reachableMaxAgeHours`.
 - Exposes two programmable interfaces: registry-compatible REST API (subregistry) + MCP servers (remote HTTP + local stdio).
 
 **Roadmap**

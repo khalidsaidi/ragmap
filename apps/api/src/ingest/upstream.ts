@@ -5,9 +5,11 @@ export async function fetchUpstreamPage(params: {
   cursor?: string | null;
   limit: number;
   updatedSince?: Date | null;
+  version?: 'latest' | 'all';
 }): Promise<{ servers: RegistryServerEntry[]; nextCursor?: string | null }> {
   const url = new URL('/v0.1/servers', params.baseUrl);
   url.searchParams.set('limit', String(params.limit));
+  url.searchParams.set('version', params.version ?? 'latest');
   if (params.cursor) url.searchParams.set('cursor', params.cursor);
   if (params.updatedSince) url.searchParams.set('updated_since', params.updatedSince.toISOString());
 
@@ -26,4 +28,3 @@ export async function fetchUpstreamPage(params: {
   const nextCursor = (data.metadata as any)?.nextCursor ?? null;
   return { servers, nextCursor };
 }
-

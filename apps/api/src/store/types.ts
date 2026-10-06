@@ -70,6 +70,9 @@ export type UsageSummary = {
   since: string;
   total: number;
   last24h: number;
+  uniqueIpCount: number;
+  uniqueIpCountExcludingBulkScrapers: number;
+  bulkScraperIps: Array<{ ip: string; count: number }>;
   byRoute: Array<{ route: string; count: number }>;
   byStatus: Array<{ status: number; count: number }>;
   byIp: Array<{ ip: string; count: number }>;
@@ -88,7 +91,6 @@ export type UsageSummary = {
     trafficClass: string;
   }>;
   daily: Array<{ day: string; count: number }>;
-  truncated?: boolean;
 };
 
 export type AgentPayloadEventInput = {
@@ -118,6 +120,7 @@ export interface RegistryStore {
 
   beginIngestRun(mode: IngestMode): Promise<{ runId: string; startedAt: Date }>;
   getLastSuccessfulIngestAt(): Promise<Date | null>;
+  countLatestServers(): Promise<number>;
   setLastSuccessfulIngestAt(at: Date): Promise<void>;
   getLastReachabilityRunAt?(): Promise<Date | null>;
   setLastReachabilityRunAt?(at: Date): Promise<void>;

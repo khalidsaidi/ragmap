@@ -192,6 +192,29 @@ export class FirestoreStore implements RegistryStore {
     return null;
   }
 
+  async countLatestServers(): Promise<number> {
+    try {
+      const aggregate = await this.serversCol().where('hidden', '==', false).count().get();
+      const count = aggregate.data().count;
+      if (typeof count === 'number') return count;
+    } catch {
+      // Fall through to scan-based fallback for emulator/older backends.
+    }
+
+    let total = 0;
+    let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    for (;;) {
+      let q = this.serversCol().where('hidden', '==', false).orderBy('name').limit(500);
+      if (last) q = q.startAfter(last);
+      const snap = await q.get();
+      if (snap.empty) break;
+      total += snap.size;
+      if (snap.size < 500) break;
+      last = snap.docs[snap.docs.length - 1];
+    }
+    return total;
+  }
+
   async setLastSuccessfulIngestAt(at: Date) {
     await this.metaDoc().set({ lastSuccessfulIngestAt: Timestamp.fromDate(at) }, { merge: true });
   }
@@ -612,9 +635,6 @@ export class FirestoreStore implements RegistryStore {
 
     let total = 0;
     let lastDay = 0;
-    let truncated = false;
-    const maxDocs = 50_000;
-
     const col = this.usageEventsCol();
     let last: FirebaseFirestore.QueryDocumentSnapshot | null = null;
     for (;;) {
@@ -671,13 +691,7 @@ export class FirestoreStore implements RegistryStore {
           });
         }
 
-        if (total >= maxDocs) {
-          truncated = true;
-          break;
-        }
       }
-
-      if (truncated) break;
     }
 
     function topK<K>(map: Map<K, number>, limit: number) {
@@ -686,15 +700,30 @@ export class FirestoreStore implements RegistryStore {
       return rows.slice(0, limit);
     }
 
+    function isBulkScraperIp(ip: string, count: number) {
+      if (ip === '34.83.14.80') return true;
+      return count >= 10_000;
+    }
+
     const dailyRows = Array.from(daily.entries())
       .map(([day, count]) => ({ day, count }))
       .sort((a, b) => a.day.localeCompare(b.day));
+
+    const bulkScraperIps = Array.from(byIp.entries())
+      .filter(([ip, count]) => isBulkScraperIp(ip, count))
+      .map(([ip, count]) => ({ ip, count }))
+      .sort((a, b) => b.count - a.count);
+    const uniqueIpCount = byIp.size;
+    const uniqueIpCountExcludingBulkScrapers = Math.max(0, uniqueIpCount - bulkScraperIps.length);
 
     return {
       days,
       since: since.toISOString(),
       total,
       last24h: lastDay,
+      uniqueIpCount,
+      uniqueIpCountExcludingBulkScrapers,
+      bulkScraperIps,
       byRoute: topK(byRoute, 10).map((row) => ({ route: String(row.key), count: row.count })),
       byStatus: topK(byStatus, 100).map((row) => ({ status: Number(row.key), count: row.count })),
       byIp: topK(byIp, 10).map((row) => ({ ip: String(row.key), count: row.count })),
@@ -703,8 +732,7 @@ export class FirestoreStore implements RegistryStore {
       byAgentName: topK(byAgentName, 10).map((row) => ({ agentName: String(row.key), count: row.count })),
       byTrafficClass: topK(byTrafficClass, 10).map((row) => ({ trafficClass: String(row.key), count: row.count })),
       recentErrors,
-      daily: dailyRows,
-      ...(truncated ? { truncated: true } : {})
+      daily: dailyRows
     };
   }
 

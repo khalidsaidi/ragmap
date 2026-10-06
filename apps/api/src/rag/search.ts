@@ -108,6 +108,38 @@ function getRagmapMeta(entry: RegistryServerEntry): any {
   return (entry._meta?.[META_RAGMAP_KEY] as any) ?? {};
 }
 
+function remoteTypeWeight(value: unknown): number {
+  if (value === 'streamable-http') return 2;
+  if (value === 'sse') return 1;
+  return 0;
+}
+
+function checkedAtMs(value: unknown): number {
+  if (typeof value !== 'string' || !value) return Number.NEGATIVE_INFINITY;
+  const ts = Date.parse(value);
+  return Number.isFinite(ts) ? ts : Number.NEGATIVE_INFINITY;
+}
+
+function compareReachabilityPreference(
+  a: RegistryServerEntry,
+  b: RegistryServerEntry,
+  enabled: boolean
+): number {
+  if (!enabled) return 0;
+  const ragA = getRagmapMeta(a);
+  const ragB = getRagmapMeta(b);
+
+  const typeWeightA = remoteTypeWeight(ragA?.reachableRemoteType);
+  const typeWeightB = remoteTypeWeight(ragB?.reachableRemoteType);
+  if (typeWeightA !== typeWeightB) return typeWeightB - typeWeightA;
+
+  const checkedAtA = checkedAtMs(ragA?.reachableCheckedAt ?? ragA?.lastReachableAt);
+  const checkedAtB = checkedAtMs(ragB?.reachableCheckedAt ?? ragB?.lastReachableAt);
+  if (checkedAtA !== checkedAtB) return checkedAtB - checkedAtA;
+
+  return 0;
+}
+
 function compareQualitySignals(a: RagSearchHit, b: RagSearchHit): number {
   const ragA = getRagmapMeta(a.entry);
   const ragB = getRagmapMeta(b.entry);
@@ -221,6 +253,7 @@ export function ragSearchKeyword(
   limit: number,
   filters?: RagFilters
 ): RagSearchHit[] {
+  const preferReachabilitySignals = filters?.reachable === true;
   const tokens = tokenize(query);
   // Match tokens at word boundaries (prefix match) so "rag" doesn't match "storage".
   const tokenRegexes = tokens.map((t) => new RegExp(`\\b${escapeRegExp(t)}`, 'i'));
@@ -233,6 +266,8 @@ export function ragSearchKeyword(
   }
   scored.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
+    const reachabilityPreference = compareReachabilityPreference(a.entry, b.entry, preferReachabilitySignals);
+    if (reachabilityPreference !== 0) return reachabilityPreference;
     return compareQualitySignals(a, b);
   });
   return scored.slice(0, limit);
@@ -244,6 +279,7 @@ export function ragSearchSemantic(
   limit: number,
   filters?: RagFilters
 ): RagSearchHit[] {
+  const preferReachabilitySignals = filters?.reachable === true;
   const scored: RagSearchHit[] = [];
   for (const item of items) {
     if (!passesFilters(item, filters)) continue;
@@ -255,6 +291,8 @@ export function ragSearchSemantic(
   }
   scored.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
+    const reachabilityPreference = compareReachabilityPreference(a.entry, b.entry, preferReachabilitySignals);
+    if (reachabilityPreference !== 0) return reachabilityPreference;
     return compareQualitySignals(a, b);
   });
   return scored.slice(0, limit);
@@ -265,12 +303,17 @@ export function ragSearchTop(
   limit: number,
   filters?: RagFilters
 ): RagSearchHit[] {
+  const preferReachabilitySignals = filters?.reachable === true;
   const scored: RagSearchHit[] = [];
   for (const item of items) {
     if (!passesFilters(item, filters)) continue;
     const score = Number(item.enrichment?.ragScore ?? 0);
     scored.push({ entry: item.entry, kind: 'keyword', score });
   }
-  scored.sort(compareQualitySignals);
+  scored.sort((a, b) => {
+    const reachabilityPreference = compareReachabilityPreference(a.entry, b.entry, preferReachabilitySignals);
+    if (reachabilityPreference !== 0) return reachabilityPreference;
+    return compareQualitySignals(a, b);
+  });
   return scored.slice(0, limit);
 }

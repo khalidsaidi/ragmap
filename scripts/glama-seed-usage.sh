@@ -13,19 +13,42 @@ INSTANCES="${INSTANCES:-4}"
 CALLS_PER_INSTANCE="${CALLS_PER_INSTANCE:-8}"
 STATUS_TIMEOUT_SECONDS="${STATUS_TIMEOUT_SECONDS:-60}"
 
+normalize_server_path() {
+  local path
+  path="$1"
+
+  # Accept either "owner/name", "@owner/name", or full glama URLs.
+  path="${path#https://glama.ai}"
+  path="${path#http://glama.ai}"
+  path="${path#/mcp/servers/}"
+  path="${path#mcp/servers/}"
+  path="${path#/}"
+  path="${path#@}"
+  echo "$path"
+}
+
+SERVER_PATH="$(normalize_server_path "$SERVER_PATH")"
+
+if [[ -z "$SERVER_PATH" || "$SERVER_PATH" != */* ]]; then
+  echo "invalid SERVER_PATH: '$SERVER_PATH'" >&2
+  exit 1
+fi
+
 create_instance() {
   local jar body code uid token
   jar="$(mktemp)"
   body="$(mktemp)"
 
-  code="$(curl -sS -c "$jar" -b "$jar" -o "$body" -w "%{http_code}" \
+  code="$(curl -sS --location --post301 --post302 --post303 -c "$jar" -b "$jar" -o "$body" -w "%{http_code}" \
     -X POST "https://glama.ai/mcp/servers/${SERVER_PATH}/inspect" \
     -H 'Content-Type: application/x-www-form-urlencoded' \
     --data 'intent=try-in-browser')"
 
   if [[ "$code" != "200" ]]; then
-    echo "create failed (HTTP $code)"
-    sed -n '1,20p' "$body" || true
+    echo "create failed (HTTP $code) for ${SERVER_PATH}" >&2
+    if [[ -s "$body" ]]; then
+      sed -n '1,20p' "$body" >&2 || true
+    fi
     rm -f "$jar" "$body"
     return 1
   fi
@@ -34,8 +57,10 @@ create_instance() {
   token="$(jq -r '.token // empty' "$body")"
 
   if [[ -z "$uid" || -z "$token" ]]; then
-    echo "create missing uid/token"
-    sed -n '1,20p' "$body" || true
+    echo "create missing uid/token for ${SERVER_PATH}" >&2
+    if [[ -s "$body" ]]; then
+      sed -n '1,20p' "$body" >&2 || true
+    fi
     rm -f "$jar" "$body"
     return 1
   fi

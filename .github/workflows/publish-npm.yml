@@ -9,6 +9,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -24,11 +27,17 @@ jobs:
       - run: pnpm -r install
       - run: pnpm -r build
       - name: Publish MCP local package
-        if: ${{ env.NODE_AUTH_TOKEN != '' }}
         run: |
+          set -euo pipefail
           cd packages/mcp-local
-          npm publish --access public
-      - name: NPM token missing
-        if: ${{ env.NODE_AUTH_TOKEN == '' }}
-        run: echo "NPM_TOKEN is not set; skipping npm publish."
-
+          if [[ -n "${NODE_AUTH_TOKEN:-}" ]]; then
+            if npm publish --access public; then
+              echo "Published with NPM token."
+              exit 0
+            fi
+            echo "Token publish failed, trying trusted publishing via OIDC..."
+          else
+            echo "NPM_TOKEN missing, trying trusted publishing via OIDC..."
+          fi
+          unset NODE_AUTH_TOKEN
+          npm publish --provenance --access public

@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:3000';
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL ?? API_BASE_URL;
 const PUBLIC_MCP_URL = process.env.PUBLIC_MCP_URL ?? 'http://localhost:4000/mcp';
 const PORT = Number(process.env.PORT ?? process.env.MCP_PORT ?? 4000);
-const SERVICE_VERSION = process.env.SERVICE_VERSION ?? '0.1.0';
+const SERVICE_VERSION = process.env.SERVICE_VERSION ?? '1.0.1';
 const MCP_AGENT_NAME = process.env.MCP_AGENT_NAME ?? 'ragmap-mcp-remote';
 const ALLOWED_ORIGINS = (process.env.MCP_ALLOWED_ORIGINS ?? '')
   .split(',')

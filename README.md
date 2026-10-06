@@ -1,6 +1,12 @@
 # RAGMap (RAG MCP Registry Finder)
 
+[![Release](https://img.shields.io/github/v/release/khalidsaidi/ragmap?display_name=tag&sort=semver)](https://github.com/khalidsaidi/ragmap/releases/latest)
+[![Deploy](https://github.com/khalidsaidi/ragmap/actions/workflows/deploy.yml/badge.svg)](https://github.com/khalidsaidi/ragmap/actions/workflows/deploy.yml)
+[![monitor-freshness](https://github.com/khalidsaidi/ragmap/actions/workflows/monitor-freshness.yml/badge.svg)](https://github.com/khalidsaidi/ragmap/actions/workflows/monitor-freshness.yml)
 [![Glama](https://glama.ai/mcp/servers/@khalidsaidi/ragmap/badge)](https://glama.ai/mcp/servers/@khalidsaidi/ragmap)
+
+**Try it:** https://ragmap-api.web.app/browse/
+**Start here:** https://github.com/khalidsaidi/ragmap/discussions/17
 
 RAGMap is a lightweight MCP Registry-compatible subregistry + MCP server focused on **RAG-related MCP servers**.
 
@@ -35,9 +41,46 @@ If you need retrieval over your own data, use a retrieval server from RAGMap res
 - Most users do **not** run ingest themselves when using the hosted service.
 - If you need tighter freshness control or private indexing behavior, self-host and run your own ingest schedule (`docs/DEPLOYMENT.md`).
 
-**Features:** Registry-compatible API; **semantic + keyword search** (when `OPENAI_API_KEY` is set, e.g. from env or your deployment’s secret manager); categories and `ragScore`; filter by **`hasRemote`**, **`reachable`** (HEAD-checked), **`citations`**, **`localOnly`**, `transport`, `minScore`, `categories`. **Human browse UI** at [ragmap-api.web.app/browse](https://ragmap-api.web.app/browse) — search, filter, copy Cursor/Claude config. MCP tools: `rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`.
+**Features:** Registry-compatible API; **semantic + keyword search** (when `OPENAI_API_KEY` is set, e.g. from env or your deployment’s secret manager); categories and `ragScore`; filter by **`hasRemote`**, **`reachable`** (probe-checked for streamable-http/SSE), **`citations`**, **`localOnly`**, `transport`, `minScore`, `categories`. **Human browse UI** at [ragmap-api.web.app/browse](https://ragmap-api.web.app/browse) — search, filter, copy Cursor/Claude config. MCP tools: `rag_find_servers`, `rag_get_server`, `rag_list_categories`, `rag_explain_score`.
 
-Full overview: `docs/OVERVIEW.md`
+## Quickstart
+
+> Requirements: `curl` and `jq`
+
+### 1) Top reachable retrievers (checked within 24h)
+
+```bash
+curl -s "https://ragmap-api.web.app/rag/top?hasRemote=true&reachable=true&reachableMaxAgeHours=24&serverKind=retriever&limit=25" | jq .
+```
+
+### 2) Search with trust filter (reachable recently)
+
+```bash
+curl -s "https://ragmap-api.web.app/rag/search?q=rag&hasRemote=true&reachable=true&reachableMaxAgeHours=24&limit=10" | jq .
+```
+
+### 3) Get install config for a server
+
+Tip: URL-encode names that contain `/`.
+
+```bash
+curl -s "https://ragmap-api.web.app/rag/install?name=ai.filegraph%2Fdocument-processing" | jq .
+```
+
+### 4) Inspect freshness and coverage
+
+```bash
+curl -s "https://ragmap-api.web.app/rag/stats" | jq .
+```
+
+### 5) Usage telemetry summary
+
+```bash
+curl -s "https://ragmap-api.web.app/api/stats" | jq .
+```
+
+Full overview: `docs/OVERVIEW.md`  
+Release history: `CHANGELOG.md`
 
 ## Architecture
 
@@ -165,6 +208,9 @@ pnpm -C packages/mcp-local dev
 - `GET /v0.1/servers/:serverName/versions`
 - `GET /v0.1/servers/:serverName/versions/:version` (supports `latest`)
 - `GET /rag/search`
+- `GET /rag/top` (default sorted recommendations; `limit` max `50`)
+- `GET /rag/install`
+- `GET /rag/stats`
 - `GET /rag/categories`
 - `GET /api/stats` (public usage aggregates; no PII)
 - `GET /api/usage-graph` (HTML chart of usage)
@@ -179,7 +225,8 @@ For hosted `ragmap-api.web.app`, `/internal/*` routes are not exposed publicly.
 - `transport` (`stdio` or `streamable-http`)
 - `registryType` (string)
 - `hasRemote` (`true` or `false` — only servers with a remote endpoint)
-- `reachable` (`true` — only servers whose streamable-http URL passed a HEAD check)
+- `reachable` (`true` — only servers that were recently probe-checked as reachable via streamable-http/SSE)
+- `reachableMaxAgeHours` (optional, only with `reachable=true` — keep only results checked within N hours)
 - `citations` (`true` — only servers that mention citations/grounding in metadata)
 - `localOnly` (`true` — only stdio, no remote)
 
