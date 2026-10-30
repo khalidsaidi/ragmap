@@ -1,7 +1,7 @@
 {
   "name": "@khalidsaidi/ragmap-mcp",
-  "version": "1.0.1",
-  "description": "Find and filter RAG-capable MCP servers by meaning or keywords. Local stdio MCP bridge to the RAGMap subregistry (semantic search, filters, explainable scores).",
+  "version": "1.1.0",
+  "description": "Find and filter RAG-capable MCP servers from a bundled, offline catalog. Local stdio MCP server with keyword search, filters, and explainable scores. No backend or API key needed.",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -46,6 +46,7 @@
   },
   "files": [
     "dist",
+    "data",
     "README.md",
     "LICENSE",
     "server.json"
@@ -62,7 +63,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "dotenv": "^17.2.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
