@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-01T02:43:01.514Z",
+  "generatedAt": "2026-11-01T03:02:07.038Z",
   "source": "https://registry.modelcontextprotocol.io",
-  "count": 2355,
+  "count": 2360,
   "servers": [
     {
       "name": "ac.tandem/docs-mcp",
@@ -12297,6 +12297,27 @@
       "lastOk": "2026-11-01"
     },
     {
+      "name": "com.employeedeskhq/site",
+      "title": null,
+      "description": "EmployeeDeskHQ: the site's own MCP server — dataset; every answer cites the site.",
+      "url": "https://employeedeskhq.com/mcp",
+      "knowledge": "employeedeskhq site dataset rows with cited answers",
+      "topics": [
+        "dataset"
+      ],
+      "tools": [
+        "dataset_columns",
+        "dataset_search",
+        "dataset_row",
+        "dataset_compare",
+        "dataset_stats",
+        "dataset_top",
+        "dataset_provenance"
+      ],
+      "repository": null,
+      "lastOk": "2026-11-01"
+    },
+    {
       "name": "com.emprego/jobs",
       "title": "emprego.com job search",
       "description": "Search live job openings in many countries and languages, and read a full job ad.",
@@ -18842,6 +18863,27 @@
       "lastOk": "2026-11-01"
     },
     {
+      "name": "com.mustvo/site",
+      "title": null,
+      "description": "Mustvo: the site's own MCP server — dataset; every answer cites the site.",
+      "url": "https://mustvo.com/mcp",
+      "knowledge": "Mustvo dataset rows with statistics and citations",
+      "topics": [
+        "dataset"
+      ],
+      "tools": [
+        "dataset_columns",
+        "dataset_search",
+        "dataset_row",
+        "dataset_compare",
+        "dataset_stats",
+        "dataset_top",
+        "dataset_provenance"
+      ],
+      "repository": null,
+      "lastOk": "2026-11-01"
+    },
+    {
       "name": "com.myanimetracker/myanimetracker",
       "title": "MyAnimeTracker",
       "description": "Anime watch order, no guesswork. Watch orders, filler guides, title search, airing this week.",
@@ -20112,6 +20154,27 @@
         "read_document_pages",
         "search_documents",
         "get_coverage_overview"
+      ],
+      "repository": null,
+      "lastOk": "2026-11-01"
+    },
+    {
+      "name": "com.orderpadledger/site",
+      "title": null,
+      "description": "OrderPadLedger: the site's own MCP server — dataset; every answer cites the site.",
+      "url": "https://orderpadledger.com/mcp",
+      "knowledge": "orderpadledger site dataset rows with cited answers",
+      "topics": [
+        "dataset"
+      ],
+      "tools": [
+        "dataset_columns",
+        "dataset_search",
+        "dataset_row",
+        "dataset_compare",
+        "dataset_stats",
+        "dataset_top",
+        "dataset_provenance"
       ],
       "repository": null,
       "lastOk": "2026-11-01"
@@ -23737,6 +23800,28 @@
         "list_feature_models"
       ],
       "repository": "https://github.com/taaft/mcp",
+      "lastOk": "2026-11-01"
+    },
+    {
+      "name": "com.thestackunderflow/datum-property",
+      "title": "US Flood Zone & Property Risk (FEMA, NOAA, USGS, Census)",
+      "description": "FEMA flood zone, hazard history and demographics for any US address, with sources on every answer.",
+      "url": "https://mcp.thestackunderflow.com/mcp/property",
+      "knowledge": "FEMA flood zones, hazard history and demographics for US addresses",
+      "topics": [
+        "property",
+        "flood",
+        "us"
+      ],
+      "tools": [
+        "address_profile",
+        "admin_areas",
+        "area_demographics",
+        "census_geocode",
+        "flood_zone",
+        "hazard_history"
+      ],
+      "repository": null,
       "lastOk": "2026-11-01"
     },
     {
@@ -31780,6 +31865,31 @@
         "get_integration"
       ],
       "repository": "https://github.com/Centrify-Internal/hubspot-mcp-server",
+      "lastOk": "2026-11-01"
+    },
+    {
+      "name": "io.github.chrisryugj/korean-law-mcp",
+      "title": "Korean Law MCP",
+      "description": "Korean law: statutes, precedents, ordinances, treaties and citation verification (법제처 API).",
+      "url": "https://mcp.gomdori.app/law",
+      "knowledge": "Korean statutes, precedents, ordinances and treaties",
+      "topics": [
+        "law",
+        "korea"
+      ],
+      "tools": [
+        "search_law",
+        "get_law_text",
+        "ordinance_radar",
+        "get_annexes",
+        "legal_research",
+        "legal_analysis",
+        "discover_tools",
+        "execute_tool",
+        "search_decisions",
+        "get_decision_text"
+      ],
+      "repository": "https://github.com/chrisryugj/korean-law-mcp",
       "lastOk": "2026-11-01"
     },
     {
