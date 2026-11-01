@@ -1,17 +1,12 @@
 # Changelog
 
-## v1.0.0 - 2026-03-01
-### Added
-- `/rag/top` for smart defaults and fast discovery.
-- `/rag/install` for actionable install/config output (supports `streamable-http` and `sse` remotes).
-- `/rag/stats` with freshness and reachability coverage metrics.
-- Reachability probing for both `streamable-http` and `sse`.
-- `reachableMaxAgeHours` filter for "reachable recently" queries.
-- Reachability-aware ranking preferences (when `reachable=true`):
-  - prefer `streamable-http` over `sse`
-  - prefer more recently checked endpoints
-- Scheduled reachability refresh runs 4x/day.
-- Public watchdog workflow `monitor-freshness` (retries/timeouts + seconds-based thresholds).
+## v2.0.0 - 2026-10-31
+Rewritten from scratch. The hosted API, database and web pages are gone.
 
-### Breaking changes
-- None (freshness filtering is opt-in via query param).
+- A daily GitHub Actions job takes the official MCP Registry, connects to every keyless remote server, lists its tools, and keeps the ones whose main job is free retrieval (labeled by Claude).
+- The list lives in `data/servers.json` and in the README.
+- The npm package is a local MCP server with three tools: `ragmap_find`, `ragmap_get`, `ragmap_install`. It reads the latest list from GitHub and falls back to its bundled copy.
+- Removed: keyword `ragScore`, categories, semantic search, REST API, browse page, stats.
+
+## v1.0.0 - 2026-03-01
+Hosted subregistry with search, reachability probes, install configs and stats (discontinued).

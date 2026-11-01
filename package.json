@@ -1,19 +1,61 @@
 {
-  "name": "ragmap",
-  "private": true,
-  "packageManager": "pnpm@9.15.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
+  "name": "@khalidsaidi/ragmap-mcp",
+  "version": "2.0.0",
+  "description": "Find a retrieval MCP server that works today. A daily-checked list of remote MCP servers that search a body of knowledge, served as a local stdio MCP server.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "rag",
+    "retrieval",
+    "search",
+    "knowledge",
+    "discovery",
+    "mcp-registry",
+    "agents"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/khalidsaidi/ragmap#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khalidsaidi/ragmap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/khalidsaidi/ragmap/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module",
+  "mcpName": "io.github.khalidsaidi/ragmap",
+  "bin": {
+    "ragmap-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist",
+    "data/servers.json",
+    "README.md",
+    "LICENSE",
+    "server.json"
   ],
   "scripts": {
-    "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
-    "build": "pnpm -r --if-present build",
-    "dev": "pnpm -r --if-present dev"
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.scripts.json",
+    "test": "node --import tsx --test test/*.test.ts",
+    "data": "tsx scripts/build-data.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "tsx": "^4.7.0"
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@types/node": "^25.2.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
   }
 }
