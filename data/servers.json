@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-01T03:02:07.038Z",
+  "generatedAt": "2026-11-01T13:25:53.722Z",
   "source": "https://registry.modelcontextprotocol.io",
   "count": 2360,
   "servers": [
@@ -271,7 +271,8 @@
       ],
       "tools": [
         "excellent_help",
-        "search_excellent_pages"
+        "search_excellent_pages",
+        "start_excellent_workspace"
       ],
       "repository": null,
       "lastOk": "2026-11-01"
@@ -5984,7 +5985,7 @@
     {
       "name": "club.elron/public-rentals",
       "title": "Elron Club Public Rentals",
-      "description": "Search Elron Club furnished apartments, availability, prices, details, and rental applications.",
+      "description": "Search rentals, manage Requests and viewings, get availability updates and contact elron club.",
       "url": "https://elron.club/api/agent/public/mcp",
       "knowledge": "Elron Club furnished apartments, locations, jobs and guidance",
       "topics": [
@@ -20511,6 +20512,17 @@
         "create_room",
         "invite_to_room",
         "send_room_message",
+        "set_webhook",
+        "webhook_status",
+        "test_webhook",
+        "clear_webhook",
+        "team_home",
+        "join_beta",
+        "create_team",
+        "invite_to_team",
+        "accept_team_invite",
+        "decline_team_invite",
+        "leave_team",
         "rate_match",
         "submit_feedback"
       ],
@@ -21069,7 +21081,8 @@
         "rank_markets",
         "demand_trend",
         "supply_trend",
-        "rules_check"
+        "rules_check",
+        "get_practice_market"
       ],
       "repository": "https://github.com/ops864/legal-marketing-data",
       "lastOk": "2026-11-01"
@@ -22883,7 +22896,7 @@
     {
       "name": "com.starlecta/influencer-tools",
       "title": "Starlecta influencer tools",
-      "description": "Instagram influencer lookup, compare, AI search, account check, Trend Cloud (Turkey). No key needed.",
+      "description": "Instagram influencer lookup, compare, search, AI search, account check, Trend Cloud. No key needed.",
       "url": "https://starlecta.com/mcp",
       "knowledge": "Instagram influencer metrics, comparisons and trending hashtags in Turkey",
       "topics": [
@@ -26389,6 +26402,7 @@
         "search_corporate_by_address",
         "lookup_corporate",
         "verify_invoice_number",
+        "search_invoice_batch",
         "company_profile"
       ],
       "repository": "https://github.com/plugrail/servers",
@@ -32725,9 +32739,11 @@
         "epa_echo_search_facilities",
         "epa_echo_get_facility",
         "epa_echo_search_violations",
+        "epa_echo_get_case",
         "epa_tri_get_facility_releases",
         "epa_tri_search_releases",
         "epa_superfund_search_sites",
+        "epa_superfund_get_site",
         "epa_water_search_systems",
         "epa_ejscreen_get_scores",
         "epa_airnow_get_conditions"
@@ -33015,6 +33031,7 @@
         "gdelt_get_coverage_breakdown",
         "gdelt_search_themes",
         "gdelt_search_tv",
+        "gdelt_get_tv_breakdown",
         "gdelt_get_tv_clips",
         "gdelt_get_tv_context",
         "gdelt_list_tv_stations"
@@ -34836,7 +34853,7 @@
         "extract_company_contacts",
         "claim_free_trial"
       ],
-      "repository": null,
+      "repository": "https://github.com/edtool79-collab/hirepulse-mcp",
       "lastOk": "2026-11-01"
     },
     {
@@ -56151,6 +56168,8 @@
         "trooth_my_company_record",
         "trooth_outside_in_read",
         "trooth_profile_checklist",
+        "trooth_profile_domain_check",
+        "trooth_profile_domain_start",
         "trooth_profile_get",
         "trooth_profile_publish",
         "trooth_profile_update",
@@ -57394,10 +57413,7 @@
       "tools": [
         "search_docs",
         "get_doc_page",
-        "list_doc_pages",
-        "list_supported_agents",
-        "list_managed_mcp_tools",
-        "get_latest_release"
+        "get_reference"
       ],
       "repository": "https://github.com/YoanWai/agent-manager-site",
       "lastOk": "2026-11-01"
@@ -59633,6 +59649,8 @@
         "register_agent",
         "my_account",
         "create_listing",
+        "upload_image",
+        "upload_file",
         "update_listing",
         "delete_listing",
         "set_payout_wallet",
@@ -61561,7 +61579,8 @@
         "get_provision",
         "get_citing_provisions",
         "get_definitions",
-        "get_amendments"
+        "get_amendments",
+        "list_changes"
       ],
       "repository": null,
       "lastOk": "2026-11-01"
@@ -64803,7 +64822,7 @@
         "list_loop_parts",
         "about_unfrozen"
       ],
-      "repository": "https://github.com/zeltorkemp/unfrozen-atlas-mcp",
+      "repository": null,
       "lastOk": "2026-11-01"
     },
     {
