@@ -23,4 +23,15 @@ jobs:
       - run: npm ci
       - run: npm test
       - name: Publish (npm trusted publishing / OIDC)
-        run: npm publish --access public
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if npm view "@khalidsaidi/ragmap-mcp@$version" version >/dev/null 2>&1; then
+            echo "$version is already on npm"
+          else
+            npm publish --access public
+          fi
+      - name: List in the MCP Registry (GitHub OIDC)
+        run: |
+          curl -sL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
