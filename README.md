@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2360 servers, checked 2026-11-01.
+2359 servers, checked 2026-11-02.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -1337,7 +1337,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.birdwell/runescape-wiki-mcp` | RuneScape wiki, Grand Exchange prices and player hiscores | https://runescape-wiki-mcp.fly.dev/mcp |
 | `io.github.bitrix24/bitrix-mcp-rest` | Bitrix24 REST API methods, events and app development documentation | https://mcp-dev.bitrix24.com/mcp |
 | `io.github.blakeplock/i2idl-glossary` | Digital learning concepts, definitions, relationships and citations | https://id.i2idl.org/mcp |
-| `io.github.bleemohr/foodbe` | Cited food answers, ingredient nutrition, allergens and recipes | https://api.foodbe.ai/api/mcp |
+| `io.github.bleemohr/foodbe` | Cited food answers, ingredient nutrition, allergens and recipes | https://foodbe-v3-production.up.railway.app/v1/mcp |
 | `io.github.bluetouff/13flow` | SEC 13F institutional holdings by fund and stock, with quality checks | https://13flow.eu/api/mcp |
 | `io.github.bluetouff/l0g` | Macro risk analysis articles, evidence and sourced claims | https://l0g.fr/api/mcp/compact |
 | `io.github.blutrich/podlearn` | Podcasts and episodes from 4M+ shows, with transcripts | https://podlearn.ai/mcp |
@@ -2079,7 +2079,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.yc-droid/grantscout` | Open and upcoming US federal grant opportunities from Grants.gov | https://grantscout.salesup.workers.dev/mcp |
 | `io.github.YGao2005/scholar-feed-mcp` | CS/AI/ML papers, citations, authors and full text | https://mcp.scholarfeed.org/mcp?src=mcp-registry |
 | `io.github.yhay81/public-data-catalog` | Japanese open government data from e-Gov portal and statistics dashboards | https://public-data-catalog-mcp.yusuke8h.workers.dev/mcp |
-| `io.github.YoanWai/agent-manager-docs` | agent-manager documentation: tmux-based AI coding agent sessions | https://agent-manager.dev/mcp |
 | `io.github.yonatangross/orchestkit` | OrchestKit documentation | https://orchestkit.dev/api/mcp |
 | `io.github.YourLifewithAI/arcology-knowledge-node` | Engineering knowledge for building a mile-high arcology city | https://arcology-mcp.fly.dev/mcp |
 | `io.github.zachhhhh/agentatlas` | Agent setup answers, MCP config for 15 clients, trending repos | https://agentatlas.dev/api/mcp |
@@ -2101,7 +2100,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.jsonpad/docs` | JSONPad docs, API, SDK and CLI references | https://mcp.jsonpad.io/docs |
 | `io.launchpadhq/launchpad-hq` | Sourced facts on AI tools, pricing and free alternatives | https://www.launchpadhq.io/mcp |
 | `io.lexlint/lexlint` | Jurisdiction-specific laws governing software, with citations | https://mcp.lexlint.io/mcp |
-| `io.mammoth/docs` | Mammoth Analytics documentation | https://docs.mammoth.io/mcp |
+| `io.mammoth/docs` | Mammoth Analytics documentation | https://mammoth.io/docs/mcp/ |
 | `io.mcp-marketplace/search` | 4,000+ security-scanned MCP servers | https://mcp-marketplace.io/api/mcp/mcp |
 | `io.mcprating/search` | MCP servers with test results, required keys, tools and token cost | https://mcprating.io/mcp/ |
 | `io.mediawork/mediawork` | Post-production and distribution vendors directory | https://mcp.mediawork.io/mcp |

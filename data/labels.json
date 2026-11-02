@@ -39847,18 +39847,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "io.github.YoanWai/agent-manager-docs": {
-  "hash": "e8bbe094d0793c04",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "agent-manager documentation: tmux-based AI coding agent sessions",
-  "topics": [
-   "documentation",
-   "coding agents",
-   "tmux"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.yonatangross/orchestkit": {
   "hash": "93f512945c5e42d7",
   "retrieval": true,
