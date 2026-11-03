@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2359 servers, checked 2026-11-02.
+2357 servers, checked 2026-11-03.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -92,7 +92,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ai.exa/exa` | Web search and page content | https://mcp.exa.ai/mcp |
 | `ai.example4/xmp4` | Source code, callers and tests of open-source libraries | https://mcp.example4.ai/mcp |
 | `ai.financegenius/financegenius` | Indian credit cards, loans, deposits, insurance and mutual funds, with calculators | https://mcp.financegenius.ai/mcp/ |
-| `ai.flyvolo/knowledge` | Sourced task-level facts on how AI changes occupations and majors | https://mcp.flyvolo.ai/mcp |
 | `ai.framethrower/framethrower` | Film stills and commercials by lighting, lens, shot size and mood | https://framethrower.ai/api/mcp |
 | `ai.fukushi/dictionary` | Japan disability welfare service fees, add-ons and staffing rules | https://fukushi.ai/api/mcp |
 | `ai.hipa/clinical-trials` | Recruiting US clinical trials by condition, city, phase and eligibility | https://hipa.ai/api/mcp/mcp |
@@ -170,7 +169,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.apiguru/amazon-data` | Live Amazon products, reviews, offers, deals and sellers | https://mcp.apiguru.app/mcp |
 | `app.applybolt/applybolt` | Live job and internship listings with remote, salary and H-1B filters | https://api.applybolt.app/mcp |
 | `app.atlasly/atlasly` | UK site research and site context from official planning sources | https://mcp.atlasly.app/mcp |
-| `app.befana/befana` | Recipes with exact amounts, scalable servings and cooking steps | https://befana.app/mcp |
 | `app.cannonstudio/cannon-studio` | Cannon Studio products, pricing, workflows, models and API | https://www.cannonstudio.app/mcp |
 | `app.cellarion/wine-registry` | Wines, grapes, regions and appellations plus wine guides | https://cellarion.app/api/mcp/public |
 | `app.citeme/citeme` | Scholarly papers searchable by topic, DOI or ISBN, with citation formatting | https://citeme.app/api/mcp |
@@ -232,7 +230,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `at.fixfind/fixfind` | Products and services from Austrian local businesses | https://fixfind.at/mcp |
 | `au.com.assetize/maximo` | IBM Maximo and MAS upgrades, error codes, gotchas, versions and lifecycle | https://assetize.com.au/mcp |
 | `au.com.bidit/registry` | Whether retailers price match or accept offers, verified by people | https://registry.bidit.com.au/api/mcp |
-| `au.com.magreader/discovery` | Magazine articles and public previews with publisher attribution | https://gen-lang-client-0753647279.web.app/agent/mcp |
+| `au.com.magreader/discovery` | Magazine articles and public previews with publisher attribution | https://app.magreader.com.au/agent/mcp |
 | `au.com.nationaldigital/website` | National Digital services, articles and case studies | https://mcp.nationaldigital.com.au/mcp |
 | `au.com.trip-planner/camping-australia` | Australian campsites, caravan parks, free camps and nearest toilets | https://app.trip-planner.com.au/api/mcp |
 | `au.publicdata/mcp` | Australian government open datasets with query, counts and version history | https://publicdata.au/mcp |
@@ -1547,7 +1545,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.hoodly-agent/hoodly-gmgn-robinhood-mcp` | Robinhood Chain token launches, trends and due diligence data | https://gmgn.hoodly.io/mcp |
 | `io.github.Humanleap/magicscreenshots-mcp` | Real App Store listing screenshots, previews and version history | https://www.magicscreenshots.com/api/mcp |
 | `io.github.HumanLineage/wt` | Public genealogical graph of people, families and places | https://humanlineage.org/api/mcp |
-| `io.github.Ibrahim-Salman19/uetgpt` | UET Taxila admissions, programs, fees and merit calculation | https://uet-gpt.vercel.app/mcp |
+| `io.github.Ibrahim-Salman19/uetgpt` | UET Taxila admissions, programs, fees and merit calculation | https://uetgpt.site/mcp |
 | `io.github.ifcode/gameshot` | Video game industry news, hot stories, and daily, weekly and monthly reports | https://gameshot.games/api/mcp |
 | `io.github.InstaBlick/complyzard` | Compliance resources and documents by framework and topic | https://complyzard.com/mcp |
 | `io.github.introman2023/tonzar` | Russian B2B industrial products and verified manufacturers catalog | https://tonzar.com/mcp |

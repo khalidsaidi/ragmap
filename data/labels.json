@@ -600,18 +600,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "ai.flyvolo/knowledge": {
-  "hash": "cdc43b5ad79820ba",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Sourced task-level facts on how AI changes occupations and majors",
-  "topics": [
-   "jobs",
-   "ai",
-   "careers"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "ai.framethrower/framethrower": {
   "hash": "324d7140b71f8135",
   "retrieval": true,
@@ -1857,18 +1845,6 @@
   "free": true,
   "knowledge": "",
   "topics": [],
-  "by": "claude-sonnet-5-5"
- },
- "app.befana/befana": {
-  "hash": "4849e8e0fd23e3af",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Recipes with exact amounts, scalable servings and cooking steps",
-  "topics": [
-   "recipes",
-   "cooking",
-   "food"
-  ],
   "by": "claude-sonnet-5-5"
  },
  "app.cannonstudio/cannon-studio": {
