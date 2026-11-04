@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2357 servers, checked 2026-11-03.
+2358 servers, checked 2026-11-04.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -878,6 +878,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.openpublica/civic-meetings` | US local government meeting summaries and transcripts | https://api.openpublica.com/mcp |
 | `com.orderpadledger/site` | orderpadledger site dataset rows with cited answers | https://orderpadledger.com/mcp |
 | `com.organikpi/organikpi` | OrganiKPI blog posts, product reviews and AI search study datasets | https://organikpi.com/.well-known/mcp |
+| `com.orgbix/site` | Rows and statistics from the Orgbix dataset with citations | https://orgbix.com/mcp |
 | `com.origamitutor/origami-tutor` | Origami models and illustrated folding instructions | https://origamitutor.com/api/mcp |
 | `com.orlandu/arcade` | Sony PVM/BVM monitor specs, PlayChoice-10 games and retro video | https://www.orlandu.com/api/mcp |
 | `com.ortexo/mcp` | Romanian and EU legislation and case law with article citations | https://mcp.ortexo.com/mcp |
