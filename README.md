@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2358 servers, checked 2026-11-04.
+2291 servers, checked 2026-11-05.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -75,7 +75,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ai.com.nlp/open-model-catalog` | Open-weight AI model releases, licenses and architectures | https://nlp.com.ai/mcp |
 | `ai.companyproof/companyproof` | Legal company registry profiles and verified company facts | https://companyproof.ai/v2/mcp |
 | `ai.context-link/context-link` | Content from the user's connected sites, Drive, Notion, email and files | https://www.context-link.ai/mcp |
-| `ai.contractorsnearme/contractors-near-me` | Licensed US contractors by trade and location, with profiles and reviews | https://contractorsnearme.ai/api/mcp |
 | `ai.coreyjames/portfolio` | Corey James's projects, systems and engineering work in GPU inference and AI | https://coreyjames.ai/mcp |
 | `ai.dablock/visibility-index` | How often AI answer engines mention 24 crypto and Web3 brands | https://dablock.ai/mcp |
 | `ai.dabyte/visibility-index` | How often AI answer engines mention 20 SaaS brands | https://dabyte.ai/mcp |
@@ -94,7 +93,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ai.financegenius/financegenius` | Indian credit cards, loans, deposits, insurance and mutual funds, with calculators | https://mcp.financegenius.ai/mcp/ |
 | `ai.framethrower/framethrower` | Film stills and commercials by lighting, lens, shot size and mood | https://framethrower.ai/api/mcp |
 | `ai.fukushi/dictionary` | Japan disability welfare service fees, add-ons and staffing rules | https://fukushi.ai/api/mcp |
-| `ai.hipa/clinical-trials` | Recruiting US clinical trials by condition, city, phase and eligibility | https://hipa.ai/api/mcp/mcp |
 | `ai.hostingbrain/intelligence` | European hosting and domain market shares, pricing, concentration and technology adoption | https://mcp.hostingbrain.ai/mcp |
 | `ai.hotapi/docs` | HotAPI integration guides, model docs and OpenAPI operations | https://hotapi.ai/mcp |
 | `ai.huntboard/huntboard` | Recent job postings from company career pages and ATS boards | https://huntboard.ai/mcp |
@@ -106,7 +104,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ai.karmafor/karma-library` | Essay on AI cooperation, moral uncertainty and power | https://karmafor.ai/api/mcp?source=mcp-registry |
 | `ai.keenable/web-search` | Live web search and page content | https://api.keenable.ai/mcp?keenable_title=mcp-registry |
 | `ai.law.mcp/lawyer-search` | Verified US lawyer profiles by practice area, state and city | https://mcp.law.ai |
-| `ai.lightray/lightray` | Who owns and runs a company, with due diligence questions | https://app.lightray.ai/mcp |
 | `ai.linof/docs` | Linof documentation and current pricing for family photo films | https://linof.ai/api/apps/6a562086cd3bd1e44e0d4c3d/functions/docsMcp |
 | `ai.llmhosting/pricing` | LLM API prices by provider and GPU rental prices with history | https://llmhosting.ai/mcp |
 | `ai.localmark/agent-directory` | Public A2A agents, their skills and endpoint checks | https://localmark.ai/mcp |
@@ -167,7 +164,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.agentindex/agentindex` | Open-source AI agents, MCP servers and developer tools | https://agentindex.app/api/mcp/ |
 | `app.allagents/directory` | Listed AI agents with tested badges and trust checks | https://allagents.app/mcp |
 | `app.apiguru/amazon-data` | Live Amazon products, reviews, offers, deals and sellers | https://mcp.apiguru.app/mcp |
-| `app.applybolt/applybolt` | Live job and internship listings with remote, salary and H-1B filters | https://api.applybolt.app/mcp |
 | `app.atlasly/atlasly` | UK site research and site context from official planning sources | https://mcp.atlasly.app/mcp |
 | `app.cannonstudio/cannon-studio` | Cannon Studio products, pricing, workflows, models and API | https://www.cannonstudio.app/mcp |
 | `app.cellarion/wine-registry` | Wines, grapes, regions and appellations plus wine guides | https://cellarion.app/api/mcp/public |
@@ -181,7 +177,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.everloot/knowledge` | World of Warcraft Forever lore, drops, vendors, quests, professions and talents | https://everloot.app/mcp/public |
 | `app.fojin/fojin-mcp` | Buddhist canon texts, parallels, dictionaries and commentaries with URN citations | https://mcp.fojin.ai/mcp |
 | `app.founderhood/founderhood` | Indie founders and online businesses by city and country | https://founderhood.app/api/mcp |
-| `app.frtracker/regulatory-research` | US federal regulations: CFR provision history, rules, obligations, comments | https://frtracker.app/mcp |
 | `app.fryd/mcp-server` | Crops, companion planting, seasonal calendars and planting plans | https://mcp.fryd.app/mcp |
 | `app.futbolatlas/futbol-atlas` | Laws of the Game and major football competitions, cited | https://futbolatlas.app/mcp?via=manifest |
 | `app.gingerguide/catalog` | European city sights, walking routes and itineraries in six languages | https://gingerguide.app/mcp |
@@ -200,7 +195,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.mcpharbor/mcp-harbor-search` | Directory of MCP servers, clients and SDKs | https://mcpharbor.app/mcp |
 | `app.netlify.japan-data-mcp/japan-data-mcp` | Japanese laws, corporations and official statistics in English | https://japan-data-mcp.netlify.app/mcp |
 | `app.offendersearch/offendersearch` | US sex-offender registries and criminal records with source citations | https://mcp.offendersearch.app/mcp |
-| `app.onesvibe/search` | Gallery of live AI-built products for prior art checks | https://onesvibe.app/api/mcp |
 | `app.openkrill/belief` | Share of people on X and Reddit holding each opinion | https://belief.openkrill.app/mcp |
 | `app.openkrill/eu-business` | EU VAT validation, company LEI and French or Norwegian company registers | https://eubusiness.openkrill.app/mcp |
 | `app.openkrill/food` | Packaged food products by barcode, with allergens | https://food.openkrill.app/mcp |
@@ -225,7 +219,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.web.yutai-mcp/yutai-mcp` | Japanese shareholder benefits (yutai) by stock, with trading date rules | https://yutai-mcp.web.app/mcp |
 | `app.workfinds/jobs` | Open jobs from company career sites by applicant country and remote status | https://workfinds.app/mcp |
 | `archi.den/den_archi_mcp` | Korean construction standards, building law and architecture principles with reasoning | https://mcp.den.archi/mcp |
-| `at.blckalpaca/knowledge-base` | SEO, GEO and AI agent knowledge base articles | https://blckalpaca.at/mcp |
 | `at.designare/knowledge` | designare.at web and AI knowledge base | https://designare.at/api/mcp |
 | `at.fixfind/fixfind` | Products and services from Austrian local businesses | https://fixfind.at/mcp |
 | `au.com.assetize/maximo` | IBM Maximo and MAS upgrades, error codes, gotchas, versions and lifecycle | https://assetize.com.au/mcp |
@@ -250,8 +243,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `br.com.fipex/mcp` | Brazilian FIPE vehicle reference prices and history | https://api.fipex.com.br/mcp |
 | `build.appside/mcp` | Appside developer docs and a catalog of apps and games | https://appside.build/mcp |
 | `build.fabricate/fabricate` | Fabricate plans, pricing and public documentation | https://fabricate.build/mcp |
-| `by.ai-belarus/registry` | Belarusian companies from the state registry by UNP | https://ai-belarus.by/mcp |
-| `by.ai-tender/tenders` | Open public procurements and tenders in Belarus | https://ai-tender.by/mcp |
 | `by.authorized/brands` | Brands and their authorized retailers, with authorization checks | https://app.authorized.by/api/public/mcp |
 | `bz.manda/manda` | Japanese businesses for sale on the MANDA M&A marketplace | https://manda.bz/mcp |
 | `ca.905trades/business-card` | 905 Trades Hamilton residential trades referral network facts and pages | https://905trades.ca/mcp |
@@ -291,7 +282,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `cn.infimeta/public-source-search` | Encyclopedias, scholarly metadata and community sources | https://infimeta.cn/mcp |
 | `cn.savantcat/answers` | China AI customer service standard GB/T 47746-2026 compliance answers | https://savantcat.cn/mcp |
 | `cn.tutulife/aijiayao` | Restaurants in China with hours, prices and reviews | https://tutulife.cn/mcp |
-| `co.avagama/openings` | Jobs from verified employer job boards | https://openings.avagama.co/mcp |
 | `co.brightkey/education-data` | Universities, international schools and degree ROI, English and Chinese | https://brightkey.co/api/mcp |
 | `co.cafedev/cafedev` | Latin American tech jobs and hiring companies | https://mcp.cafedev.co/mcp |
 | `co.chinaready/search` | China market entry guides for Western software teams | https://mcp.chinaready.co/mcp |
@@ -305,24 +295,20 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `co.heyspark.mcp/server` | Local businesses with contact info, hours and reviews | https://mcp.heyspark.co/mcp |
 | `co.ivfcost/ivf-cost-data` | US IVF clinic prices, state insurance laws and grants | https://ivfcost.co/api/mcp |
 | `co.leviathansystems/public-content` | Leviathan Systems articles, services and company scope | https://www.leviathansystems.co/mcp |
-| `co.netstate/netstate` | Official company registrations across US states and Canada | https://netstate.co/mcp |
 | `co.neverapply/neverapply` | Global job listings searchable by filters | https://neverapply.co/mcp |
 | `co.peptidesacademy/peptides-academy` | Cited peptide research summaries, comparisons and trial papers | https://peptidesacademy.co/mcp |
 | `co.rentalhunter/rentalhunter` | Rental listings in India and Southeast Asian cities | https://rentalhunter.co/mcp |
 | `co.supp/suppco` | Supplement products, brand trust scores and supplement research | https://api.supp.co/mcp |
 | `co.theoldways/library` | Historical texts and mythology references with citation URLs | https://mcp.theoldways.co/mcp |
 | `co.totalcms/docs` | Total CMS documentation, Twig reference and CMS comparisons | https://totalcms.co/mcp |
-| `co.xianmi/xianmi` | Chinese Buddhist texts, about 250,000 pages | https://mcp.xianmi.co/mcp |
 | `co.yachtfinder/yachtfinder` | Yachts for sale and charter with specs and AIS positions | https://mcp.yachtfinder.co/mcp |
 | `com.0xpi.pantrypos/find-food-pantry` | US food pantries near a location and state TEFAP rules | https://pantrypos.0xpi.com/mcp-pantry |
 | `com.0xpi.sdsentry/sds-lookup` | Safety data sheets, GHS pictograms and OSHA HazCom dates | https://sdsentry.0xpi.com/mcp-sds |
 | `com.1001locals/catalog` | Local tours and experiences in Italy and Europe | https://api.1001locals.com/mcp |
-| `com.101soundboards/search` | Public soundboards and sound clips | https://www.101soundboards.com/mcp/search |
 | `com.1102tools/ecfr-mcp` | US Code of Federal Regulations text including FAR and DFARS, with change history | https://ecfr.1102tools.com/mcp |
 | `com.1102tools/regulations-gov-mcp` | US rulemaking dockets, documents, public comments and open comment periods | https://regulations-gov.1102tools.com/mcp |
 | `com.313automations/site` | 313 Automations services, prices and site pages | https://313automations.com/mcp |
 | `com.360tft/coaching-brain` | Football coaching writing by Kevin Middleton | https://brain.360tft.com/api/brain/mcp |
-| `com.530amodel/calculator` | 530A Trump Account rules, tax treatment and guides | https://mcp.530amodel.com |
 | `com.99datarooms/mcp` | 99 Data Rooms pricing, docs, glossary and use cases | https://mcp.99datarooms.com/mcp |
 | `com.abutly/site` | Abutly dataset rows with statistics and provenance | https://abutly.com/mcp |
 | `com.accentvoice/site` | Accent cloud phone and messaging site content and plan prices | https://www.accentvoice.com/agent/mcp |
@@ -338,7 +324,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.advisorfinder/mcp` | SEC-registered financial advisors, firms, disclosures and fees | https://mcp.advisorfinder.com/mcp |
 | `com.agentmaru/agentmaru` | Korean export estimates, HARPEX freight index and official FX, CPI and GDP data | https://agentmaru.com/mcp |
 | `com.agentonair/podcasts` | AI-hosted podcast episodes, shows and hosts | https://api.agentonair.com/mcp |
-| `com.agentoolrank/agent-tools` | Open-source AI agent tools ranked by GitHub activity | https://agentoolrank.com/api/mcp |
 | `com.agentresourcemarket/agent-resource-market` | Agent profiles, service offers and discussions | https://agentresourcemarket.com/api/mcp |
 | `com.agents-wiki/agents-wiki` | Knowledge base articles written for AI agents | https://agents-wiki.com/mcp |
 | `com.agentsbooks/commons` | Agent forum threads and Q&A knowledge base | https://agentsbooks.com/api/commons/mcp |
@@ -351,7 +336,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.aibenchmarkindex/directory` | AI benchmarks by category with data sources and licences | https://aibenchmarkindex.com/mcp |
 | `com.aidemos/catalogue` | AI tool reviews, rankings, use cases and comparisons | https://mcp.aidemos.com/mcp |
 | `com.aidevboard/jobs` | Current AI jobs, companies and salaries | https://aidevboard.com/mcp |
-| `com.aigregator/ai-tools` | AI tools directory with pricing, features and alternatives | https://x402.aigregator.com/mcp |
 | `com.aikizi/mcp` | Decoded art styles and their prompts from a public gallery | https://aikizi.com/mcp |
 | `com.ainovaq/mcp` | Ainovaq services, blog on startups and go-to-market | https://ainovaq.com/mcp |
 | `com.aiprofile/answers` | Sourced answers about local businesses, many owner-confirmed | https://www.aiprofile.com/api/mcp |
@@ -364,7 +348,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.alkemata/public-knowledge` | Alkemata published articles, topics and knowledge maps | https://alkemata.com/wp-json/mcp/alkemata-public |
 | `com.alleskralle/jobs` | 500k job listings in Austria, Germany and Switzerland | https://mcp.alleskralle.com/mcp |
 | `com.altairworld/site` | Equity research reports, S&P 500 breadth and ticker indicators | https://altairworld.com/mcp |
-| `com.alternativeassetliteracy/aal-retail-mcp` | Alternative assets education: glossary, learning modules and investor facts | https://alternativeassetliteracy.com/mcp/retail |
 | `com.alwa7i.bayan/bayan` | Arabic hadith with grades, Qur'an verses with tafsir, narrators | https://bayan.alwa7i.com/mcp |
 | `com.amazonaws.us-east-1.execute-api.4fucgqu5if/agent-platform-rules` | Whether AI agents may post or automate on Reddit, HN, Bluesky, GitHub, X | https://4fucgqu5if.execute-api.us-east-1.amazonaws.com/mcp |
 | `com.americassuretybonds/surety-bonds` | US surety bond requirements across all 50 states | https://americassuretybonds.com/mcp |
@@ -395,7 +378,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.attestroom/site` | Attestroom dataset rows with statistics, provenance and citations | https://attestroom.com/mcp |
 | `com.attestvio/site` | Attestvio dataset rows with statistics, provenance and citations | https://attestvio.com/mcp |
 | `com.augur-trade/foresight-web` | Web page text, domain data, Wikipedia, arXiv, GitHub and package info | https://augur-trade.com/foresight/mcp/web |
-| `com.aureum-tech/website` | Aureum Technology IT services, prices and contact in German | https://aureum-tech.com/mcp |
 | `com.australiawidefirstaid/docs` | First aid library, policies and developer docs from Australia Wide First Aid | https://www.australiawidefirstaid.com/mcp/docs |
 | `com.autodesk.aps.api/product-help-mcp` | Official Autodesk help documentation for 110+ products | https://api.aps.autodesk.com/knowledge/public/v1/mcp |
 | `com.autoprivado/autoprivado` | Private-seller car listings in Europe, VIN decoding and used car price estimates | https://autoprivado.com/mcp |
@@ -454,7 +436,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.chateaupedia/chateaux` | French castles with hours, prices, accessibility and events | https://chateaupedia.com/mcp |
 | `com.citedindex/mcp` | AI-visibility and GEO tools with pricing, limits and sources | https://citedindex.com/mcp |
 | `com.citestamp/citestamp` | Scholarly citation graph: what supports, refutes or cites a paper, retractions | https://mcp.citestamp.com/mcp |
-| `com.citizenleap/civica` | Citizenship test facts, official sources and sample questions for 8 countries | https://api.citizenleap.com/mcp |
 | `com.claspine/claspine` | Claspine guides, API reference, recipes and upgrade notes | https://api.claspine.com/mcp |
 | `com.claude-world/worlds-knowledge` | CLI guides, commands and configuration for Claude Code, Codex and Grok Build | https://mcp.claude-world.com/mcp |
 | `com.claude.platform/docs` | Claude Platform documentation and API reference | https://platform.claude.com/docs/mcp |
@@ -487,7 +468,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.craftedtrust/mcp-shield` | Trust scores and security scans for 4,200 MCP servers | https://mcp.craftedtrust.com/api/v1/mcp |
 | `com.craftingeventfinder/events` | US crafting shows, retreats and workshops | https://craftingeventfinder.com/api/mcp |
 | `com.craftingstepbystep/tutorials` | Step-by-step papercraft tutorials with tools and supplies | https://www.craftingstepbystep.com/api/mcp |
-| `com.createmod/schematics` | Minecraft Create Mod schematics with descriptions and authors | https://createmod.com/api/mcp |
 | `com.crosodo/mcp` | Cottage-food and home-bakery laws by US state and county | https://crosodo.com/api/mcp |
 | `com.csatzo/site` | Csatzo dataset rows with statistics, provenance and citations | https://csatzo.com/mcp |
 | `com.csidia/notes` | Italian notes on AI regulation, data protection and compliance | https://mcp.csidia.com/mcp |
@@ -551,8 +531,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.elopstudio.aiwave/ai-wave` | AI model releases, pricing, context sizes and deprecations | https://aiwave.elopstudio.com/api/mcp |
 | `com.emdly/emdly` | Markdown skills for AI agents to find and install | https://emdly.com/mcp |
 | `com.employeedeskhq/site` | employeedeskhq site dataset rows with cited answers | https://employeedeskhq.com/mcp |
-| `com.emprego/jobs` | Open job listings in many countries with full job ads | https://emprego.com/api/mcp |
-| `com.empresskorea/kbeauty-agent-commons` | Korean beauty product catalog and canonical product facts | https://empresskorea.com/kb-agent-network/mcp |
 | `com.empryo/docs` | Empryo product documentation and release information | https://empryo.com/mcp |
 | `com.engagemii/citation-watch` | Brands ChatGPT recommends and AI visibility scores for company domains | https://api.engagemii.com/api/mcp |
 | `com.entityreach/public-resources` | EntityReach corporate group data product information and sample analyses | https://entityreach.com/api/public-mcp |
@@ -571,9 +549,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.evidentagents/reviews` | Directory of MCP services for research and document tasks | https://evidentagents.com/mcp |
 | `com.evryroom/property-search` | Homes for sale and rent across Europe and the UAE | https://evryroom.com/mcp |
 | `com.examova/mcp` | CIPS, PMP and PRINCE2 exam facts, modules, guides and sample questions | https://examova.com/api/mcp |
-| `com.excurvo/site` | Excurvo dataset rows with sources and statistics | https://excurvo.com/mcp |
 | `com.expatriator/immigration` | Spanish immigration procedures, pitfalls and Madrid padron appointments | https://mcp.expatriator.com/mcp |
-| `com.extinvo/site` | Rows and statistics from the Extinvo dataset with citations | https://extinvo.com/mcp |
 | `com.extralingo/extralingo` | Language schools abroad with courses, dates and prices | https://www.extralingo.com/mcp |
 | `com.ezoic/setup` | Ezoic ad integration documentation and setup code | https://setup-agent.ezoic.com/mcp |
 | `com.faceabot/deep-search` | Science, world news, Internet Archive, GitHub and discussion search | https://faceabot.com/tools-mcp/deep-search |
@@ -692,7 +668,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.infosecjobboard/jobs` | Cybersecurity jobs, salary benchmarks and hiring stats | https://www.infosecjobboard.com/api/mcp |
 | `com.infysvg/svg-clipart` | Free SVG cut files and clipart designs | https://infysvg.com/mcp |
 | `com.intakez/site` | intakez site dataset rows with cited answers | https://intakez.com/mcp |
-| `com.intotheprompt/into-the-prompt` | Short practical AI videos and learning paths | https://intotheprompt.com/mcp |
 | `com.invokera/book-search` | Books and authors from the Open Library catalog | https://invokera.com/r/book-search |
 | `com.invokera/currency-rates` | Latest and historical ECB foreign exchange reference rates | https://invokera.com/r/currency-rates |
 | `com.invokera/discover` | Catalog of published tools on the Invokera platform | https://invokera.com/discover |
@@ -770,13 +745,11 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.lordevo/agent-directory` | Directory of agent-callable APIs, x402 endpoints and MCP servers | https://lordevo.com/mcp |
 | `com.losshq/directory` | Certified insurance appraisers and umpires by state, city and specialty | https://www.losshq.com/mcp |
 | `com.lotsofsounds/mcp` | CC0 sound effects searchable by keyword and category | https://api.lotsofsounds.com/mcp |
-| `com.lovedhall/memorials` | Public obituaries, memorials, service times and grief guides | https://lovedhall.com/mcp |
 | `com.lovefengis/docs` | lovefengis developer docs for REST API, MCP, CLI and auth | https://lovefengis.com/mcp/docs |
 | `com.lpreportly/site` | lpreportly site dataset rows with cited answers | https://lpreportly.com/mcp |
 | `com.lucernel/lucernel` | Lucernel apps, guides, roundups and comparison articles | https://lucernel.com/mcp |
 | `com.lugtorq/site` | lugtorq site dataset rows with cited answers | https://lugtorq.com/mcp |
 | `com.lxrflow/agora` | Q&A threads where AI agents ask and answer technical questions | https://agora.lxrflow.com/mcp |
-| `com.lyntahq/public-documentation` | Lynta public website documentation pages | https://lyntahq.com/mcp |
 | `com.macaroonnetwork/bible-evidence` | BSB and WEB Bible verses with context, comparison and cross-references | https://api.macaroonnetwork.com/mcp-faith-evidence-v1/mcp/ |
 | `com.mactechsolutionsllc.www/federal-market` | US federal contract opportunities, awards, contractors and spending | https://www.mactechsolutionsllc.com/api/mcp/market |
 | `com.mandateoffice/mandate` | EU and national law links, company registers and formation guides | https://mandateoffice.com/mcp |
@@ -837,7 +810,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.myoddly/oddly-corpus` | Observed web records, subject histories and benchmarks | https://myoddly.com/api/public/mcp |
 | `com.myprivacyagent/public` | Data broker opt-out guides and removal routes | https://myprivacyagent.com/api/mcp |
 | `com.myrmigo/myrmigo` | Airline booking change rules, official booking sites and EU261 compensation | https://mcp.myrmigo.com/mcp |
-| `com.nalpeiron.docs/mcp` | Nalpeiron Zentitle2, ZenGain and ZenMeter product documentation | https://docs.nalpeiron.com/~gitbook/mcp |
 | `com.ncstatutes/ncgs` | North Carolina General Statutes text, amendments and changes | https://mcp.ncstatutes.com/mcp |
 | `com.nearfine/books` | Book listings, new and used, across booksellers worldwide | https://nearfine.com/mcp |
 | `com.negativeresistance/cure-protocol` | Disease research signals, clinical trials and cure progress evidence | https://negativeresistance.com/api/v1/mcp |
@@ -860,8 +832,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.nuxtseo/nuxt-seo` | Nuxt SEO module docs and SEO checks for URLs | https://nuxtseo.com/mcp |
 | `com.nymwell/lookup` | Domain availability, prices and public registration records | https://nymwell.com/mcp/lookup |
 | `com.oakferry/agents` | Oakferry app facts: platforms, prices, ratings and limits | https://agents.oakferry.com/mcp |
-| `com.odingard/bifrost` | Company trust center security and compliance answers | https://bifrost-mcp-842108046620.us-central1.run.app/public/mcp |
-| `com.offerlaneauto/motor-row` | Used cars for sale from Indianapolis dealers | https://offerlaneauto.com/mcp |
 | `com.oilpicker/oilpicker` | Korean regional currency fuel discounts and accepting merchants | https://oilpicker.com/api/mcp |
 | `com.okeystay/okeystay` | Holiday rental listings with availability and total prices | https://okeystay.com/mcp |
 | `com.okfindex/okfindex` | Open Knowledge Format bundles and legislation status | https://okfindex.com/mcp |
@@ -871,12 +841,10 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.olyport/pubmed` | PubMed biomedical literature, related articles and MeSH terms | https://mcp.olyport.com/pubmed/mcp |
 | `com.onefindme/search` | AliExpress and eBay product listings with prices and ratings | https://onefindme.com/mcp |
 | `com.oneuedu.mcp/oneu-education` | Australian courses, providers, occupations and skilled visa invitation data | https://mcp.oneuedu.com/mcp |
-| `com.opendont/opendont` | Sourced public knowledge records and open questions on any subject | https://opendont.com/mcp |
 | `com.openforallofus/agora` | MCP servers catalog ranked by measured health checks | https://openforallofus.com/api/mcp |
 | `com.openmedici/public` | Public fellowships, grants, scholarships and prizes | https://openmedici.com/mcp |
 | `com.opennash.jobs/opennash-jobs` | Official job listings at Forbes Global 2000 companies and trends | https://jobs.opennash.com/mcp |
 | `com.openpublica/civic-meetings` | US local government meeting summaries and transcripts | https://api.openpublica.com/mcp |
-| `com.orderpadledger/site` | orderpadledger site dataset rows with cited answers | https://orderpadledger.com/mcp |
 | `com.organikpi/organikpi` | OrganiKPI blog posts, product reviews and AI search study datasets | https://organikpi.com/.well-known/mcp |
 | `com.orgbix/site` | Rows and statistics from the Orgbix dataset with citations | https://orgbix.com/mcp |
 | `com.origamitutor/origami-tutor` | Origami models and illustrated folding instructions | https://origamitutor.com/api/mcp |
@@ -901,13 +869,11 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.petnecto/pets` | Adoptable shelter pets and rescues near a place | https://petnecto.com/mcp |
 | `com.pewesenergy/catalogue` | PEWES ENERGY drinks catalogue and price list | https://pewesenergy.com/api/mcp |
 | `com.pick-rate/hotels` | Hotels bookable directly without OTA commission | https://pick-rate.com/mcp |
-| `com.pickpathly/site` | Rows and statistics from the Pickpathly dataset with citations | https://pickpathly.com/mcp |
 | `com.plendio/plendio` | Product prices compared across shops in Denmark, Sweden, Norway and Germany | https://plendio.com/mcp |
 | `com.plumbregistry/directory` | Fire protection contractor licenses in Texas and California | https://plumbregistry.com/mcp |
 | `com.podlexicon/podlexicon` | AI summaries of long-form podcast episodes by topic | https://podlexicon.com/mcp/ |
 | `com.point-topic/point-topic-mcp-public` | UK broadband ISPs, networks, links and standards | https://mcp.point-topic.com/public |
 | `com.politicalcomms/docs` | Political Comms product documentation | https://docs.politicalcomms.com/mcp |
-| `com.ponito/product-intelligence` | Swiss and European product prices, barcodes and price history | https://www.ponito.com/mcp |
 | `com.pontofato/pontofato` | Brazilian addresses by CEP, geocoded points and companies at each CEP | https://pontofato.com/mcp |
 | `com.powerplatformtip/mcp` | Practical Microsoft Power Platform tips and articles | https://func-mcp-kmupower.azurewebsites.net/tip/mcp |
 | `com.pplfree/ground-school` | FAA private pilot ground school lessons and practice questions | https://pplfree.com/mcp |
@@ -923,7 +889,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.qubitsok/mcp-server` | Quantum computing jobs, arXiv papers and researcher profiles | https://qubitsok.com/mcp |
 | `com.quelvio/mcp-server` | A company's internal knowledge across Drive and other connected systems | https://mcp.quelvio.com/http |
 | `com.radar-cnpj/radar-cnpj` | Brazilian company registry data by CNPJ, CNAE and construction works | https://radar-cnpj.com/mcp |
-| `com.ratevert/mcp` | Current exchange rates for currencies, stocks, ETFs and crypto | https://ratevert.com/api/mcp |
 | `com.realevr.estates/estates` | African homes for rent or sale with real estate news | https://estates.realevr.com/mcp |
 | `com.recipes-daily/recipes` | Recipes and cooking guides searchable by ingredient | https://recipes-daily.com/mcp |
 | `com.redocly/mcp` | Redocly product docs, guides and blog | https://redocly.com/mcp |
@@ -970,8 +935,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.seniordognotes/pawline-pet-guides` | Pet and animal care guides plus care calculators | https://pawline-mcp.pawline.workers.dev/mcp |
 | `com.senzing/mcp` | Senzing entity resolution docs, SDK reference, code examples and error codes | https://mcp.senzing.com/mcp |
 | `com.sgpbusiness/singapore-entities-directory` | Singapore registered entities by name or UEN from ACRA open data | https://mcp.sgpbusiness.com/mcp |
-| `com.sgpdirectory/mcp` | Singapore companies, UENs and SSIC industry classification codes | https://mcp.sgpdirectory.com/mcp |
-| `com.sgpdirectory/singapore-business-directory` | Singapore companies, UENs and SSIC industry classification codes | https://sgpdirectory.com/mcp |
 | `com.shipshapedata/shipshape-data-docs` | Practical guides on data engineering and AI from Shipshape Data | https://shipshapedata.com/mcp/docs |
 | `com.shrutikaushik/research` | Founder go-to-market guides and LinkedIn, Reddit, AI search statistics | https://shrutikaushik.com/mcp |
 | `com.sigistry/plugin-catalog` | Claude Code plugins, skills and graded MCP server scorecards | https://sigistry.com/mcp |
@@ -982,7 +945,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.sitepatent/directory` | Directory of software, SaaS and AI tools with alternatives and categories | https://sitepatent.com/api/mcp |
 | `com.skaidigital/norwegian-companies` | Norwegian company registry data, annual accounts, groups and industry codes | https://tools.skaidigital.com/brreg/mcp |
 | `com.skillmd/skillmd` | Registry of Agent Skills (SKILL.md) searchable by task | https://api.skillmd.com/mcp |
-| `com.skipseek/skipseek` | Cross-venue prediction market probabilities, discrepancies, movers and briefings | https://skipseek.com/mcp |
 | `com.skipshit/mcp` | People contact and property records: phones, emails, addresses, relatives | https://mcp.skipshit.com/mcp |
 | `com.smspva/docs` | SMSPVA API docs for SMS activation, number rental and private email | https://mcp.smspva.com/docs |
 | `com.soc2compared/mcp` | SOC 2 compliance platform prices and audit firms comparison | https://soc2compared.com/mcp |
@@ -1046,7 +1008,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.truepeptidesource/peptides` | Peptide reference: published dose ranges, protocols, comparisons and reconstitution math | https://truepeptidesource.com/mcp |
 | `com.tryafterlight.commons/afterlight-commons` | Agent-written records of errors, fixes, gotchas and dead ends | https://commons.tryafterlight.com/mcp |
 | `com.tulugar/tulugar` | Paraguay and Latin America real estate listings, projects and agencies | https://tulugar.com/api/mcp |
-| `com.turkishmeme/video-search` | Turkish meme videos by title, quote, person or scene | https://turkishmeme.com/mcp |
 | `com.ultimatesweepers/sweepstakes` | Free-to-enter US sweepstakes by prize, end date and state | https://ultimatesweepers.com/mcp |
 | `com.umesh-malik/blog-mcp` | Blog posts on Claude Code, MCP, AI search and LLM engineering | https://umesh-malik.com/mcp |
 | `com.unifiedchambers/legal` | Indian debt recovery law, DRT benches, SARFAESI periods and bare acts | https://www.unifiedchambers.com/mcp |
@@ -1126,7 +1087,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `dev.getbureau/about` | Bureau self-hosted AI agent office: FAQ, roadmap and install steps | https://www.getbureau.dev/mcp |
 | `dev.getwork/jobs` | Developer jobs by stack, level, remote and salary insights | https://getwork.dev/mcp |
 | `dev.ioconnex/search-mcp` | Web search results and page text | https://search.ioconnex.dev/mcp |
-| `dev.lattis/mcp` | Markdown content of indexed websites and their AI visibility scores | https://mcp.lattis.dev/mcp |
 | `dev.launchdog/public` | Product launches, past winners and upcoming launch weeks on Launchdog | https://launchdog.dev/mcp/public |
 | `dev.mcpnav/directory` | Directory of MCP servers with install configs | https://mcp.mcpnav.dev/mcp |
 | `dev.modelmarket/emporion` | EU VAT, EORI, LEI, sanctions, company and ECB rate lookups | https://modelmarket.dev/tools/mcp/emporion |
@@ -1140,7 +1100,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `dev.promplate/hmr` | Python hmr hot reload library docs, source and tests | https://pyth-on-line.promplate.dev/hmr/mcp |
 | `dev.q4a/board` | Questions and answers posted by AI agents | https://q4a.dev/mcp |
 | `dev.refnusa/refnusa` | Indonesia holidays, minimum wages, regions, postal codes, tax and statistics | https://refnusa.dev/mcp |
-| `dev.releasealert/mcp` | Package releases, release notes and CVEs across registries | https://releasealert.dev/mcp |
 | `dev.rmcp/rmcp` | Index of remote MCP servers and their tools | https://rmcp.dev/mcp |
 | `dev.rossdata/data-dictionary` | Ross ERP 8.0 database schema, menus and program catalog | https://mcp.rossdata.dev/mcp |
 | `dev.shirabe/hub` | Japanese calendar, address normalization and corporate number registry data | https://shirabe.dev/mcp |
@@ -1227,7 +1186,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `il.co.mamachoice/guides` | Hebrew baby product buying guides | https://mamachoice-mcp.ohadf1976.workers.dev/mcp |
 | `il.co.sabag3d/studio` | Sabag 3D Studio services, past projects, products and FAQ | https://sabag3d.co.il/mcp |
 | `in.dalalos/mcp` | Indian NSE/BSE stock filings, financials and FII flows | https://mcp.dalalos.in/mcp |
-| `in.gatedaily/gatedaily` | GATE CS practice questions with worked solutions | https://gatedaily.in/mcp |
 | `in.nebulatech/nebula` | Nebula B2B digital marketing services and AI search answers | https://www.nebulatech.in/_functions/mcp |
 | `in.sambodh-ias/upsc-prep` | UPSC study material, previous-year questions and current affairs | https://api.sambodh-ias.in/mcp |
 | `in.therapistsnearme/directory` | Credential-verified therapists in India by specialty | https://mcp.therapistsnearme.in/api/mcp |
@@ -1263,7 +1221,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.founderventures/founder-ventures` | Bootstrapped B2B SaaS founder library and European founder events | https://founderventures.io/api/mcp |
 | `io.foundplay/foundplay` | Directory of free browser games including AI-made games and fan ports | https://foundplay.io/mcp |
 | `io.fusionauth/mcp-docs` | FusionAuth documentation and technical answers | https://ai.fusionauth.dev/mcp/docs |
-| `io.gamefork/mcp` | Public browser games on GameFork with metadata, fork lineage and code | https://gamefork.dev/api/mcp |
 | `io.github.0design/qfactory` | Verified catalog of agent workflows and components with schemas | https://qfactory.io/api/mcp |
 | `io.github.0xkayser/vaultvision` | Hyperliquid vault records, risk scores, rankings and TVL | https://vaultvision.tech/mcp |
 | `io.github.1nzpainter/painting-lessons` | Transcribed painting lessons with video timestamps | https://mypaintingclub.com/kb/mcp |
@@ -1298,7 +1255,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.amirdaraee/luxembourg-mcp` | Luxembourg open data, laws, statistics, geodata and weather alerts | https://mcp.luxembourg-mcp.com/mcp |
 | `io.github.AnastasiyaW/diffusion-love-knowledge` | Public knowledge snapshot and news on diffusion models and tooling | https://diffusion.love/mcp |
 | `io.github.AnchorRegistry/ar-mcp` | On-chain provenance records for artifacts by AR-ID or hash | https://mcp.anchorregistry.ai/mcp |
-| `io.github.angelnikolov/remote-jobs` | Live remote developer jobs, salaries and hiring companies | https://www.remotefrontendjobs.com/mcp |
 | `io.github.Anon2052/search-mcp` | Web search results and page text | https://search-mcp-tgsn.onrender.com/mcp/ |
 | `io.github.anousss007/ng-blatui` | ng-blatui Angular components, blocks, charts, templates and typed APIs | https://ngblatui.remix-it.com/mcp |
 | `io.github.ant588362/yarrow` | Fixes other coding agents found for errors | https://yarrow-fixes.vercel.app/mcp |
@@ -1358,7 +1314,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.cello305/carddeals-mcp` | Current US gift card discounts across providers | https://catalog.carddeals.co/mcp |
 | `io.github.Centrify-Internal/hubspot-integrations-mcp` | HubSpot Integrations Center app integrations data | https://n6k96b1ql7.execute-api.us-west-2.amazonaws.com/prod/ |
 | `io.github.chrisryugj/korean-law-mcp` | Korean statutes, precedents, ordinances and treaties | https://mcp.gomdori.app/law |
-| `io.github.ckangas2/abstractinator` | Immunology and virology papers, trials and grants | https://mcp.abstractinator.me/mcp |
 | `io.github.classofdoom/tresslers-intelligence` | Intelligence dossiers and daily briefings with semantic search and knowledge graph | https://tresslersgroup.com/api/mcp |
 | `io.github.CleanSlice/mcp` | Architecture docs and patterns for NestJS and Nuxt full-stack apps | https://mcp.cleanslice.org/mcp |
 | `io.github.cloudalien2025/1800deals-directory` | Directory of toll-free and vanity-number US businesses | https://1800deals-connector.michael-b38.workers.dev/mcp |
@@ -1458,7 +1413,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.CyberMax-tools/creative-commons-images` | Openly licensed and public-domain images with license and credit lines | https://commonkite.cybermax-tools.workers.dev/mcp?via=mcp-registry |
 | `io.github.daftAI2026/awesome-jev` | Jev and System One projects with recorded inclusion evidence | https://awesomejev.cc/api/mcp |
 | `io.github.Daisuke134/ai-monk-index` | AI monk avatar creators, video formats, monetization and playbooks | https://aniccaai.com/.netlify/functions/ai-monk-mcp |
-| `io.github.dakai/copierparts` | Copier parts catalog with OEM numbers and compatibility | https://thecopierparts.com/public/mcp |
 | `io.github.daleweaver1981/tariffmonitor-mcp` | US HTS codes and stacked import tariff rates by origin | https://adcreator-ai.com/mcp-free |
 | `io.github.Damso74/arcadeops-public-discovery` | ArcadeOps public developer docs, OAuth guide and OpenAPI | https://arcadeops.leadalpes.fr/mcp/public |
 | `io.github.danielinniss/boundr` | UK administrative boundaries and GeoJSON geometries from OS Boundary Line | https://mcp.boundr.dev/mcp |
@@ -1475,7 +1429,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.dhamma-seeker/tripitaka-mcp` | Pali Canon suttas with search, citations and translations | https://mcp.tripitaka-mcp.com/mcp |
 | `io.github.DiceHoldingsInc/dice-mcp` | Tech job listings on Dice.com | https://mcp.dice.com/mcp |
 | `io.github.disclose/lookup-disclose-io` | Security vulnerability disclosure contacts for domains, packages and repositories | https://lookup.disclose.io/mcp |
-| `io.github.dockster/uxspot-mcp` | UX glossary, design tools directory, checklists and curriculum | https://uxspot.io/mcp |
 | `io.github.dodopayments/dodo-knowledge` | Dodo Payments API and product documentation | https://knowledge.dodopayments.com/mcp |
 | `io.github.domusdeiug/muyiribi` | Ugandan business directory by category and district | https://ug-online.domus-dei-tech.workers.dev/mcp |
 | `io.github.donniertf-hub/jp-library-search-mcp` | Japan National Diet Library catalogue of books and publications | https://jp-library-search-mcp.donniertf.workers.dev/mcp |
@@ -1516,7 +1469,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.Georgi-Petkov/personalknowhow` | One person's skills and work experience as a knowledge graph | https://personalknowhow-demo.kxtwrdzt6g.workers.dev/mcp |
 | `io.github.geronco/commandvault` | Prompts, CLAUDE.md templates, Cursor rules and agent skills | https://commandvault.ai/api/mcp |
 | `io.github.getgapup/mcp-knowledge` | Enriched metadata on games, films and other content franchises | https://mcp.gapup.io |
-| `io.github.giorgio44/gateonai-mcp` | Directory of AI tools with comparisons, workflows and GDPR hosting | https://www.gateonai.com/mcp/ |
 | `io.github.godavid/gitjog` | Hungarian laws full text with amendment history and point-in-time versions | https://gitjog.remenyfarm.hu/api/mcp |
 | `io.github.gokimedia/cordfind-generator-compatibility` | Generator cords, plugs, connector compatibility and cord sizing | https://cordfind.com/api/mcp |
 | `io.github.gokimedia/sewlore-measurement-reference` | Sewing measurement documentation, worked examples and tool references | https://sewlore.gitbook.io/sewlore-docs/~gitbook/mcp |
@@ -1545,7 +1497,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.hiddenjobs/job-search-mcp` | Remote tech job listings and descriptions | https://api.hiddenjobs.dev/mcp |
 | `io.github.hoodly-agent/hoodly-gmgn-robinhood-mcp` | Robinhood Chain token launches, trends and due diligence data | https://gmgn.hoodly.io/mcp |
 | `io.github.Humanleap/magicscreenshots-mcp` | Real App Store listing screenshots, previews and version history | https://www.magicscreenshots.com/api/mcp |
-| `io.github.HumanLineage/wt` | Public genealogical graph of people, families and places | https://humanlineage.org/api/mcp |
 | `io.github.Ibrahim-Salman19/uetgpt` | UET Taxila admissions, programs, fees and merit calculation | https://uetgpt.site/mcp |
 | `io.github.ifcode/gameshot` | Video game industry news, hot stories, and daily, weekly and monthly reports | https://gameshot.games/api/mcp |
 | `io.github.InstaBlick/complyzard` | Compliance resources and documents by framework and topic | https://complyzard.com/mcp |
@@ -1569,7 +1520,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.jmrplens/libgen-mcp` | Books, papers, magazines and standards with text reading | https://mcp.jmrp.io/libgen |
 | `io.github.joachimglassell-ship-it/tsre-swedish-equities` | Daily research intelligence on Swedish equities and market | https://machine-job-fishing-net.onrender.com/mcp/ |
 | `io.github.joelp22-maker/referencesource` | Verified reference datasets with source URLs and quotes | https://referencesource.org/mcp |
-| `io.github.jonwillington/ddbx` | Rated insider share dealings in UK, US, Sweden, Netherlands and Congress | https://api.ddbx.uk/mcp |
 | `io.github.jovan1301/official-translator-guides` | Guides on document translation, apostille and visas | https://officialtranslator.pro/mcp |
 | `io.github.jqy-yo/gptimagehub` | Attributed image generation prompt templates by category | https://www.gptimagehub.com/mcp |
 | `io.github.JSONbored/heyclaude` | Directory of Claude Code agents, MCP servers, skills and tools | https://heyclau.de/api/mcp |
@@ -1642,7 +1592,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.mcp-dir/kb-mcp` | User's own uploaded documents, searchable by meaning | https://api.mcp.ai/p_kb |
 | `io.github.mcp-dir/pncp-mcp` | Brazilian government tenders, public procurement notices, winners and edital documents | https://api.mcp.ai/p_pncp |
 | `io.github.mcpexplorer/mcpexplorer` | MCP servers with install methods, risk labels and trust scores | https://mcpexplorer.com/mcp |
-| `io.github.MCPServings/paper-mcp` | Academic papers from arXiv, Semantic Scholar, OpenAlex, plus PubMed medical literature | https://latex-tools.online/mcp |
 | `io.github.megabrainee/sectora` | CVE, EPSS, KEV and package vulnerability threat intelligence | https://mcp.sectora.io/mcp |
 | `io.github.menghaoran214-lang/vibe-coding-cn` | Chinese vibe coding guides and documentation | https://n8n.xiaomeng.ink/mcp/vibe-coding-cn |
 | `io.github.michaelcolenso/nobodynamed` | US baby name popularity by year from 1880 to 2025 | https://nobodynamed.com/mcp |
@@ -1693,7 +1642,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.op0ai/iconlab` | Over 324,000 Lucide-style icons as SVG | https://iconlab.skillkit.run/mcp |
 | `io.github.open-mtor-atlas/mtor-atlas` | mTOR pathway studies, entities, claims and evidence labels | https://mtor-atlas-mcp.mtor-atlas.workers.dev/mcp |
 | `io.github.OpenConverters/kelvin` | Power electronics component specs, selection and cross-references | https://kelvin.openconverters.com/mcp |
-| `io.github.OpenHeritageOnline/public-search` | Genealogy and cultural heritage records, cemeteries and memorials | https://openheritage.online/mcp |
 | `io.github.openqfr-dev/openqfr` | Public evidence of failed quantitative trading strategies | https://openqfr.dev/mcp |
 | `io.github.OptimNow/cloud-finops` | Cloud cost optimization guidance and waste-fixing runbooks | https://mcp.optimnow.io/mcp |
 | `io.github.OrderlyNetwork/orderly-mcp` | Orderly Network documentation, contracts and SDK patterns | https://mcp.orderly.network/ |
@@ -1714,7 +1662,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.pgeneralpl/edgar-entity-mcp` | SEC EDGAR filings, XBRL financials, insider trades, state entity records | https://edgar-entity-mcp.vercel.app/mcp |
 | `io.github.pguerrerolinares/bizkaia-now` | Cultural and nightlife events in Bizkaia, Spain | https://bizkaianow.com/mcp |
 | `io.github.PilotSuite/crystalram-open-commons` | CrystalRAM public AI research cycles and Open Commons discussion threads | https://crystalram.ai/mcp |
-| `io.github.pineapple-farm/skill-history` | Download history of agent skills on ClawHub | https://skill-history.com/mcp |
 | `io.github.pinkpwningclub/recipes` | Software options and reproducible AI agent workflow recipes | https://softwaresausage.com/api/mcp |
 | `io.github.pipeworx-io/abn-lookup` | Australian Business Register ABN company records | https://gateway.pipeworx.io/abn-lookup/mcp |
 | `io.github.pipeworx-io/alaska-code` | Alaska state statutes by citation and topic | https://gateway.pipeworx.io/alaska-code/mcp |
@@ -1927,7 +1874,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.rainbow686/china-export-rebate-mcp` | China export tax rebate rates by HS code | https://china-export-rebate-mcp.rainbow686.workers.dev/mcp |
 | `io.github.rarasAI/raras` | Brazilian rare disease knowledge graph in Portuguese | https://raras.org/api/mcp |
 | `io.github.rasitakyol/aicoolies` | Catalog of AI and developer tools | https://aicoolies.com/mcp |
-| `io.github.Ravesteijntjes/qquickpick` | Movies and TV shows by mood, genre, cast, awards and streaming availability | https://qquickpick.com/mcp |
 | `io.github.ray999/knowledge-graph` | Directory of AI tools, models and agents with community feedback | https://kg.zhiyong.dev/mcp |
 | `io.github.RayceRossum/getregisters` | NDIS pricing, care and licensing rules with official citations and register previews | https://getregisters.com/api/v1/mcp |
 | `io.github.re-fagiano/bloodyhopes-campfire` | Historical ballads, lyrics and critical research corpus | https://bloodyhopes.com/mcp |
@@ -1950,7 +1896,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.saagpatel/portfolio-mcp` | Saagar Patel's essays, book chapters, field notes, and projects | https://mcp.saagarpatel.dev/mcp |
 | `io.github.sacrosaunt/redra` | Current class-action settlements with official source links | https://mcp.redra.ai/mcp |
 | `io.github.Sagar27888/google-maps-mcp-server` | Business names, addresses, phones, ratings and hours from Google Maps | https://google-maps-mcp-server.vercel.app/mcp |
-| `io.github.salemalem/npmscan` | npm package metadata, known vulnerabilities, advisories, and CVEs | https://npmscan.com/api/mcp |
 | `io.github.sam1siam/ruagentic-directory` | Directory of MCP servers, clients and AI agents | https://ruagentic.com/mcp |
 | `io.github.sandeepkelvadi/marketing-skills-directory` | 340+ marketing and SEO skills for Claude Code | https://marketingskills.directory/wp-json/mkt/v1/mcp |
 | `io.github.Santurce-Software-LLC/birds-of-puerto-rico` | Puerto Rico bird species guide entries and families | https://birdsofpuertorico.com/mcp |
@@ -2022,7 +1967,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.theluckystrike/ofac-screening` | OFAC sanctions list entries and name screening | https://ofac-screening.zovo.one/mcp |
 | `io.github.TheRundown/documentation` | Official TheRundown sports data API documentation | https://docs.therundown.io/mcp |
 | `io.github.thiazzz/maker-machines-atlas` | Maker machine research, comparisons and buying guidance | https://makermachinesatlas.com/mcp |
-| `io.github.thiazzz/smart-glasses-atlas` | Smart glasses specifications, comparisons, and regional retailer links | https://smartglassesatlas.com/mcp |
 | `io.github.thinksuitesolution-coder/visibilityai` | Businesses worldwide by category and city, with AI-visibility data | https://www.visibilityai.in/api/mcp |
 | `io.github.thunderbid/socketlist-mcp` | Directory of 800+ open-source MCP servers with install configs | https://socketlist.pages.dev/mcp |
 | `io.github.timescale/pg-aiguide` | PostgreSQL documentation and best practices | https://mcp.tigerdata.com/docs |
@@ -2034,7 +1978,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.togo-framework/togo` | ToGO Go and React framework docs and plugins | https://mcp.to-go.dev/mcp |
 | `io.github.TonyChen56/paperbanana-prompts` | Research figure prompt templates from PaperBanana | https://paperbanana-prompts-mcp.873217126.workers.dev/mcp |
 | `io.github.TravelType/travel-poi` | Global cities, countries and travel points of interest | https://mcp.traveltype.app |
-| `io.github.travelwhiz-ltd/live-times-transit` | Live public transit departures, stops, and journey directions | https://livebustimes.org/api/mcp |
 | `io.github.tresor4k/leavesheet-certified-payroll` | Davis-Bacon prevailing wage determinations and certified payroll rules | https://app.tabletemplates.com/api/mcp |
 | `io.github.trip2g/trip2g` | Markdown notes folder served with search and sourced answers | https://trip2g.com/_system/mcp |
 | `io.github.troothllc/trooth-network` | Company trust profiles and disclosed facts | https://api.trooth.co/public/mcp |
@@ -2107,7 +2050,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.motcheck/mot` | UK vehicle details and MOT history from DVSA data | https://motcheck.io/mcp |
 | `io.motomarks/mcp` | Car brand logos and automotive brand data | https://motomarks.io/api/mcp |
 | `io.nightbreak/forge` | Nightbreak Minecraft plugin wiki, source code, and config schemas | https://forge.nightbreak.io/mcp |
-| `io.omoro/style-library` | Visual aesthetic styles, palettes, and creative directions | https://omoro.io/api/mcp |
 | `io.openvidu/docs` | Official OpenVidu documentation by version, with changelog and pricing | https://docs-mcp.openvidu.io/mcp |
 | `io.philidor/defi-vaults` | 700+ DeFi vaults with risk scores and protocol analysis | https://mcp.philidor.io/api/mcp |
 | `io.printpal/printpal` | 3D printing models, troubleshooting wiki, and build guides | https://printpal.io/mcp |
@@ -2141,7 +2083,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ir.bijack/loadboard` | Active public freight loads and loadboard halls on Bijack | https://mcp.bijack.ir/mcp |
 | `it.asapdevs/site` | ASAPDevs software house offers, case studies, blog and pricing | https://asapdevs.it/api/mcp |
 | `it.giornatamondiale/world-days` | Italian world and international days with dates and sources | https://giornatamondiale.it/mcp |
-| `it.istruzionemessina/istruzione-messina` | Italian education news and articles for Messina | https://istruzionemessina.it/mcp |
 | `it.matricedeldestino/matrice-del-destino` | Destiny matrix guides and calculators from an Italian site | https://matricedeldestino.it/mcp |
 | `it.occasioni/bandi` | Italian public grants and incentives for businesses with deadlines | https://occasioni.it/mcp |
 | `it.taxcompass/taxcompass` | Italian tax rules from primary sources with citations | https://api.taxcompass.it/mcp |
@@ -2151,7 +2092,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `jobs.superintelligence/frontier-ai` | Open frontier AI lab roles and hiring organizations | https://superintelligence.jobs/mcp |
 | `jp.afdb/mcp` | Japanese point-site reward offers, conditions and yen values | https://mcp.afdb.jp/mcp |
 | `jp.co.roundup-inc/knowledge` | Japanese SME web marketing insights, Q&A, and podcast excerpts | https://roundup-knowledge-mcp.bitter-sea-955b.workers.dev/mcp |
-| `jp.livetribe/live-tribe` | Japanese live house shows, artists and venues | https://livetribe.jp/mcp |
 | `ke.co.firmledger/firmledger` | Verified company directory records, categories and countries | https://mcp.firmledger.co.ke/mcp |
 | `kr.lifelaw/kr-law` | Korean statutes, case law, administrative rules and legal reference figures | https://mcp.lifelaw.kr/mcp |
 | `land.moss/alpha-mcp` | Korean crypto and macro media analysis, daily briefs and market data | https://alpha.moss.land/api/mcp |
@@ -2176,7 +2116,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `me.gaborharsanyi/knowledge` | Gabor Harsanyi's professional expertise, credentials, and published knowledge | https://mcp.gaborharsanyi.me/mcp |
 | `me.ryanlindsey/ryanlindsey-me` | Ryan Lindsey's resume, case studies and published writing | https://mcp.ryanlindsey.me/mcp |
 | `media.thecoop/the-coop` | iGaming articles, supplier profiles, events and payment capabilities | https://thecoop.media/mcp |
-| `my.com.condo/property-search` | Malaysian property listings, articles, agents and community Q&A | https://condo.com.my/mcp |
 | `net.balford/ask` | Metal stamping, deep drawing and design-for-manufacturing engineering answers | https://balford.net/ask/mcp |
 | `net.gamedev/mcp` | GameDev.net forums, tutorials, postmortems, game industry news and shader projects | https://gamedev.net/mcp/ |
 | `net.genebe/genebe-mcp` | Human genetic variant classification, ACMG criteria, genes and consequences | https://mcp.genebe.net/v1/mcp |
@@ -2200,7 +2139,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `network.wellknown/wellknown` | Index of AI agents and MCP servers with liveness and capabilities | https://wellknown.network/mcp |
 | `news.agingresearch/agingresearch-news` | Aging research papers, trials, claims about drugs and genes | https://agingresearch.news/api/mcp |
 | `news.asha/asha-news` | Source-backed news archive with Palestine and conflict coverage | https://asha.news/api/v1/mcp |
-| `news.handyai/mcp` | Weekly AI news, model releases, and benchmark scores | https://handyai.news/mcp |
 | `news.hottub/hottub-news` | Worldwide news headlines and story clusters across outlets and languages | https://hottub.news/mcp |
 | `news.pollar/pollar-news` | Independent European news, explainers, daily briefs and storylines | https://mcp.pollar.news/mcp |
 | `nl.boekenbase/catalogus` | Dutch book catalog with ISBN metadata and new releases | https://boekenbase.nl/mcp |
@@ -2235,14 +2173,12 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `org.casimo/mcp` | US casino terms, observed changes, and source-backed facts | https://casimo.org/mcp |
 | `org.celo/docs-mcp` | Celo blockchain developer documentation | https://docs.celo.org/mcp |
 | `org.citizenofnowhere.rankings/global-metro-power-rankings` | Rankings and profiles of 4,300 world metros across sixteen dimensions | https://rankings.citizenofnowhere.org/api/mcp |
-| `org.climateinsightsdirectory/climate-energy-research` | Civil-society climate and energy reports, policy briefs, and analyses | https://climateinsightsdirectory.org/api/mcp?utm_source=mcp-registry&utm_medium=mcp |
 | `org.davisstirling/davisstirling` | California HOA law: Davis-Stirling Act text and court decisions | https://davisstirling.org/mcp |
 | `org.dictionaryofml/dictionary` | Machine learning term definitions and cross-references | https://dictionaryofml.org/mcp |
 | `org.edufeed/nope-mcp` | German open educational resources with open licenses | https://mcp.edufeed.org/mcp |
 | `org.everroad/dealers` | Utah franchise car dealer hours, fees, services, and state fee law | https://everroad.org/mcp |
 | `org.fairappraisers/mcp` | Public registry of FAIR appraisers by location and specialty | https://mcp.fairappraisers.org/mcp |
 | `org.imqueue/mcp` | Official @imqueue documentation, packages, and release status | https://mcp.imqueue.org/mcp |
-| `org.jainebooks/catalogue` | Free Jainism ebooks and audiobooks in Indian languages | https://jainebooks.org/mcp |
 | `org.japanlaw/japanese-law` | Japanese statutes with English translations, provisions, and amendments | https://japanlaw.org/mcp |
 | `org.jobopportunitiesapi/mcp` | Live employer-direct job postings, hiring signals, and market statistics | https://api.jobopportunitiesapi.org/mcp |
 | `org.kampyeri/mcp-server` | Verified campsites and glamping in Turkey | https://kampyeri.org/mcp |
@@ -2289,13 +2225,11 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `pl.spokojnierodzice/spokojnie` | Polish answers on normal child development for ages 0-36 months | https://spokojnie-mcp.vercel.app/api/mcp |
 | `pl.supplemental/foodlaw` | EU and Polish food supplement law, health claims and novel foods | https://mcp.supplemental.pl/mcp |
 | `pl.vanauto/campers` | Camper and rental listings with specs and prices | https://mcp.vanauto.pl/mcp |
-| `porn.tik-tok/tiktokporn` | Adult video clips, creators and hashtags | https://tik-tok.porn/mcp |
 | `pro.appboard/appboard` | Community-ranked software products, alternatives, and trending launches | https://api.appboard.pro/api/mcp |
 | `pro.dsgvo/dsgvo-pro` | German and EU digital law statutes including GDPR and AI Act | https://dsgvo.pro/api/mcp |
 | `pro.investormatch/investor-match-public` | Venture capital investor directory and fundraising guides | https://investormatch.pro/mcp/public |
 | `pro.laspi/directory` | Directory of owner-confirmed small businesses | https://laspi.pro/api/v1/mcp/directory |
 | `realestate.rak/catalog` | Off-plan property projects, developers and areas in Ras Al Khaimah | https://www.rak.realestate/mcp |
-| `ro.altziar/news` | Romanian news from many newsrooms with confirmed versus claimed facts | https://altziar.ro/mcp |
 | `ro.autoid/autoid-support` | AutoID product catalog, specifications and technical support | https://mcp.autoid.ro/mcp |
 | `rocks.dreamland/help` | DreamLand MUD help articles, items, news and online players | https://dreamland.rocks/mcp/help |
 | `rocks.iching/hexagram-mcp` | I Ching 64 hexagrams and eight trigrams | https://mcp.iching.rocks/mcp |
@@ -2354,7 +2288,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `tech.tailor/mcp` | Tailor Platform documentation | https://mcp.tailor.tech/ |
 | `tech.tresbien/drupal-code-query` | Drupal core API changes, contrib module usage and upgrade data | https://mcp.tresbien.tech/mcp |
 | `tech.ydb-qdrant.pets/codex-pets-ydb-qdrant` | Community Codex pet packs and install instructions | https://pets.ydb-qdrant.tech/mcp |
-| `to.trustmebro/trust-me-bro` | Fact-check verdicts on public claims with cited evidence | https://trustmebro.to/mcp |
 | `today.lmk/commerce` | Cross-merchant product prices, price history, and deals | https://lmk.today/api/ucp/mcp |
 | `today.nyangi/oneul-nyangi` | Real cat photos, profiles, breeds and cat care references | https://nyangi.today/mcp |
 | `tools.grokbot/connectors` | Grok Bot connectors, install methods, and test status | https://mcp.grokbot.tools/mcp |
