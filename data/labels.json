@@ -2730,18 +2730,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "app.withglint.recallradar/recallradar": {
-  "hash": "1f8e73204fa042ad",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "US FDA, USDA FSIS and CPSC product recalls",
-  "topics": [
-   "recalls",
-   "safety",
-   "us"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "app.workfinds/jobs": {
   "hash": "649e00fc5a4c9e3f",
   "retrieval": true,
@@ -37078,14 +37066,6 @@
    "benchmark",
    "apis"
   ],
-  "by": "claude-sonnet-5-5"
- },
- "io.github.PugarHuda/nota": {
-  "hash": "ddd41e0b5aecbd61",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
   "by": "claude-sonnet-5-5"
  },
  "io.github.purasim/purasim-mcp": {

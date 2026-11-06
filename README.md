@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2291 servers, checked 2026-11-05.
+2295 servers, checked 2026-11-06.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ai.jopp/jobs` | Open jobs in Switzerland and Liechtenstein | https://jopp.ai/mcp |
 | `ai.justautomate/website` | JustAutomate agency services, pages, workshop pricing and contact | https://justautomate.ai/mcp |
 | `ai.karmafor/karma-library` | Essay on AI cooperation, moral uncertainty and power | https://karmafor.ai/api/mcp?source=mcp-registry |
-| `ai.keenable/web-search` | Live web search and page content | https://api.keenable.ai/mcp?keenable_title=mcp-registry |
+| `ai.keenable/web-search` | Live web search and page content | https://api.keenable.ai/mcp-public?keenable_title=mcp-registry |
 | `ai.law.mcp/lawyer-search` | Verified US lawyer profiles by practice area, state and city | https://mcp.law.ai |
 | `ai.linof/docs` | Linof documentation and current pricing for family photo films | https://linof.ai/api/apps/6a562086cd3bd1e44e0d4c3d/functions/docsMcp |
 | `ai.llmhosting/pricing` | LLM API prices by provider and GPU rental prices with history | https://llmhosting.ai/mcp |
@@ -243,6 +243,8 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `br.com.fipex/mcp` | Brazilian FIPE vehicle reference prices and history | https://api.fipex.com.br/mcp |
 | `build.appside/mcp` | Appside developer docs and a catalog of apps and games | https://appside.build/mcp |
 | `build.fabricate/fabricate` | Fabricate plans, pricing and public documentation | https://fabricate.build/mcp |
+| `by.ai-belarus/registry` | Belarusian companies from the state registry by UNP | https://ai-belarus.by/mcp |
+| `by.ai-tender/tenders` | Open public procurements and tenders in Belarus | https://ai-tender.by/mcp |
 | `by.authorized/brands` | Brands and their authorized retailers, with authorization checks | https://app.authorized.by/api/public/mcp |
 | `bz.manda/manda` | Japanese businesses for sale on the MANDA M&A marketplace | https://manda.bz/mcp |
 | `ca.905trades/business-card` | 905 Trades Hamilton residential trades referral network facts and pages | https://905trades.ca/mcp |
@@ -398,7 +400,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.blacklabeltec/site-mcp` | Public pages of BlackLabel Tech | https://blacklabeltec.com/mcp |
 | `com.blbestate/site-mcp` | Public property records, parcels and owners by US state | https://blbestate.com/mcp |
 | `com.blicht/mcp` | Articles on e-commerce, AI and lifestyle in German and English | https://blicht.com/mcp |
-| `com.blockvectra/docs` | BlockVectra multi-chain RPC and data API documentation | https://docs.blockvectra.com/mcp |
+| `com.blockvectra/docs` | BlockVectra multi-chain RPC and data API documentation | https://docs.blockvectra.com/mcp/docs |
 | `com.blvigil/site-mcp` | Public pages and products of Vigil | https://blvigil.com/mcp |
 | `com.boardroomlist/mcp` | Open senior roles at the 500 largest US companies | https://boardroomlist.com/api/mcp |
 | `com.bonebenders/bonebenders` | Dentistry: implantology, periodontology, oral surgery, glossary and drugs | https://bonebenders.com/mcp |
@@ -568,6 +570,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.firmeromanesti/company-data` | Romanian companies, profiles, financials, status and CAEN codes | https://firmeromanesti.com/mcp |
 | `com.fiscalisto/docs` | Mexican CFDI 4.0 e-invoicing API documentation and errors | https://fiscalisto.com/docs/api/mcp |
 | `com.flat-hunt/mcp` | Furnished apartments and rooms for rent in Berlin | https://mcp.flat-hunt.com/mcp |
+| `com.flatratebook/site` | Rows and statistics from the FlatRateBook dataset with citations | https://flatratebook.com/mcp |
 | `com.flevy/flevy` | Consulting frameworks, templates, financial models and management topics | https://flevy.com/mcp |
 | `com.flywhereto/mcp` | Nonstop flight routes, airports and airlines worldwide | https://flywhereto.com/api/mcp |
 | `com.foliofact/foliofact` | Value-investing fund holdings, filings, stocks and insider transactions | https://foliofact.com/mcp |
@@ -1967,6 +1970,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.theluckystrike/ofac-screening` | OFAC sanctions list entries and name screening | https://ofac-screening.zovo.one/mcp |
 | `io.github.TheRundown/documentation` | Official TheRundown sports data API documentation | https://docs.therundown.io/mcp |
 | `io.github.thiazzz/maker-machines-atlas` | Maker machine research, comparisons and buying guidance | https://makermachinesatlas.com/mcp |
+| `io.github.thiazzz/smart-glasses-atlas` | Smart glasses specifications, comparisons, and regional retailer links | https://smartglassesatlas.com/mcp |
 | `io.github.thinksuitesolution-coder/visibilityai` | Businesses worldwide by category and city, with AI-visibility data | https://www.visibilityai.in/api/mcp |
 | `io.github.thunderbid/socketlist-mcp` | Directory of 800+ open-source MCP servers with install configs | https://socketlist.pages.dev/mcp |
 | `io.github.timescale/pg-aiguide` | PostgreSQL documentation and best practices | https://mcp.tigerdata.com/docs |
