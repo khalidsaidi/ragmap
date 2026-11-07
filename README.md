@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2295 servers, checked 2026-11-06.
+2292 servers, checked 2026-11-07.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -283,7 +283,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `club.elron/public-rentals` | Elron Club furnished apartments, locations, jobs and guidance | https://elron.club/api/agent/public/mcp |
 | `cn.infimeta/public-source-search` | Encyclopedias, scholarly metadata and community sources | https://infimeta.cn/mcp |
 | `cn.savantcat/answers` | China AI customer service standard GB/T 47746-2026 compliance answers | https://savantcat.cn/mcp |
-| `cn.tutulife/aijiayao` | Restaurants in China with hours, prices and reviews | https://tutulife.cn/mcp |
 | `co.brightkey/education-data` | Universities, international schools and degree ROI, English and Chinese | https://brightkey.co/api/mcp |
 | `co.cafedev/cafedev` | Latin American tech jobs and hiring companies | https://mcp.cafedev.co/mcp |
 | `co.chinaready/search` | China market entry guides for Western software teams | https://mcp.chinaready.co/mcp |
@@ -848,6 +847,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.openmedici/public` | Public fellowships, grants, scholarships and prizes | https://openmedici.com/mcp |
 | `com.opennash.jobs/opennash-jobs` | Official job listings at Forbes Global 2000 companies and trends | https://jobs.opennash.com/mcp |
 | `com.openpublica/civic-meetings` | US local government meeting summaries and transcripts | https://api.openpublica.com/mcp |
+| `com.orderpadledger/site` | orderpadledger site dataset rows with cited answers | https://orderpadledger.com/mcp |
 | `com.organikpi/organikpi` | OrganiKPI blog posts, product reviews and AI search study datasets | https://organikpi.com/.well-known/mcp |
 | `com.orgbix/site` | Rows and statistics from the Orgbix dataset with citations | https://orgbix.com/mcp |
 | `com.origamitutor/origami-tutor` | Origami models and illustrated folding instructions | https://origamitutor.com/api/mcp |
@@ -1903,7 +1903,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.sandeepkelvadi/marketing-skills-directory` | 340+ marketing and SEO skills for Claude Code | https://marketingskills.directory/wp-json/mkt/v1/mcp |
 | `io.github.Santurce-Software-LLC/birds-of-puerto-rico` | Puerto Rico bird species guide entries and families | https://birdsofpuertorico.com/mcp |
 | `io.github.sarthakjain004/headstart` | 466k tech jobs from company career sites and hiring trends | https://imposeidon-headstart-search.hf.space/mcp |
-| `io.github.Sashank-Singh/agenttwin-docs` | AgentTwin agent testing guides and CLI commands | https://agenttwin.si/mcp/docs |
 | `io.github.scraping-api-plans/web-data-plan-finder` | Pricing and conditions of scraping, search, and other API plans | https://plans.intoperson.com/mcp |
 | `io.github.seanmeverett/evergences` | Evergences memos, site content, API guides and public agent memories | https://evergences.com/api/mcp/ |
 | `io.github.sellrock-de/steamwebapi` | Steam Market API docs, schemas, products and games | https://mcp.steamwebapi.com/mcp |
@@ -2042,7 +2041,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.imagekit/devtools` | ImageKit developer documentation and transformations | https://devtools-mcp.imagekit.io/mcp |
 | `io.insourcia/insourcia` | French company financials, directors, ownership, M&A and insolvency | https://mcp.insourcia.io/mcp |
 | `io.jobsbase/jobs` | Builder job listings where one person owns engineering, product, QA | https://jobsbase.io/mcp |
-| `io.jobslop/jobslop` | US job listings with ghost-job warning signs and company reports | https://jobslop.io/mcp |
 | `io.jsonpad/docs` | JSONPad docs, API, SDK and CLI references | https://mcp.jsonpad.io/docs |
 | `io.launchpadhq/launchpad-hq` | Sourced facts on AI tools, pricing and free alternatives | https://www.launchpadhq.io/mcp |
 | `io.lexlint/lexlint` | Jurisdiction-specific laws governing software, with citations | https://mcp.lexlint.io/mcp |
@@ -2218,7 +2216,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `org.verifiedhandles/verified-handles` | Official social media accounts and identifiers of people and organisations | https://verifiedhandles.org/mcp |
 | `org.vicp-registry/vicp-registry` | US vaccine court VICP decisions, statistics, and attorneys | https://vicp-registry.org/mcp |
 | `org.videohistoryproject/research` | Experimental video history records, sources, and citations | https://www.videohistoryproject.org/mcp |
-| `org.webgcp/catalog` | Catalog of skills, agencies, and roles with signed provenance | https://catalog.myparallel.dev/mcp |
 | `org.wikibrand/wikibrand` | Brand logos, colors, typefaces and tone of voice from brand websites | https://wikibrand.org/api/mcp |
 | `org.wikiprompt/mcp` | Curated AI prompts by model, style and type | https://mcp.wikiprompt.org/mcp |
 | `page.afterimage/afterimage` | Stored readable copies of public web pages | https://afterimage.page/mcp |
