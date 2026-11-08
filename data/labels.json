@@ -14101,19 +14101,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "com.scienceshot/data-centres": {
-  "hash": "384e7197c2bb8929",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "European data-centre markets, grid rules and radiation physics reference",
-  "topics": [
-   "data centres",
-   "grid",
-   "physics",
-   "europe"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "com.scopedly/site": {
   "hash": "7d653f756c22aa1b",
   "retrieval": true,
@@ -14784,18 +14771,6 @@
   "free": true,
   "knowledge": "",
   "topics": [],
-  "by": "claude-sonnet-5-5"
- },
- "com.starlecta/influencer-tools": {
-  "hash": "e6a3dc9a1821f9da",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Instagram influencer metrics, comparisons and trending hashtags in Turkey",
-  "topics": [
-   "influencers",
-   "instagram",
-   "turkey"
-  ],
   "by": "claude-sonnet-5-5"
  },
  "com.stayker/1stay": {
