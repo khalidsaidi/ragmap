@@ -25611,18 +25611,6 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
- "io.github.Layropro/layro": {
-  "hash": "25a5b1a8bb6af3f8",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "React and Tailwind UI components and templates",
-  "topics": [
-   "react",
-   "tailwind",
-   "ui-components"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.LayUp-Sport/sports-booking": {
   "hash": "5b8eeabf22037304",
   "retrieval": false,
