@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2278 servers, checked 2026-11-09.
+2272 servers, checked 2026-11-10.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -565,7 +565,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.firmeromanesti/company-data` | Romanian companies, profiles, financials, status and CAEN codes | https://firmeromanesti.com/mcp |
 | `com.fiscalisto/docs` | Mexican CFDI 4.0 e-invoicing API documentation and errors | https://fiscalisto.com/docs/api/mcp |
 | `com.flat-hunt/mcp` | Furnished apartments and rooms for rent in Berlin | https://mcp.flat-hunt.com/mcp |
-| `com.flatratebook/site` | Rows and statistics from the FlatRateBook dataset with citations | https://flatratebook.com/mcp |
 | `com.flevy/flevy` | Consulting frameworks, templates, financial models and management topics | https://flevy.com/mcp |
 | `com.flywhereto/mcp` | Nonstop flight routes, airports and airlines worldwide | https://flywhereto.com/api/mcp |
 | `com.foliofact/foliofact` | Value-investing fund holdings, filings, stocks and insider transactions | https://foliofact.com/mcp |
@@ -1108,7 +1107,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `dev.svelte/mcp` | Official Svelte 5 and SvelteKit documentation | https://mcp.svelte.dev/mcp |
 | `dev.swiftskills/catalog` | Agent skills, MCP servers and rules for Swift and iOS development | https://swiftskills.dev/mcp |
 | `dev.toolpin/toolpin` | MCP server reachability, advertised tools and tool definition changes | https://toolpin.dev/mcp |
-| `dev.upfork/upfork` | React and Tailwind CSS components, landing pages and developer lessons | https://upfork.dev/mcp |
 | `dev.urantia/urantia-papers` | Urantia Papers text with Bible and other text cross-references | https://api.urantia.dev/mcp |
 | `dev.workers.bhazarstudio.datoqa/historical-exchange-rates` | ECB historical daily exchange rates since 1999 with source evidence | https://datoqa.bhazarstudio.workers.dev/mcp/fx |
 | `dev.workers.cybermax-tools.cybermax/commonkite` | Openly licensed and public-domain images with license and credit lines | https://commonkite.cybermaxtools.com/mcp?via=mcp-registry |
@@ -1298,7 +1296,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.BUYMYAGENT-TECHNOLOGIES-INC/marketplace` | Curated catalogue of AI agents for sale | https://www.buy-my-agent.com/api/mcp |
 | `io.github.c-mongan/ireland-mcp` | Irish public data: statistics, law, transport, weather, property | https://mcp.irishopendata.ie/mcp |
 | `io.github.cadenlpicard/rocketvault` | RocketVault product documentation, plans and public card marketplace listings | https://rocketvault.io/mcp |
-| `io.github.cairncommons/cairn-commons` | Verified records of dependency bugs and their fixes | https://cairncommons.dev/api/mcp |
 | `io.github.cairncommons/cairn-read` | Verified, version-pinned bug notes for software library dependencies | https://cairncommons.dev/api/mcp/read |
 | `io.github.cammac-creator/openswissdata` | Swiss customs tariff, FINMA register, companies and industry classification codes | https://mcp.openswissdata.com/jsonrpc |
 | `io.github.carbaj03/solution-commons` | Public solutions from agent work with evidence and reuse reports | https://solutions.agentlife.app/api/mcp |
@@ -2014,7 +2011,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.yhay81/public-data-catalog` | Japanese open government data from e-Gov portal and statistics dashboards | https://public-data-catalog-mcp.yusuke8h.workers.dev/mcp |
 | `io.github.yonatangross/orchestkit` | OrchestKit documentation | https://orchestkit.dev/api/mcp |
 | `io.github.YourLifewithAI/arcology-knowledge-node` | Engineering knowledge for building a mile-high arcology city | https://arcology-mcp.fly.dev/mcp |
-| `io.github.zachhhhh/agentatlas` | Agent setup answers, MCP config for 15 clients, trending repos | https://agentatlas.dev/api/mcp |
 | `io.github.zation/agent-radar` | Rated AI tools with recommendations and explanations | https://agent-radar.zation1.workers.dev/api/mcp |
 | `io.github.zaxarovcom/thisispaper` | Curated architecture, design, photography, and art projects | https://www.thisispaper.com/intelligence/api/mcp |
 | `io.github.zeit-dev/canton-projects` | Canton Network ecosystem projects and categories | https://canton.wiki/mcp |
@@ -2025,7 +2021,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.zeroatflops/flopsindex-mcp` | GPU rental reference prices for spot, on-demand, and DePIN compute | https://app.flopsindex.com/mcp |
 | `io.github.zzn199216/worldrole` | Remote and overseas job listings with eligibility checks | https://mcp.worldrole.work/mcp |
 | `io.griddo/ax-docs` | Griddo backoffice documentation for content authors | https://ax.mcp.griddo.io/mcp |
-| `io.growthvector/mcp` | SEO, GEO, ads, and email marketing guides, glossary, and prompts | https://growthvector.io/mcp |
 | `io.imagekit/devtools` | ImageKit developer documentation and transformations | https://devtools-mcp.imagekit.io/mcp |
 | `io.insourcia/insourcia` | French company financials, directors, ownership, M&A and insolvency | https://mcp.insourcia.io/mcp |
 | `io.jobsbase/jobs` | Builder job listings where one person owns engineering, product, QA | https://jobsbase.io/mcp |
@@ -2128,7 +2123,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `network.wellknown/wellknown` | Index of AI agents and MCP servers with liveness and capabilities | https://wellknown.network/mcp |
 | `news.agingresearch/agingresearch-news` | Aging research papers, trials, claims about drugs and genes | https://agingresearch.news/api/mcp |
 | `news.asha/asha-news` | Source-backed news archive with Palestine and conflict coverage | https://asha.news/api/v1/mcp |
-| `news.hottub/hottub-news` | Worldwide news headlines and story clusters across outlets and languages | https://hottub.news/mcp |
 | `news.pollar/pollar-news` | Independent European news, explainers, daily briefs and storylines | https://mcp.pollar.news/mcp |
 | `nl.boekenbase/catalogus` | Dutch book catalog with ISBN metadata and new releases | https://boekenbase.nl/mcp |
 | `nl.intermediair.www/jobs` | Dutch job postings on Intermediair | https://www.intermediair.nl/mcp |
