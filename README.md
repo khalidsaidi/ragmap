@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2272 servers, checked 2026-11-10.
+2269 servers, checked 2026-11-11.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -1639,7 +1639,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.parallect/prxhub` | Shared research bundles and extracted claims on prxhub | https://prxhub.com/api/mcp |
 | `io.github.parfica/fragrances` | Fragrance notes, accords, perfumers and similar-scent dupes | https://parfica.com/mcp |
 | `io.github.parkragsterman/whyismy-org` | Sourced answers to everyday why-is-my questions on health, home, cars | https://whyismy.org/mcp |
-| `io.github.paul-salviani/trust-switchboard` | Public privacy policies with dated excerpts and change comparisons | https://170.64.146.185.sslip.io/mcp |
 | `io.github.paulieb89/pinescript-mcp` | Pine Script v6 documentation and function reference | https://pinescript-mcp.fly.dev/mcp |
 | `io.github.paulieb89/uk-legal-mcp` | UK case law, legislation, Hansard, bills and committees | https://uk-legal-mcp.fly.dev/mcp |
 | `io.github.pawel-kowalczyk/harness-atlas` | Wire-harness and cable-assembly manufacturers by country and capability | https://harnessatlas.com/api/mcp |
@@ -1847,7 +1846,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.pipeworx-io/zillow` | US housing market research data from Zillow | https://gateway.pipeworx.io/zillow/mcp |
 | `io.github.ply-ui-ng/ply-ui` | Ply Angular and Tailwind UI components and usage | https://mcp.ply-ui.com/mcp |
 | `io.github.pmndrs/docs` | Docs and examples for react-three-fiber, drei, zustand, jotai | https://docs.pmnd.rs/api/mcp |
-| `io.github.posdo-io/mcp-server` | 356,000 restaurants in 20 countries with reviews and context | https://pos.do/mcp |
 | `io.github.pournasserian/mcp-my-site` | Content of one website indexed by a crawler | https://ai.pournasserian.com/mcp |
 | `io.github.pradeep-anantha/venuvidya` | Carnatic flute lessons and syllabus in Kannada and English | https://venuvidya-backend-production.up.railway.app/api/mcp/ |
 | `io.github.prakhar1605/carrerlift` | Indian jobs and internships, plus international intern roles | https://www.carrerlift.in/api/mcp |
@@ -1978,7 +1976,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.upstash/context7` | Up-to-date library and framework documentation | https://mcp.context7.com/mcp |
 | `io.github.usliberty/joint-genesis-mcp` | Physician reviewed research on joint pain and osteoarthritis | https://mcp.usliberty.com/mcp |
 | `io.github.vanshulgoyal101/ctx` | GitHub repository code and documentation site passages | https://ctx.vanshul.com/mcp |
-| `io.github.veritylabsai/rattlewatch` | US CPSC and FDA product recalls with citations | https://rattlewatch.rattled.ca/mcp |
 | `io.github.vhspace/agentbase` | Shared knowledge base contributed by AI agents | https://mcp.agentbase.tools/mcp |
 | `io.github.vicentesurraco/offpeak` | US jobs filtered by commute, pay and seniority | https://offpeak.fyi/mcp |
 | `io.github.voidly-ai/voidly-hosted` | Global internet censorship index, country status, and incidents | https://api.voidly.ai/mcp |
