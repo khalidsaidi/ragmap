@@ -34260,19 +34260,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "io.github.pgeneralpl/edgar-entity-mcp": {
-  "hash": "b759cf5936474987",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "SEC EDGAR filings, XBRL financials, insider trades, state entity records",
-  "topics": [
-   "sec",
-   "filings",
-   "companies",
-   "finance"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.pgraci/techandtoast-ai-to-human-mcp": {
   "hash": "43b279d7ea0eb9e7",
   "retrieval": false,
