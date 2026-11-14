@@ -20042,14 +20042,6 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
- "io.github.2xe/ask-emil": {
-  "hash": "53d48c098b2deecf",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.99darwin/nexus": {
   "hash": "3a9e0c426b3936a0",
   "retrieval": true,

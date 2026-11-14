@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2246 servers, checked 2026-11-13.
+2243 servers, checked 2026-11-14.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -460,7 +460,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.courtdelta/court-delta` | North Carolina court cases, citations, hearings and expunction options | https://mcp.courtdelta.com/mcp |
 | `com.craftedtrust/mcp-shield` | Trust scores and security scans for 4,200 MCP servers | https://mcp.craftedtrust.com/api/v1/mcp |
 | `com.craftingeventfinder/events` | US crafting shows, retreats and workshops | https://craftingeventfinder.com/api/mcp |
-| `com.craftingstepbystep/tutorials` | Step-by-step papercraft tutorials with tools and supplies | https://www.craftingstepbystep.com/api/mcp |
 | `com.crosodo/mcp` | Cottage-food and home-bakery laws by US state and county | https://crosodo.com/api/mcp |
 | `com.csatzo/site` | Csatzo dataset rows with statistics, provenance and citations | https://csatzo.com/mcp |
 | `com.csidia/notes` | Italian notes on AI regulation, data protection and compliance | https://mcp.csidia.com/mcp |
@@ -864,7 +863,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.podlexicon/podlexicon` | AI summaries of long-form podcast episodes by topic | https://podlexicon.com/mcp/ |
 | `com.point-topic/point-topic-mcp-public` | UK broadband ISPs, networks, links and standards | https://mcp.point-topic.com/public |
 | `com.politicalcomms/docs` | Political Comms product documentation | https://docs.politicalcomms.com/mcp |
-| `com.pontofato/pontofato` | Brazilian addresses by CEP, geocoded points and companies at each CEP | https://pontofato.com/mcp |
 | `com.powerplatformtip/mcp` | Practical Microsoft Power Platform tips and articles | https://func-mcp-kmupower.azurewebsites.net/tip/mcp |
 | `com.pplfree/ground-school` | FAA private pilot ground school lessons and practice questions | https://pplfree.com/mcp |
 | `com.ppn-hub/ppn-hub` | Dozens of public APIs covering environment, culture and energy data | https://mcp.ppn-hub.com/mcp |
@@ -878,7 +876,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.quantlix/content` | Quantlix services, company information and insights | https://quantlix.com/mcp/ |
 | `com.qubitsok/mcp-server` | Quantum computing jobs, arXiv papers and researcher profiles | https://qubitsok.com/mcp |
 | `com.quelvio/mcp-server` | A company's internal knowledge across Drive and other connected systems | https://mcp.quelvio.com/http |
-| `com.radar-cnpj/radar-cnpj` | Brazilian company registry data by CNPJ, CNAE and construction works | https://radar-cnpj.com/mcp |
 | `com.realevr.estates/estates` | African homes for rent or sale with real estate news | https://estates.realevr.com/mcp |
 | `com.recipes-daily/recipes` | Recipes and cooking guides searchable by ingredient | https://recipes-daily.com/mcp |
 | `com.redocly/mcp` | Redocly product docs, guides and blog | https://redocly.com/mcp |
@@ -1864,7 +1861,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.robit-man/mapsource` | OpenStreetMap places, elevation, and geographic data | https://api.mapsource.io/mcp |
 | `io.github.romulusfoundry/grantsonar` | Open US federal, state, and foundation grant opportunities | https://grantsonar.com/api/mcp |
 | `io.github.RRGU26/bankregpulse-mcp-server` | US banking regulation news, digests and comment deadlines | https://lexregpulse.com/mcp |
-| `io.github.rt1966/showmestepbystep` | 409 step-by-step how-to tutorials | https://www.showmestepbystep.com/api/mcp |
 | `io.github.Rupesh7128/cofounderbase` | Evidence-checked AI automation agencies by need, tool, country and budget | https://cofounderbase.com/api/mcp/ |
 | `io.github.RustamIsmail/healthy-aging-atlas` | Evidence-ranked supplement research by health goal, with citations | https://healthyagingatlas.com/api/mcp/ |
 | `io.github.saagpatel/portfolio-mcp` | Saagar Patel's essays, book chapters, field notes, and projects | https://mcp.saagarpatel.dev/mcp |
@@ -2151,6 +2147,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `org.memoryapi/patent` | USPTO patents and company patent portfolios | https://patent.memoryapi.org/mcp |
 | `org.memoryapi/research` | PubMed and arXiv papers with Crossref citations | https://research.memoryapi.org/mcp |
 | `org.nyuengelberg/corpus` | IP and innovation law scholarship from NYU's Engelberg Center | https://corpus.nyuengelberg.org/mcp |
+| `org.openindianalaw/indiana-code` | Indiana Code statutes and appellate cases | https://mcp.openindianalaw.org/mcp |
 | `org.opennih/opennih` | NIH grants 1985-2026 by topic, investigator, institution and funding trends | https://mcp.opennih.org/mcp |
 | `org.oravan/mcp` | US Congress bills in plain language and representative lookup | https://oravan.org/api/mcp/mcp |
 | `org.pinnacleblooms/ask` | Child development milestones, warning signs, and ICF code references | https://ask-mcp.pinnacleblooms.org/mcp |
