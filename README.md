@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2243 servers, checked 2026-11-14.
+2238 servers, checked 2026-11-15.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -330,6 +330,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.aibenchmarkindex/directory` | AI benchmarks by category with data sources and licences | https://aibenchmarkindex.com/mcp |
 | `com.aidemos/catalogue` | AI tool reviews, rankings, use cases and comparisons | https://mcp.aidemos.com/mcp |
 | `com.aidevboard/jobs` | Current AI jobs, companies and salaries | https://aidevboard.com/mcp |
+| `com.aigregator/ai-tools` | AI tools directory with pricing, features and alternatives | https://x402.aigregator.com/mcp |
 | `com.aikizi/mcp` | Decoded art styles and their prompts from a public gallery | https://aikizi.com/mcp |
 | `com.ainovaq/mcp` | Ainovaq services, blog on startups and go-to-market | https://ainovaq.com/mcp |
 | `com.aiprofile/answers` | Sourced answers about local businesses, many owner-confirmed | https://www.aiprofile.com/api/mcp |
@@ -350,7 +351,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.anchorterminal/anchor-terminal` | Graded directory of AI agent tools, MCP servers and model prices | https://www.anchorterminal.com/mcp |
 | `com.angelscohq/aether` | Index of about 53,000 MCP servers and agents | https://angelscohq.com/aether/mcp |
 | `com.angelscohq/agentify` | Seller-published products, verified companies and live MCP servers for agents | https://angelscohq.com/agentify/mcp |
-| `com.anots/directory` | Businesses listed on ANOTS and answers from their agents | https://api.anots.com/mcp |
 | `com.anthonyhunts/shaart-agency-docs` | GoHighLevel and AI automation guides, services and pricing | https://www.anthonyhunts.com/api/mcp/docs |
 | `com.anygett/anygett` | Directory of offers and listings by category | https://api.anygett.com/mcp |
 | `com.anywhereroles/jobs` | Remote jobs, companies, salary ranges and market statistics | https://anywhereroles.com/mcp |
@@ -1479,9 +1479,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.InstaBlick/complyzard` | Compliance resources and documents by framework and topic | https://complyzard.com/mcp |
 | `io.github.introman2023/tonzar` | Russian B2B industrial products and verified manufacturers catalog | https://tonzar.com/mcp |
 | `io.github.isaacaskew/venunite-events` | US local events: concerts and more within 90 days | https://mcp.venunite.com/v1/mcp/ |
-| `io.github.IsaiahDupree/agentsearch-mcp` | Web search, instant answers and clean page text | https://agentsearch-mcp.vercel.app/mcp |
-| `io.github.IsaiahDupree/jobstack-mcp` | Job postings merged from USAJOBS, Adzuna, Greenhouse and Lever | https://jobstack-mcp.vercel.app/mcp |
-| `io.github.IsaiahDupree/socialbridge-mcp` | Social media profiles, posts, comments and ads across networks | https://socialbridge-mcp.vercel.app/mcp |
 | `io.github.iyuyoung/jotoak` | Published word searches, crosswords and mazes with printable PDFs | https://jotoak.com/mcp |
 | `io.github.iyuyoung/nameideahub` | US surnames with 2010 Census ranks and counts | https://nameideahub.com/mcp |
 | `io.github.izzet/mcp` | Izzet Yildirim's research papers, publications and CV | https://iyildirim.com/api/mcp |
@@ -1529,7 +1526,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.LAHutchins91/patent` | US patents, claims, citations and prior art | https://patent-mcp.vercel.app/mcp |
 | `io.github.laibniz/scholarfetch` | Scholarly papers, abstracts, full text, authors and references | https://laibniz-scholarfetch-web.hf.space/mcp/ |
 | `io.github.LambdaLabsHQ/searchwire` | Keyword search volume, Google results, app store keywords and domain availability | https://searchwire.dev/mcp |
-| `io.github.landedjobs/landed` | AI-native job listings, application forms and interview prep content | https://mcp.landed.jobs/mcp |
 | `io.github.laravilt/laravilt` | Laravilt Laravel admin panel docs, packages, changelogs and plugin guide | https://mcp.laravilt.com/mcp |
 | `io.github.Latina-Dev/latina-dev` | Latina software engineers directory plus communities, programs and job boards | https://latina.dev/mcp |
 | `io.github.leejaejeon/beobi-daneun-got` | Korean statutes, precedents, business-district stats and public procurement | https://jake-asus.tail2c6a90.ts.net/law/mcp |
@@ -1973,7 +1969,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.wwwnlab/rest-area` | Questions and answers on a forum for AI agents | https://rest-area-six.vercel.app/mcp |
 | `io.github.wywy-llc/gas-library-hub` | Google Apps Script libraries with AI-generated summaries | https://appscripthub.com/api/mcp |
 | `io.github.xiaoba-dev/atlaxy` | AI products, models, agents, and organizations with explainable scores | https://api.atlaxy.ai/mcp |
-| `io.github.XLSV777/7maps` | Directory of MCP servers with status, tool risk and tool search | https://7it.co.il/7maps/mcp?via=registry |
 | `io.github.xyzzylabs/tc39-mcp` | ECMAScript ECMA-262 and ECMA-402 spec clauses, grammar, and TC39 proposals | https://mcp.xyzzylabs.ai/tc39/mcp |
 | `io.github.xyzzylabs/wasm-mcp` | WebAssembly specification: instructions, types, sections, proposals | https://mcp.xyzzylabs.ai/wasm/mcp |
 | `io.github.yadasa/afrotech-guide` | AfroTech 2026 events, sessions, jobs, and attendees | https://afrotech.guide/mcp |
