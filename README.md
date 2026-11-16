@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2238 servers, checked 2026-11-15.
+2236 servers, checked 2026-11-16.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -575,7 +575,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.getagentictools/catalog` | Catalog of 41,000 agent skills, MCP servers and plugins | https://getagentictools.com/api/mcp |
 | `com.getaxionlabs/axion-gateway` | UK parking appeal outcomes, NYC ticket dismissal rates, UK MTD tax | https://mcp.getaxionlabs.com/mcp |
 | `com.getbeachfinder/beachfinder` | Beaches, swim spots, water activity locations and travel guides worldwide | https://getbeachfinder.com/mcp |
-| `com.getbotlens/donhuffines` | Articles from the Don Huffines for Comptroller site | https://donhuffines.mcp.getbotlens.com/mcp |
 | `com.getbotlens/getbotlens` | Articles published on getbotlens.com | https://getbotlens.mcp.getbotlens.com/mcp |
 | `com.getbotlens/manoforstaterep` | Articles from the Mano DeAyala state representative site | https://manoforstaterep.mcp.getbotlens.com/mcp |
 | `com.getbotlens/raconteur` | Business and industry articles published by Raconteur | https://raconteur.mcp.getbotlens.com/mcp |
@@ -1434,7 +1433,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.flo7up/aiusecasehub` | Source-linked enterprise AI deployment use cases | https://basic-backend713-dsd8hygyfkc8d8f5.swedencentral-01.azurewebsites.net/api/mcp |
 | `io.github.flogvit/bible` | Bible translations, Hebrew and Greek texts, study notes and cross references | https://mcp.bible.flogvit.com/mcp |
 | `io.github.flohoeller/affectui` | AffectUI React components, screens and blocks with docs and source | https://www.affectui.com/api/mcp |
-| `io.github.fluttersdk/ai` | FlutterSDK package documentation: Wind UI, Magic, Dusk, Telescope, Artisan | https://mcp.fluttersdk.com/ |
 | `io.github.Fokuus/mdprint-docs` | mdprint product information, documentation and Markdown examples | https://mdprint.app/mcp/docs |
 | `io.github.ForkastPredict/forkast-mcp-docs` | Forkast prediction market documentation | https://mcp.forkast.gg/mcp |
 | `io.github.frankbongo/disc-golf-england` | English Disc Golf Association tour results, policies, courses and funding guidance | https://discgolfengland.com/wp-json/edga/v1/mcp |
@@ -1518,7 +1516,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.klmlfl/case-doha-record` | Decided US DOHA security-clearance cases and outcome statistics | https://www.clearancesearchengine.com/api/mcp |
 | `io.github.KonstantinStarovoytov/agent-docs` | Official docs of Claude Code, Cursor, OpenAI Codex and MCP | https://agent-docs-mcp.onrender.com/mcp/ |
 | `io.github.kreativeManish/iso20022-navigator` | ISO 20022 messages, bank transaction codes, legacy MT mappings and code sets | https://mcp.isonavigator.io/iso20022 |
-| `io.github.krishnakaushik195/desidata-mcp` | Catalogue of India datasets with sources, licences and previews | https://lqcxdxjncdzzkwgveydz.supabase.co/functions/v1/mcp |
 | `io.github.krupalghori44-dev/infyicon-mcp` | Over 161,000 free icons as SVG or PNG | https://infyicon.com/mcp |
 | `io.github.ktozvonil/phone-lookup` | Caller reputation, spam rating and reviews for phone numbers | https://ktozvonil.net/mcp |
 | `io.github.kylelloyd63-star/sourcetome` | Passages from a rights-cleared library of classic literature | https://sourcetome-public.onrender.com/mcp |
@@ -1627,7 +1624,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.pcmarts/recruiter-roles-mcp` | Recruiter and talent acquisition job listings and market stats | https://recruiterroles.com/api/mcp |
 | `io.github.peterloomans/equivista` | Belgian company registry data, financials and relationships | https://equivista.be/mcp |
 | `io.github.petitsolu/solubles` | French solutions journalism podcast on ecology, climate and society | https://mcp.csoluble.media/api/mcp |
-| `io.github.PetShopBros/lowdown-proxy` | Recorded facts about MCP servers: registry declarations and npm package status | https://lowdown-proxy.vercel.app/mcp |
 | `io.github.pguerrerolinares/bizkaia-now` | Cultural and nightlife events in Bizkaia, Spain | https://euskadinow.com/mcp |
 | `io.github.PilotSuite/crystalram-open-commons` | CrystalRAM public AI research cycles and Open Commons discussion threads | https://crystalram.ai/mcp |
 | `io.github.pinkpwningclub/recipes` | Software options and reproducible AI agent workflow recipes | https://softwaresausage.com/api/mcp |
@@ -2207,6 +2203,8 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `si.socialswarm/directory` | GitHub projects welcoming AI agent contributions | https://socialswarm.si/mcp |
 | `si.thinkhard/prompt-tools` | Work prompt templates, prompt patterns, and AI term definitions | https://thinkhard.si/mcp |
 | `site.aefact/aefact` | Korean law changes, Bank of Korea figures and government news | https://aefact.site/mcp |
+| `site.ayushrai.life/docs` | Public documentation pages on life.ayushrai.site | https://life.ayushrai.site/mcp/docs |
+| `site.ayushrai.life/product` | Ayush Rai's public profile, projects and contact info | https://life.ayushrai.site/mcp/product |
 | `site.chatgpt.aqua-orbit-4010.common-agent-commons/common` | Agent insights, open research questions, and reproducible findings | https://common-agent-commons.aqua-orbit-4010.chatgpt.site/api/mcp |
 | `site.chatgpt.lorh89.the-knowledge-commons/evidence` | Source-linked evidence for MCP troubleshooting and public research | https://the-knowledge-commons.lorh89.chatgpt.site/api/agent/mcp |
 | `site.chatgpt.sarath0210.shekkizh-agent-exchange/agent-exchange` | Tools and hosted agents by task with documentation | https://shekkizh-agent-exchange.sarath0210.chatgpt.site/api/mcp |

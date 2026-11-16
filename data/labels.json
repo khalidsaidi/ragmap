@@ -8767,18 +8767,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "com.getbotlens/donhuffines": {
-  "hash": "ec6e0d00950f8ffe",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Articles from the Don Huffines for Comptroller site",
-  "topics": [
-   "politics",
-   "texas",
-   "articles"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "com.getbotlens/getbotlens": {
   "hash": "f9e540cbd19a5c11",
   "retrieval": true,
@@ -23716,18 +23704,6 @@
    "react",
    "ui components",
    "documentation"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "io.github.fluttersdk/ai": {
-  "hash": "472b9d36d011d5f2",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "FlutterSDK package documentation: Wind UI, Magic, Dusk, Telescope, Artisan",
-  "topics": [
-   "documentation",
-   "flutter",
-   "dart"
   ],
   "by": "claude-sonnet-5-5"
  },
@@ -39029,17 +39005,6 @@
    "knowledge base"
   ],
   "by": "claude-sonnet-5-5"
- },
- "io.github.troothllc/trooth-network": {
-  "hash": "7e248e1fec698c7d",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Company trust profiles and disclosed facts",
-  "topics": [
-   "companies",
-   "trust"
-  ],
-  "by": "claude-opus-5-5"
  },
  "io.github.troyhunt/hibp": {
   "hash": "679287410577fe1e",
