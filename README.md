@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2236 servers, checked 2026-11-16.
+2235 servers, checked 2026-11-17.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -351,6 +351,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.anchorterminal/anchor-terminal` | Graded directory of AI agent tools, MCP servers and model prices | https://www.anchorterminal.com/mcp |
 | `com.angelscohq/aether` | Index of about 53,000 MCP servers and agents | https://angelscohq.com/aether/mcp |
 | `com.angelscohq/agentify` | Seller-published products, verified companies and live MCP servers for agents | https://angelscohq.com/agentify/mcp |
+| `com.anots/directory` | Businesses listed on ANOTS and answers from their agents | https://api.anots.com/mcp |
 | `com.anthonyhunts/shaart-agency-docs` | GoHighLevel and AI automation guides, services and pricing | https://www.anthonyhunts.com/api/mcp/docs |
 | `com.anygett/anygett` | Directory of offers and listings by category | https://api.anygett.com/mcp |
 | `com.anywhereroles/jobs` | Remote jobs, companies, salary ranges and market statistics | https://anywhereroles.com/mcp |
@@ -571,7 +572,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.gemalli/trade` | Verified manufacturers, products, sanctions screening and HS customs codes | https://gemalli.com/api/mcp |
 | `com.gemmein/mcp` | Gemmein SDK documentation, API reference and error explanations | https://api.gemmein.com/mcp |
 | `com.get-flowie/docs` | Flowie Exchange API documentation and OpenAPI reference | https://docs.get-flowie.com/mcp |
-| `com.getagentdepot/agent-provider-depot` | Sourced prices and comparisons of LLM, sandbox, search and email providers | https://getagentdepot.com/api/mcp?via=mcp-registry |
+| `com.getagentdepot/agent-provider-depot` | Sourced prices and comparisons of LLM, sandbox, search and email providers | https://getagentdepot.com/api/mcp |
 | `com.getagentictools/catalog` | Catalog of 41,000 agent skills, MCP servers and plugins | https://getagentictools.com/api/mcp |
 | `com.getaxionlabs/axion-gateway` | UK parking appeal outcomes, NYC ticket dismissal rates, UK MTD tax | https://mcp.getaxionlabs.com/mcp |
 | `com.getbeachfinder/beachfinder` | Beaches, swim spots, water activity locations and travel guides worldwide | https://getbeachfinder.com/mcp |
@@ -1275,7 +1276,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.blutrich/podlearn` | Podcasts and episodes from 4M+ shows, with transcripts | https://podlearn.ai/mcp |
 | `io.github.bmlt-enabled/bmlt-server-mcp` | Narcotics Anonymous meetings worldwide by location and format | https://mcp.bmlt.app/mcp |
 | `io.github.bobymicjohn/2b2t-atlas` | 2b2t Minecraft server bases, signs, rare blocks and NoCom history | https://api.blackportal.cloud/mcp |
-| `io.github.books-service/ru-books` | Russian books catalog by genre, author, language and format | https://knigochit.ru/mcp |
 | `io.github.brand-lc/findaiforwork` | Curated AI software tools for work, with comparisons | https://findaiforwork.com/mcp |
 | `io.github.brian8a1/atisbo-docs` | Atisbo product documentation pages | https://app.atisbo.dev/api/mcp-docs |
 | `io.github.busybusybussiness/uk-legislation-changes` | Amendment histories of UK law provisions | https://uk-legal-changes.pages.dev/mcp |
@@ -1505,7 +1505,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.Kennethlee83/world-innovation` | World Innovation research abstracts and white papers with citations | https://winnovation.wead.live/mcp |
 | `io.github.kerbelp/ai-collection` | Directory of AI tools with categories, alternatives and comparisons | https://thataicollection.com/mcp |
 | `io.github.ketherworks/atcoder` | AtCoder competitive programming problem statements | https://api.ksrnyx.top/oj-mcp/atcoder/mcp |
-| `io.github.khaledmoayad/3ammiya` | Egyptian Arabic slang words, meanings and regions | https://3ammiya.com/api/mcp/mcp |
 | `io.github.khaoss85/agent-crm` | Accordo CRM framework documentation and capability claims | https://accordo.dev/api/mcp |
 | `io.github.Kibetho/saasforit` | Curated SaaS business tools directory with recommendations and guides | https://fuechvghummojkgliyha.supabase.co/functions/v1/mcp |
 | `io.github.killbridge/startupjobs-mcp` | Live startup job listings, companies, trends and salary benchmarks | https://api.startup.jobs/mcp |
@@ -1837,6 +1836,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.rainbow686/china-export-rebate-mcp` | China export tax rebate rates by HS code | https://china-export-rebate-mcp.rainbow686.workers.dev/mcp |
 | `io.github.rarasAI/raras` | Brazilian rare disease knowledge graph in Portuguese | https://raras.org/api/mcp |
 | `io.github.rasitakyol/aicoolies` | Catalog of AI and developer tools | https://aicoolies.com/mcp |
+| `io.github.Ravesteijntjes/qquickpick` | Movies and TV shows by mood, genre, cast, awards and streaming availability | https://qquickpick.com/mcp |
 | `io.github.ray999/knowledge-graph` | Directory of AI tools, models and agents with community feedback | https://kg.zhiyong.dev/mcp |
 | `io.github.RayceRossum/getregisters` | NDIS pricing, care and licensing rules with official citations and register previews | https://getregisters.com/api/v1/mcp |
 | `io.github.re-fagiano/bloodyhopes-campfire` | Historical ballads, lyrics and critical research corpus | https://bloodyhopes.com/mcp |
@@ -1987,6 +1987,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.zeroatflops/flopsindex-mcp` | GPU rental reference prices for spot, on-demand, and DePIN compute | https://app.flopsindex.com/mcp |
 | `io.github.zzn199216/worldrole` | Remote and overseas job listings with eligibility checks | https://mcp.worldrole.work/mcp |
 | `io.griddo/ax-docs` | Griddo backoffice documentation for content authors | https://ax.mcp.griddo.io/mcp |
+| `io.growthvector/mcp` | SEO, GEO, ads, and email marketing guides, glossary, and prompts | https://growthvector.io/mcp |
 | `io.imagekit/devtools` | ImageKit developer documentation and transformations | https://devtools-mcp.imagekit.io/mcp |
 | `io.insourcia/insourcia` | French company financials, directors, ownership, M&A and insolvency | https://mcp.insourcia.io/mcp |
 | `io.jobsbase/jobs` | Builder job listings where one person owns engineering, product, QA | https://jobsbase.io/mcp |
@@ -2061,7 +2062,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `market.plati.mcp/digimarket` | plati.market digital goods catalogue with product and seller details | https://mcp.plati.market/mcp |
 | `markets.iamai/marketplace` | Listings of AI agents, apps, prompts and templates for sale | https://iamai.markets/mcp |
 | `md.mostlyright/datasets` | Open reproducible Parquet datasets with schemas and sample rows | https://mostlyright.md/api/mcp |
-| `me.freehire/freehire` | IT job postings, employers, salary and job market statistics | https://freehire.me/api/v1/mcp |
 | `me.gaborharsanyi/knowledge` | Gabor Harsanyi's professional expertise, credentials, and published knowledge | https://mcp.gaborharsanyi.me/mcp |
 | `me.ryanlindsey/ryanlindsey-me` | Ryan Lindsey's resume, case studies and published writing | https://mcp.ryanlindsey.me/mcp |
 | `media.thecoop/the-coop` | iGaming articles, supplier profiles, events and payment capabilities | https://thecoop.media/mcp |
@@ -2152,7 +2152,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `org.thewaterhub/site` | The Water Hub water dataset with search and statistics | https://thewaterhub.org/mcp |
 | `org.thewileyrule/public` | 7-OH and kratom research, test results, FDA actions, and state laws | https://thewileyrule.org/mcp |
 | `org.tickets4pets/events` | US live events, ticket price index and city event listings | https://tickets4pets.org/mcp |
-| `org.toolwork/toolwork` | MCP servers, APIs, CLIs, and skills with scores and comparisons | https://mcp.toolwork.org/mcp |
+| `org.toolwork/toolwork` | MCP servers, APIs, CLIs, and skills with scores and comparisons | https://mcp.toolwork.org/mcp?ref=mcp-registry |
 | `org.totto/javabin-archieve` | Origins of javaBin and JavaZone Norwegian Java community, 1998 to 2007 | https://mcp-javabin-archieve.fly.dev/mcp |
 | `org.totto/knowledge` | Thor Henning Hetland's signed knowledge web on software topics | https://mcp.totto.org/mcp |
 | `org.ukrfish.sk/sudnokontrol` | Ukrainian ship registry vessel records and statistics | https://api.sk.ukrfish.org/mcp |
@@ -2220,7 +2220,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `space.spontanno/events` | Concerts, theatre and standup events in Russian cities | https://spontanno.space/mcp |
 | `stream.aidata/site-search` | AI Data Stream documentation, blog, changelog, and pricing | https://aidata.stream/mcp |
 | `studio.ghosty/docs` | Ghosty Studio documentation and OpenAPI specification | https://www.ghosty.studio/mcp/docs |
-| `study.vela/corpus` | Cited literary passages on human experience, emotions and themes | https://vela.study/mcp |
 | `swiss.openhelvetia/gateway` | Swiss federal law from Fedlex and political linked data with sources | https://mcp.openhelvetia.swiss/mcp |
 | `tc.mcp/mcp-tc` | Directory of MCP servers with install commands and tools | https://mcp.tc/mcp |
 | `team.leanscale/gtm-knowledge` | Go-to-market operations playbooks, benchmarks, case studies, and podcast episodes | https://mcp.leanscale.team/mcp |

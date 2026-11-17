@@ -1686,38 +1686,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "ai.zerowidth/napkin": {
-  "hash": "f31f468afbf3d24a",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
- "ai.zerowidth/prism": {
-  "hash": "fb74ba7a4e3ebf21",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
- "ai.zerowidth/workbench": {
-  "hash": "03be13850ce10e5e",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
- "ai.zerowidth/zerowidth": {
-  "hash": "8a73a08fe00db964",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
  "ai.zicron.claims/medical-chronology": {
   "hash": "f8ac00d33aa71303",
   "retrieval": false,
@@ -3107,14 +3075,6 @@
    "services",
    "brazil"
   ],
-  "by": "claude-sonnet-5-5"
- },
- "br.com.designmaster/dmcommerce": {
-  "hash": "f929c298bea5c2e8",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
   "by": "claude-sonnet-5-5"
  },
  "br.com.fipex/mcp": {
