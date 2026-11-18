@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2235 servers, checked 2026-11-17.
+2233 servers, checked 2026-11-18.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -182,6 +182,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `app.himalayas/mcp` | Remote job listings and salary data | https://mcp.himalayas.app/mcp |
 | `app.hologallery.pocket/pokemon-tcg-pocket-catalog` | Pokemon TCG Pocket cards, sets and packs | https://pocket.hologallery.app/mcp |
 | `app.hyperwave.www/docs` | Hyperwave wavetable documentation | https://www.hyperwave.app/mcp/docs |
+| `app.itemnumbers/itemnumbers-mbs` | Australian Medicare Benefits Schedule items, fees, history and rules | https://itemnumbers.app/mcp |
 | `app.knowra/knowra` | arXiv papers and structured analysis reports | https://mcp.knowra.app/mcp |
 | `app.listentosadhu/corpus` | Vedic scripture verses, commentaries and recorded lectures | https://mcp.listentosadhu.app/mcp |
 | `app.loveoracle/tarot` | Tarot card meanings for love and common love questions | https://www.loveoracle.app/api/mcp |
@@ -551,7 +552,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.familyfishin.mcp/site-discovery` | Freshwater fishing articles, guidance and tackle products | https://mcp.familyfishin.com/mcp |
 | `com.fateandstars/tarot-knowledge` | Tarot card meanings, topics and spread definitions | https://fateandstars.com/mcp |
 | `com.ferntool/ip` | IP, WHOIS, DNS and network lookup data for domains | https://www.ferntool.com/mcp |
-| `com.filltrust/questions` | Guidance for answering vendor security questionnaire questions | https://www.filltrust.com/api/mcp |
 | `com.finallyoffline.www/culture` | Culture news and trends in sports, music, fashion and streetwear | https://www.finallyoffline.com/mcp |
 | `com.finchiefs/research` | Research views on assets, macro themes and central banks | https://finchiefs.com/api/mcp |
 | `com.findenergyrates/electricity-rates` | US retail electricity plans and utility default rates by ZIP | https://findenergyrates.com/mcp/public |
@@ -572,7 +572,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.gemalli/trade` | Verified manufacturers, products, sanctions screening and HS customs codes | https://gemalli.com/api/mcp |
 | `com.gemmein/mcp` | Gemmein SDK documentation, API reference and error explanations | https://api.gemmein.com/mcp |
 | `com.get-flowie/docs` | Flowie Exchange API documentation and OpenAPI reference | https://docs.get-flowie.com/mcp |
-| `com.getagentdepot/agent-provider-depot` | Sourced prices and comparisons of LLM, sandbox, search and email providers | https://getagentdepot.com/api/mcp |
+| `com.getagentdepot/agent-provider-depot` | Sourced prices and comparisons of LLM, sandbox, search and email providers | https://getagentdepot.com/mcp |
 | `com.getagentictools/catalog` | Catalog of 41,000 agent skills, MCP servers and plugins | https://getagentictools.com/api/mcp |
 | `com.getaxionlabs/axion-gateway` | UK parking appeal outcomes, NYC ticket dismissal rates, UK MTD tax | https://mcp.getaxionlabs.com/mcp |
 | `com.getbeachfinder/beachfinder` | Beaches, swim spots, water activity locations and travel guides worldwide | https://getbeachfinder.com/mcp |
@@ -754,7 +754,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.maxand98/maxand98` | maxand98 publications, citations, claims and evidence records | https://maxand98.com/mcp |
 | `com.maximofn/content` | AI and machine learning posts, tips and projects | https://www.maximofn.com/mcp |
 | `com.mcp-revenue-empire/japan-public-ledgers` | Daily ledgers of Japanese public data across 12 domains | https://mcp.mcp-revenue-empire.com/mcp |
-| `com.mcplookup/mcp` | Trust, security and maintenance ratings for MCP servers | https://mcplookup.com/mcp |
 | `com.mcpskillhub/mcpskillhub` | 49,000 MCP servers with token cost, security signals and install snippets | https://mcpskillhub.com/mcp |
 | `com.mcptoplist/mcptoplist` | MCP servers ranked by adoption data | https://mcptoplist.com/mcp |
 | `com.measuretechpro/agent-door` | Measure Tech PRO contractor CRM knowledge base, forum, roadmap and pricing | https://measuretechpro.com/mcp |
@@ -1179,9 +1178,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.agentage/find-mcp` | Directory of 17,000 MCP servers with trust grades | https://catalog.agentage.io/mcp |
 | `io.agentropolis/agentropolis` | Index of MCP servers, paid APIs and A2A agents | https://agentropolis.io/api/mcp |
 | `io.arxo/cnaf` | French family benefit rules from CNAF with sources | https://mcp.arxo.io/mcp/cnaf |
-| `io.arxo/code-civil` | French Civil Code rules with legal grounds | https://mcp.arxo.io/mcp/code-civil |
 | `io.arxo/fide-chess` | FIDE Laws of Chess 2023 rules answered with grounds and source text | https://mcp.arxo.io/mcp/fide-chess |
-| `io.arxo/picc` | UNIDROIT Principles 2016 contract law rules with source text | https://mcp.arxo.io/mcp/picc |
 | `io.aviationresources/aviation-resources` | FAA handbooks, advisory circulars and airman certification standards | https://api.aviationresources.io/mcp |
 | `io.banksapi/docs` | BANKSapi open banking developer docs and OpenAPI specs | https://banksapi.io/docs-mcp |
 | `io.blockrazor/docs` | BlockRazor documentation for fast blockchain transactions | https://mcp.blockrazor.io/docs |
@@ -1559,6 +1556,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.mcp-dir/kb-mcp` | User's own uploaded documents, searchable by meaning | https://api.mcp.ai/p_kb |
 | `io.github.mcp-dir/pncp-mcp` | Brazilian government tenders, public procurement notices, winners and edital documents | https://api.mcp.ai/p_pncp |
 | `io.github.mcpexplorer/mcpexplorer` | MCP servers with install methods, risk labels and trust scores | https://mcpexplorer.com/mcp |
+| `io.github.MCPServings/paper-mcp` | Academic papers from arXiv, Semantic Scholar, OpenAlex, plus PubMed medical literature | https://latex-tools.online/mcp |
 | `io.github.megabrainee/sectora` | CVE, EPSS, KEV and package vulnerability threat intelligence | https://mcp.sectora.io/mcp |
 | `io.github.menghaoran214-lang/vibe-coding-cn` | Chinese vibe coding guides and documentation | https://n8n.xiaomeng.ink/mcp/vibe-coding-cn |
 | `io.github.michaelcolenso/nobodynamed` | US baby name popularity by year from 1880 to 2025 | https://nobodynamed.com/mcp |

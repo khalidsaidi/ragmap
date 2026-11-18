@@ -17612,56 +17612,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "dev.pages.scrapemole/arxiv": {
-  "hash": "fd4e27c723066a99",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "arXiv paper search, metadata, abstracts and category listings",
-  "topics": [
-   "papers",
-   "arxiv",
-   "science"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "dev.pages.scrapemole/companies": {
-  "hash": "5ebda54c8bce1996",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "SEC EDGAR company profiles, XBRL financials and filings",
-  "topics": [
-   "sec",
-   "companies",
-   "financials",
-   "filings"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "dev.pages.scrapemole/pkgs": {
-  "hash": "1ffece7198a17c10",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "npm and PyPI package metadata, versions and download counts",
-  "topics": [
-   "packages",
-   "npm",
-   "pypi"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "dev.pages.scrapemole/quotes": {
-  "hash": "e27c1627b5a8ffab",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "Stock, ETF, FX and crypto quotes and price history",
-  "topics": [
-   "markets",
-   "stocks",
-   "crypto",
-   "prices"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "dev.pages.scrapemole/scrapemole": {
   "hash": "bfeafd72833bdd70",
   "retrieval": true,
@@ -17671,29 +17621,6 @@
    "youtube",
    "transcripts",
    "trends"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "dev.pages.scrapemole/search": {
-  "hash": "ef4d4863692a2eff",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "Web search, news search and search autocomplete suggestions",
-  "topics": [
-   "web-search",
-   "news"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "dev.pages.scrapemole/wiki": {
-  "hash": "f74f3dc9b5946e47",
-  "retrieval": true,
-  "free": false,
-  "knowledge": "Wikipedia summaries, search and Wikidata facts",
-  "topics": [
-   "encyclopedia",
-   "wikipedia",
-   "wikidata"
   ],
   "by": "claude-sonnet-5-5"
  },
