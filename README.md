@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2233 servers, checked 2026-11-18.
+2229 servers, checked 2026-11-19.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -268,7 +268,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `ch.agentready/swiss-company-directory` | Verified Swiss company profiles and services | https://agentready.ch/api/mcp |
 | `ch.bitspire/website` | BitSpire .NET development, AI agents, trainings and blog | https://bitspire.ch/mcp |
 | `ch.busik/fahrten` | Minibus trips between Ukraine, Germany and Switzerland | https://busik.ch/api/mcp |
-| `ch.dadaville/dadaville` | Dadaville pages, personalities and historic residences, in Italian | https://www.dadaville.ch/mcp |
 | `ch.easylpd/fadp` | Swiss FADP and GDPR duties, transfers and document templates | https://easylpd.ch/api/mcp |
 | `ch.fedlex-connector/fedlex-connector` | Swiss federal laws, articles and amendment history | https://mcp.fedlex-connector.ch/ |
 | `ch.funkyjobs/jobs` | Current job listings in Switzerland | https://www.funkyjobs.ch/mcp |
@@ -517,7 +516,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.dropwatchhq/health-intel` | US healthcare providers, exclusion lists and FDA enforcement actions | https://health.dropwatchhq.com/mcp |
 | `com.dropwatchhq/research-intel` | New NIH grants and clinical trials by sponsor and institution | https://research.dropwatchhq.com/mcp |
 | `com.dropwatchhq/safe-check` | Active US product recalls and counterfeit risk signals | https://safecheck.dropwatchhq.com/mcp |
-| `com.durabilitycurve/archive` | Essays, claim ledgers and AI model release dates and prices | https://mcp.durabilitycurve.com/mcp/c/registry |
 | `com.e-esim/esim-catalog` | Travel eSIM data plans, prices and coverage by country | https://e-esim.com/wp-json/e-esim/mcp |
 | `com.easykmarket.vote/votebox-law` | Korean e-voting statutes, quorum requirements and resolution rules | https://vote.easykmarket.com/api/mcp |
 | `com.editalmd/editalmd` | Brazilian public procurement tenders from PNCP with deadlines | https://editalmd.com/mcp |
@@ -851,7 +849,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `com.penguindriver/glossary` | Plain-language Chinese explanations of AI and tech terms and how-tos | https://glossary.penguindriver.com/mcp |
 | `com.peopleanalyst/discovery` | People analytics answers, story tracks and marketing registries | https://peopleanalyst.com/mcp |
 | `com.perkusai/search` | In-stock US and Amazon products with prices and ratings | https://mcp.perkusai.com/ |
-| `com.pestpin/pestpin` | US pest control licenses and typical service costs | https://pestpin.com/mcp |
 | `com.petabloom/podcasts` | Podcast episode transcripts searchable by keyword and topic | https://podcasts.petabloom.com/mcp |
 | `com.petforai/pet-data-station` | Pet food regulations, recalls, nutrient standards and pet health data | https://petforai.com/mcp/ |
 | `com.petnecto/pets` | Adoptable shelter pets and rescues near a place | https://petnecto.com/mcp |
@@ -1512,6 +1509,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.klmlfl/case-doha-record` | Decided US DOHA security-clearance cases and outcome statistics | https://www.clearancesearchengine.com/api/mcp |
 | `io.github.KonstantinStarovoytov/agent-docs` | Official docs of Claude Code, Cursor, OpenAI Codex and MCP | https://agent-docs-mcp.onrender.com/mcp/ |
 | `io.github.kreativeManish/iso20022-navigator` | ISO 20022 messages, bank transaction codes, legacy MT mappings and code sets | https://mcp.isonavigator.io/iso20022 |
+| `io.github.krishnakaushik195/desidata-mcp` | Catalogue of India datasets with sources, licences and previews | https://lqcxdxjncdzzkwgveydz.supabase.co/functions/v1/mcp |
 | `io.github.krupalghori44-dev/infyicon-mcp` | Over 161,000 free icons as SVG or PNG | https://infyicon.com/mcp |
 | `io.github.ktozvonil/phone-lookup` | Caller reputation, spam rating and reviews for phone numbers | https://ktozvonil.net/mcp |
 | `io.github.kylelloyd63-star/sourcetome` | Passages from a rights-cleared library of classic literature | https://sourcetome-public.onrender.com/mcp |
@@ -1571,7 +1569,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.MkSaaSHQ/mksaas` | MkSaaS documentation | https://mksaas.com/mcp |
 | `io.github.MkThingsHQ/betterlaunch` | Directory of products launched on BetterLaunch by category and tag | https://betterlaunch.app/mcp |
 | `io.github.MkThingsHQ/openfree` | Free and open-source AI tools for indie makers | https://openfree.tools/mcp |
-| `io.github.modern-ai-inc/w0-mcp-server` | How often AI search recommends a brand first | https://w0-mcp-server.modernai.workers.dev |
 | `io.github.monriah-studio/sec-edgar-mcp` | SEC filings, insider trades and XBRL financials of US companies | https://sec-edgar-api.kidriahx.workers.dev/mcp |
 | `io.github.mooshee/untax` | County property assessment records and VA facilities and forms | https://untax.io/mcp |
 | `io.github.mzizi-dev/mzizi-mcp` | Mzizi design system components, tokens, conventions and docs | https://mcp.mzizi.dev/mcp |
@@ -2113,7 +2110,6 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `org.breakwire/breakwire` | API and SDK breaking changes, deprecations, advisories, and error fixes | https://breakwire.org/mcp |
 | `org.btcdecoded/intelligence` | Cited Bitcoin development and governance discussion record | https://mcp.btcdecoded.org/mcp |
 | `org.bull-run/bullrun` | Global stocks, UCITS ETF costs and overlap, company news and macro | https://mcp.bull-run.org/mcp |
-| `org.californiabitcoin/agent-commerce` | Bitcoin knowledge, topics, and sourced answers | https://californiabitcoin.org/mcp?source=official-mcp-registry |
 | `org.casimo/mcp` | US casino terms, observed changes, and source-backed facts | https://casimo.org/mcp |
 | `org.celo/docs-mcp` | Celo blockchain developer documentation | https://docs.celo.org/mcp |
 | `org.citizenofnowhere.rankings/global-metro-power-rankings` | Rankings and profiles of 4,300 world metros across sixteen dimensions | https://rankings.citizenofnowhere.org/api/mcp |

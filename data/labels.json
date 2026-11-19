@@ -33243,18 +33243,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "io.github.modern-ai-inc/w0-mcp-server": {
-  "hash": "847c7f36eeba36e4",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "How often AI search recommends a brand first",
-  "topics": [
-   "brands",
-   "ai-search",
-   "marketing"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.monriah-studio/sec-edgar-mcp": {
   "hash": "e193c87aeb33c3fc",
   "retrieval": true,
