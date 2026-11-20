@@ -19929,18 +19929,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "io.github.a-church-ai/church": {
-  "hash": "d41ec6a41ca5e892",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Songs, lyrics, theology and writings of an AI sanctuary",
-  "topics": [
-   "songs",
-   "spirituality",
-   "writing"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.github.aadarshvelu/hirehouse-mcp": {
   "hash": "4add194ab10c227a",
   "retrieval": true,
