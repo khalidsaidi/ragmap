@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-21T14:39:50.328Z",
+  "generatedAt": "2026-11-21T21:37:59.535Z",
   "source": "https://registry.modelcontextprotocol.io",
-  "count": 2224,
+  "count": 2225,
   "servers": [
     {
       "name": "ac.tandem/docs-mcp",
@@ -29801,7 +29801,14 @@
         "get_public_bda_feature_summary",
         "list_public_sitemap_urls",
         "get_public_page_metadata",
-        "list_public_api_endpoints"
+        "list_public_api_endpoints",
+        "search_temples",
+        "get_temple",
+        "list_blog_posts",
+        "list_mantras",
+        "get_mantra",
+        "list_scriptures",
+        "get_scripture"
       ],
       "repository": "https://github.com/BharatDharmaAcademy/bda-mcp",
       "lastOk": "2026-11-21"
@@ -37021,6 +37028,7 @@
         "datajud_movimentos",
         "datajud_raw_query",
         "datajud_localizar_processo",
+        "datajud_acompanhar_processos",
         "show_version",
         "report_bug",
         "connect",
@@ -37175,6 +37183,7 @@
       "tools": [
         "jurisprudencia_buscar",
         "jurisprudencia_sumulas",
+        "jurisprudencia_temas",
         "jurisprudencia_documento",
         "show_version",
         "report_bug",
@@ -37481,6 +37490,7 @@
         "get_reference_article",
         "search_reference_articles",
         "get_regulated_area_history",
+        "get_tax_schedule",
         "get_article_history",
         "get_amendments",
         "get_article_tiers",
@@ -37964,6 +37974,30 @@
       "lastOk": "2026-11-19"
     },
     {
+      "name": "io.github.NavtejDhillon/grants",
+      "title": "Community Funding NZ",
+      "description": "Search 380+ New Zealand community grant funders, deadlines and application questions. No login.",
+      "url": "https://funding.alltoohuman.nz/mcp",
+      "knowledge": "New Zealand community grant funders, deadlines and application questions",
+      "topics": [
+        "grants",
+        "new-zealand",
+        "funding"
+      ],
+      "tools": [
+        "list_filters",
+        "search_funders",
+        "get_funder",
+        "rounds_closing_soon",
+        "rounds_opening_soon",
+        "report_outcome",
+        "suggest_funder",
+        "flag_funder_detail"
+      ],
+      "repository": "https://github.com/NavtejDhillon/grants-mcp",
+      "lastOk": "2026-11-21"
+    },
+    {
       "name": "io.github.neerajsohal/slate",
       "title": "Electrik Slate",
       "description": "Read-only MCP for Electrik Slate: Blade component docs, blocks gallery, source, and llms.txt.",
@@ -38359,7 +38393,7 @@
         "get_tasq_principal_binding"
       ],
       "repository": "https://github.com/notforhumansfun-rgb/not-for-humans-mcp",
-      "lastOk": "2026-11-19"
+      "lastOk": "2026-11-21"
     },
     {
       "name": "io.github.nu-people/nue-people-jobs",
@@ -58287,7 +58321,7 @@
         "get_meal_planner_info"
       ],
       "repository": null,
-      "lastOk": "2026-11-19"
+      "lastOk": "2026-11-21"
     },
     {
       "name": "online.pandus/accessibility",

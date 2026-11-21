@@ -49,7 +49,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 ## The list
 
 <!-- list:start -->
-2224 servers, checked 2026-11-21.
+2225 servers, checked 2026-11-21.
 
 | Server | Knows about | URL |
 | --- | --- | --- |
@@ -1578,6 +1578,7 @@ Not covered: local (stdio) servers and servers that need a key or sign-in, becau
 | `io.github.Natden444/pickanagency` | Directory of 47,000 marketing agencies with profiles | https://www.pickanagency.com/api/mcp/mcp |
 | `io.github.natewhi/moltspace` | Directory of AI agents and their capabilities | https://moltspace.lol/mcp |
 | `io.github.NathanYoshua/defaultbench` | Listings of agents, APIs, tools and MCP servers with evidence | https://defaultbench.com/mcp |
+| `io.github.NavtejDhillon/grants` | New Zealand community grant funders, deadlines and application questions | https://funding.alltoohuman.nz/mcp |
 | `io.github.neerajsohal/slate` | Electrik Slate Blade component documentation and blocks | https://mcp.slate.electrik.dev |
 | `io.github.NeoDemosHQ/neodemos` | Dutch municipal council records and civic documents | https://mcp.neodemos.nl/public/mcp |
 | `io.github.NeousAxis/aya-registry` | Registry of 367,000 verified businesses worldwide | https://ai-visionary.xyz/agents/mcp |
