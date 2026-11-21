@@ -10704,14 +10704,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "com.lattice-sys.plumbline/mcp": {
-  "hash": "9cf58f014be13a80",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-sonnet-5-5"
- },
  "com.launch529/open-data": {
   "hash": "fcab3fc6d3bea355",
   "retrieval": true,
