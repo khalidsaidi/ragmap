@@ -568,6 +568,19 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "ai.bittuitive.api/bittuitive": {
+  "hash": "ef89a22c7864acd9",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "Bitcoin price, weather, FX, rates, SEC fundamentals, sanctions lists",
+  "topics": [
+   "finance",
+   "bitcoin",
+   "weather",
+   "sanctions"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "ai.boltclaw/docs": {
   "hash": "02d00a9cc6cddf25",
   "retrieval": true,
@@ -624,7 +637,7 @@
   "by": "claude-opus-5-5"
  },
  "ai.carfinity/marketplace": {
-  "hash": "1c6f6563c88b0a70",
+  "hash": "e7cdd45324447f3a",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -1075,8 +1088,16 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "ai.gixo/arc": {
+  "hash": "cd7789c07ecba08f",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "ai.gondola/gondola": {
-  "hash": "59f76c3d31f0edbd",
+  "hash": "d366bf547fda606f",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -1157,14 +1178,14 @@
   "by": "claude-opus-5-5"
  },
  "ai.heyrole/heyrole": {
-  "hash": "d96d6350ebaa038d",
+  "hash": "7a1839c85ff1665c",
   "retrieval": true,
   "free": true,
-  "knowledge": "Active remote job postings with descriptions and application links",
+  "knowledge": "Remote job postings, companies hiring, and application links",
   "topics": [
    "jobs",
    "remote work",
-   "careers"
+   "hiring"
   ],
   "by": "claude-opus-5-5"
  },
@@ -1356,15 +1377,15 @@
   "by": "claude-sonnet-5-5"
  },
  "ai.keenable/web-search": {
-  "hash": "61d70757dab63b00",
+  "hash": "26a22099dcf5e212",
   "retrieval": true,
-  "free": true,
-  "knowledge": "Live web search and page content",
+  "free": false,
+  "knowledge": "Live web search results and page content as markdown",
   "topics": [
-   "web",
-   "search"
+   "web search",
+   "news"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "ai.law.mcp/lawyer-search": {
   "hash": "675d450b8e22780e",
@@ -1428,6 +1449,18 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "ai.llpro/trust": {
+  "hash": "f6bb3c245adfc516",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Cited public facts: weather, floods, earthquakes, air quality, alerts",
+  "topics": [
+   "fact checking",
+   "weather",
+   "disasters"
+  ],
+  "by": "claude-opus-5-5"
  },
  "ai.localmark/agent-directory": {
   "hash": "997f5fbb664ba193",
@@ -1939,9 +1972,9 @@
   "by": "claude-opus-5-5"
  },
  "ai.refora/refora": {
-  "hash": "d2943c2869f65ec1",
+  "hash": "03e853448281d656",
   "retrieval": false,
-  "free": true,
+  "free": false,
   "knowledge": "",
   "topics": [],
   "by": "claude-opus-5-5"
@@ -1979,6 +2012,14 @@
    "global"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "ai.robowrite/mcp": {
+  "hash": "e0c6e8049a268a67",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "ai.rocketlist/rocketlist": {
   "hash": "51bf6104580b4531",
@@ -2185,11 +2226,15 @@
   "by": "claude-sonnet-5-5"
  },
  "ai.staffbots/dispatch": {
-  "hash": "62d8c4240298ad07",
-  "retrieval": false,
+  "hash": "3e78b9f3738e47b6",
+  "retrieval": true,
   "free": true,
-  "knowledge": "",
-  "topics": [],
+  "knowledge": "StaffBots plans, pricing, comparisons, FAQ and product docs",
+  "topics": [
+   "product docs",
+   "ai assistants",
+   "pricing"
+  ],
   "by": "claude-opus-5-5"
  },
  "ai.startuphub/startuphub": {
@@ -2797,6 +2842,14 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "ai.zestli/commerce": {
+  "hash": "ecd856e70202b6a8",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "ai.zicron.claims/medical-chronology": {
   "hash": "f8ac00d33aa71303",
   "retrieval": false,
@@ -2834,6 +2887,14 @@
    "documentation"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "app.agentdeals/agentdeals": {
+  "hash": "af22edb2ec5013b4",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "app.agentindex/agentindex": {
   "hash": "5a5916408cc11cc4",
@@ -2988,6 +3049,17 @@
    "research"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "app.coinspay/docs": {
+  "hash": "6dc8d7863f2cf53a",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "CoinsPay crypto payments API: invoices, payouts, webhooks, test mode",
+  "topics": [
+   "api docs",
+   "crypto payments"
+  ],
+  "by": "claude-opus-5-5"
  },
  "app.cosend/mcp": {
   "hash": "3787d15c5acd85db",
@@ -3316,6 +3388,14 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "app.itmly/itmly": {
+  "hash": "685a21f593e45e4f",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "app.kellian/kellian": {
   "hash": "cce600d30a933655",
   "retrieval": true,
@@ -3485,6 +3565,18 @@
    "mcp",
    "directory",
    "ai tools"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "app.nabras/qudrat": {
+  "hash": "04d3c9b15554a7e8",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Saudi Qudrat GAT exam fees, dates, rules and score calculation",
+  "topics": [
+   "education",
+   "exams",
+   "saudi arabia"
   ],
   "by": "claude-opus-5-5"
  },
@@ -4127,6 +4219,18 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "app.vercel.warstwa-omega/docs-mcp": {
+  "hash": "caa768d77e82fb26",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Warstwa shop terms, returns, delivery, privacy and help answers",
+  "topics": [
+   "store policy",
+   "returns",
+   "poland"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "app.veteranhq/va-disability-benefits": {
   "hash": "3af1d658711195aa",
   "retrieval": true,
@@ -4297,7 +4401,7 @@
   "by": "claude-sonnet-5-5"
  },
  "au.com.byronwebstudio.linepref/linepref": {
-  "hash": "bc59376568ce65bd",
+  "hash": "3732266576b2c1a4",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -4939,6 +5043,18 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "ca.speedydrone.agr/site": {
+  "hash": "471bb2dcb6eb3b09",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Canadian agricultural drone spraying guides, regulations, costs and models",
+  "topics": [
+   "agriculture",
+   "drones",
+   "canada"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "ca.tonbot.tolca/tolca": {
   "hash": "3ba966d1a3225053",
   "retrieval": true,
@@ -5296,6 +5412,17 @@
   "topics": [
    "experts",
    "decision making"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "chat.wyp/docs": {
+  "hash": "074e4d01c93d8cb5",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "WYP.chat help centre, guides, glossary, industry and channel pages",
+  "topics": [
+   "product docs",
+   "messaging"
   ],
   "by": "claude-opus-5-5"
  },
@@ -6522,6 +6649,19 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "com.abinomics/reference": {
+  "hash": "15ddb63507ee5901",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Definitions of economics, finance, politics and genomics terms, multilingual",
+  "topics": [
+   "dictionary",
+   "economics",
+   "finance",
+   "genomics"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.abutly/site": {
   "hash": "32e2e978af46d625",
   "retrieval": true,
@@ -7369,6 +7509,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "com.alkaratr/store-mcp": {
+  "hash": "8583992507209ae6",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.alkemata/public-knowledge": {
   "hash": "1024e5271e88f174",
   "retrieval": true,
@@ -7415,6 +7563,17 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "com.alltegrio/site": {
+  "hash": "6edccb88315f10de",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Alltegrio AI development services, case studies and company info",
+  "topics": [
+   "ai development",
+   "company info"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.alohafungi/store": {
   "hash": "1db97d61d6b8c9eb",
   "retrieval": false,
@@ -7424,15 +7583,14 @@
   "by": "claude-opus-5-5"
  },
  "com.alonzio/alonzio": {
-  "hash": "8a32c626a00d8884",
+  "hash": "6f73858766dedbb7",
   "retrieval": true,
   "free": true,
-  "knowledge": "Tested AI agents, MCP servers and APIs, plus live web answers",
+  "knowledge": "Tested agents, MCP servers and APIs for given tasks",
   "topics": [
-   "mcp",
+   "mcp directory",
    "agents",
-   "apis",
-   "web search"
+   "apis"
   ],
   "by": "claude-opus-5-5"
  },
@@ -7610,6 +7768,14 @@
    "mcp",
    "directory"
   ],
+  "by": "claude-opus-5-5"
+ },
+ "com.andreporsch/scorecards": {
+  "hash": "23d938cba4bdda09",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "com.andrewcmcguire/gtm-directory": {
@@ -8040,10 +8206,10 @@
   "by": "claude-sonnet-5-5"
  },
  "com.askonhand/onhand": {
-  "hash": "191e1676e9038276",
+  "hash": "a6779af809f8c992",
   "retrieval": true,
   "free": true,
-  "knowledge": "Local Dallas shops: addresses, hours, stock, appointments and FAQs",
+  "knowledge": "Local Dallas shops: hours, stock, services, FAQs and contacts",
   "topics": [
    "local business",
    "shopping",
@@ -8485,15 +8651,11 @@
   "by": "claude-sonnet-5-5"
  },
  "com.bazaraki/listings": {
-  "hash": "70c7600df79c0089",
-  "retrieval": true,
+  "hash": "806dc17556839bc7",
+  "retrieval": false,
   "free": true,
-  "knowledge": "Cyprus classified listings and new property developments",
-  "topics": [
-   "classifieds",
-   "cyprus",
-   "real estate"
-  ],
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "com.beatandraise/sec-filings": {
@@ -8796,6 +8958,18 @@
    "collectibles",
    "blind boxes",
    "authentication"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.blockrelations/agent-access": {
+  "hash": "81c64bc305237758",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "Block Relations crypto research reports, courses, articles and market data",
+  "topics": [
+   "crypto",
+   "research",
+   "blockchain"
   ],
   "by": "claude-opus-5-5"
  },
@@ -9236,6 +9410,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "com.byokg/byokg": {
+  "hash": "dc37907e33cd2bbf",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Knowledge graph nodes, relations and cited evidence across topic rooms",
+  "topics": [
+   "knowledge graph",
+   "research",
+   "evidence"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.cacheby/search": {
   "hash": "e1b263889c7494f3",
   "retrieval": true,
@@ -9249,7 +9435,7 @@
   "by": "claude-opus-5-5"
  },
  "com.caelaralabs/docs": {
-  "hash": "025b6a7a2ada0bef",
+  "hash": "d0930adf782d63b8",
   "retrieval": false,
   "free": false,
   "knowledge": "",
@@ -9314,7 +9500,7 @@
   "by": "claude-opus-5-5"
  },
  "com.callmemcp/call-me": {
-  "hash": "7f4e3358bd897fb9",
+  "hash": "1113c75022256dab",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -9700,20 +9886,23 @@
   "by": "claude-opus-5-5"
  },
  "com.checkneatly/neatly": {
-  "hash": "6c9860f9fa4428d9",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Rules and fee laws for rental car and vacation damage charges",
-  "topics": [
-   "consumer rights",
-   "rental",
-   "travel",
-   "law"
-  ],
+  "hash": "1397fd07f1a5e694",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "com.checkrss/mcp": {
   "hash": "e3284d6009f39cf3",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "com.chexlow/catalog": {
+  "hash": "e9b89ed6297f2e3a",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -10188,15 +10377,16 @@
   "by": "claude-opus-5-5"
  },
  "com.conferencefindr/events": {
-  "hash": "a9e24c4826474c0e",
+  "hash": "414342d9028824c8",
   "retrieval": true,
   "free": true,
-  "knowledge": "Upcoming business conferences and trade shows by industry and place",
+  "knowledge": "Upcoming business conferences and trade shows with dates, venues, prices",
   "topics": [
+   "conferences",
    "events",
-   "conferences"
+   "business"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "com.conformradar/conformradar": {
   "hash": "3c8809e137a8b50b",
@@ -10562,6 +10752,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "com.customprintingco/site": {
+  "hash": "edfc5b24a129677c",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Label printing costs, materials and labeling compliance guides",
+  "topics": [
+   "printing",
+   "labels",
+   "compliance"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.cutluma/video-editor": {
   "hash": "7750de4fa095dfb7",
   "retrieval": false,
@@ -10582,16 +10784,11 @@
   "by": "claude-sonnet-5-5"
  },
  "com.cymetica/event-trader-research": {
-  "hash": "ab413b05d8fc70ad",
-  "retrieval": true,
+  "hash": "cbd52537469ce9d1",
+  "retrieval": false,
   "free": true,
-  "knowledge": "Crypto token research, fund analytics, prediction markets and health research",
-  "topics": [
-   "crypto",
-   "markets",
-   "funds",
-   "health research"
-  ],
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "com.daawid/registry": {
@@ -11047,6 +11244,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "com.disclosedlabs/disclosed-labs": {
+  "hash": "cfb3eb209665286e",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Research peptide vendor trust grades, lab test results and prices",
+  "topics": [
+   "peptides",
+   "lab testing",
+   "vendors"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.disclovo/site": {
   "hash": "e969cac7c4bba495",
   "retrieval": true,
@@ -11136,7 +11345,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.docs-md/markdown-share": {
-  "hash": "0828f5242d3c313c",
+  "hash": "8aed0a8b618db81c",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -11599,6 +11808,14 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "com.eliteaiempire/empiresentinel-site": {
+  "hash": "5f962fdd3542e583",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.eliteaiempire/lumen": {
   "hash": "4b3ca6a7ca987f40",
   "retrieval": false,
@@ -11617,6 +11834,14 @@
  },
  "com.eliteaiempire/scrubline": {
   "hash": "39431484b29629ab",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "com.eliteaiempire/th-research": {
+  "hash": "1a1c7eac425267b9",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -11994,14 +12219,14 @@
   "by": "claude-sonnet-5-5"
  },
  "com.eurorackref/eurorack": {
-  "hash": "120aba78f62c8c10",
+  "hash": "970b4bbc320eebad",
   "retrieval": true,
   "free": true,
-  "knowledge": "Eurorack module specs, manufacturers, compatibility and patch techniques",
+  "knowledge": "Eurorack module specs, jacks, controls and manufacturers with citations",
   "topics": [
    "eurorack",
    "synthesizers",
-   "music"
+   "music hardware"
   ],
   "by": "claude-opus-5-5"
  },
@@ -12495,7 +12720,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.findestate/public-catalogs": {
-  "hash": "d022cb1d8c96b0c3",
+  "hash": "a47a759717cc63a2",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -13028,6 +13253,14 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "com.gatherhq.synthetic/research-reports": {
+  "hash": "242b019eef8f983c",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.gatrends/trend-radar": {
   "hash": "36677aadbc5fef3b",
   "retrieval": true,
@@ -13157,6 +13390,14 @@
    "product",
    "e-invoicing"
   ],
+  "by": "claude-opus-5-5"
+ },
+ "com.get0cean/0cean": {
+  "hash": "101630d888643b84",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "com.getagentdepot/agent-provider-depot": {
@@ -13374,14 +13615,14 @@
   "by": "claude-opus-5-5"
  },
  "com.getyoutubetranscript/youtube-transcript-and-youtube-search": {
-  "hash": "2e64b80759ea2b9e",
+  "hash": "ec5cac7837b204f4",
   "retrieval": true,
   "free": false,
-  "knowledge": "YouTube transcripts, video search, channel and playlist contents",
+  "knowledge": "YouTube video transcripts, search results, channels, playlists and comments",
   "topics": [
    "youtube",
-   "transcripts",
-   "video"
+   "video",
+   "transcripts"
   ],
   "by": "claude-opus-5-5"
  },
@@ -13497,14 +13738,14 @@
   "by": "claude-sonnet-5-5"
  },
  "com.globalfinreg/lei": {
-  "hash": "be4f8ee6b6e60a48",
+  "hash": "c415973487f62eb2",
   "retrieval": true,
   "free": true,
-  "knowledge": "Legal Entity Identifier records and legal forms of companies worldwide",
+  "knowledge": "Global LEI register records, entity details and legal form codes",
   "topics": [
    "lei",
-   "companies",
-   "finance"
+   "finance",
+   "companies"
   ],
   "by": "claude-opus-5-5"
  },
@@ -14507,6 +14748,18 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "com.icepartsdb/ice-machine-parts": {
+  "hash": "8211eb0dedae6f10",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Commercial ice machine parts, models, ratings and price ranges",
+  "topics": [
+   "ice machines",
+   "parts",
+   "equipment"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.iconic-expeditions/concierge": {
   "hash": "9fbc390717bc0fa7",
   "retrieval": true,
@@ -14548,13 +14801,14 @@
   "by": "claude-opus-5-5"
  },
  "com.iinventedlight/library": {
-  "hash": "5b628ef681a9bce9",
+  "hash": "e3fdac6587897628",
   "retrieval": true,
   "free": true,
   "knowledge": "iinventedlight public notes and openly licensed reference library",
   "topics": [
    "reference",
-   "notes"
+   "notes",
+   "library"
   ],
   "by": "claude-opus-5-5"
  },
@@ -14955,15 +15209,16 @@
   "by": "claude-sonnet-5-5"
  },
  "com.janlinketscher/site": {
-  "hash": "a5fabb47274edbf4",
+  "hash": "57878937cac5269a",
   "retrieval": true,
   "free": true,
-  "knowledge": "Essays and profile of Jan Linketscher on digital topics",
+  "knowledge": "Jan Linketscher's essays and positions on digital agency topics",
   "topics": [
    "essays",
-   "digital"
+   "digital business",
+   "german"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "com.japandirecttrucks/shop": {
   "hash": "3d53724e7cc4d5e9",
@@ -15125,6 +15380,18 @@
   "topics": [
    "jobs",
    "careers"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.jobsglitch/jobs": {
+  "hash": "159b39f07deae44b",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Live job listings from employer hiring systems and market stats",
+  "topics": [
+   "jobs",
+   "hiring",
+   "labor market"
   ],
   "by": "claude-opus-5-5"
  },
@@ -15567,6 +15834,18 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "com.kentapplied/data": {
+  "hash": "16440817d69b9c97",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Sourced US healthcare facts, chart data and research articles",
+  "topics": [
+   "healthcare",
+   "statistics",
+   "us"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.kevinlukelewis/agent-lounge-tools": {
   "hash": "3a33fee7d3375a77",
   "retrieval": false,
@@ -15733,6 +16012,18 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "com.koenig-solutions/koenig-mcp": {
+  "hash": "ddcac7a8f5d6d925",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "IT training courses, exam codes, outlines and vendors at Koenig",
+  "topics": [
+   "it training",
+   "certification",
+   "courses"
+  ],
+  "by": "claude-opus-5-5"
  },
  "com.kollus/kollus": {
   "hash": "7f9c8f16dccad6c8",
@@ -16132,14 +16423,14 @@
   "by": "claude-opus-5-5"
  },
  "com.lexifina/global-law": {
-  "hash": "7b1775101c3de812",
+  "hash": "62917d795f4a19fb",
   "retrieval": true,
   "free": true,
-  "knowledge": "Laws of nearly every country, historical versions and amendments",
+  "knowledge": "Point-in-time law of nearly every country, with amendment history",
   "topics": [
    "law",
    "legislation",
-   "legal history"
+   "global"
   ],
   "by": "claude-opus-5-5"
  },
@@ -16164,7 +16455,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.licensesaas/marketplace": {
-  "hash": "91aa356c89c90a18",
+  "hash": "d02bc23af4206f3e",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -17154,6 +17445,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "com.mewegig/marketplace": {
+  "hash": "69e4d598005c7e52",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.mhsbloom/neutral-skincare-reference": {
   "hash": "c18f2d2e6c3f53a5",
   "retrieval": true,
@@ -17399,6 +17698,19 @@
    "investors",
    "startups",
    "fundraising"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.modularpsl/site": {
+  "hash": "6f9dee93bcbd3885",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "US prefab modular housing permits, ADU laws, container homes",
+  "topics": [
+   "housing",
+   "prefab",
+   "permits",
+   "adu"
   ],
   "by": "claude-opus-5-5"
  },
@@ -17839,6 +18151,14 @@
    "nalpeiron"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "com.namepiq/domains": {
+  "hash": "bb09708ab12dc668",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "com.nanion/vaia": {
   "hash": "3e203a20d5324b6a",
@@ -18608,10 +18928,10 @@
   "by": "claude-opus-5-5"
  },
  "com.oneuedu.mcp/oneu-education": {
-  "hash": "174a52d2650441c3",
+  "hash": "9d87bbd0c20e0b96",
   "retrieval": true,
   "free": true,
-  "knowledge": "Australian courses, occupations, visa rules, fees and skilled migration data",
+  "knowledge": "Australian courses, providers, skilled occupations, visa rules and invitations",
   "topics": [
    "education",
    "immigration",
@@ -18948,6 +19268,18 @@
    "investigation"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "com.ourowncause/publication": {
+  "hash": "5e2a740b0d9c4763",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Posts and open questions written by AIs for AIs",
+  "topics": [
+   "ai",
+   "publication",
+   "essays"
+  ],
+  "by": "claude-opus-5-5"
  },
  "com.outfame/instagram-growth": {
   "hash": "f7ad774829e5b567",
@@ -19419,6 +19751,14 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "com.pipeyield/search-term-review": {
+  "hash": "4ccefc42350b6d23",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.pirateskills/pirateskills": {
   "hash": "0b2b0af3333eaa0e",
   "retrieval": false,
@@ -19835,7 +20175,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.promptandco/operational-memory": {
-  "hash": "ecb6bd1078234df0",
+  "hash": "ac2ee7dada1305e7",
   "retrieval": true,
   "free": true,
   "knowledge": "Agent-reported real-world task obstacles and fixes at businesses and sites",
@@ -20445,6 +20785,18 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "com.resolvemesh/compatibility": {
+  "hash": "671c1ff5c96b475e",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "MCP Registry servers by capability and client compatibility data",
+  "topics": [
+   "mcp",
+   "registry",
+   "compatibility"
+  ],
+  "by": "claude-opus-5-5"
  },
  "com.retainvia/site": {
   "hash": "fc848cf3fef1936e",
@@ -21273,6 +21625,22 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "com.sellknowledgebasetoai/site": {
+  "hash": "a3e9aa07b4421d02",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "com.selllawfirmdatatoai/site": {
+  "hash": "08ed48a2f2d1ff43",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "com.sendameal/storefront": {
   "hash": "b2c777fe27d5e087",
   "retrieval": false,
@@ -21371,11 +21739,15 @@
   "by": "claude-opus-5-5"
  },
  "com.sfxmint/sounds": {
-  "hash": "42dfbcf710a46d96",
-  "retrieval": false,
+  "hash": "b2efc697094a8f31",
+  "retrieval": true,
   "free": true,
-  "knowledge": "",
-  "topics": [],
+  "knowledge": "Free CC0 sound effects catalog with metadata and downloads",
+  "topics": [
+   "sound effects",
+   "audio",
+   "games"
+  ],
   "by": "claude-opus-5-5"
  },
  "com.sgpbusiness/singapore-entities-directory": {
@@ -21950,6 +22322,18 @@
   "free": true,
   "knowledge": "",
   "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "com.sovereigngl/sgl-developers": {
+  "hash": "e93adb567b16652c",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "SGL developer docs, API reference, engine plugins and game mods",
+  "topics": [
+   "developer docs",
+   "gaming",
+   "api"
+  ],
   "by": "claude-opus-5-5"
  },
  "com.space-kitty/research-archive": {
@@ -22646,6 +23030,18 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "com.tatseek/tatseek": {
+  "hash": "370804ebddb4bc68",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Tattoo photos, artists, studios, symbol meanings and tattoo guides",
+  "topics": [
+   "tattoos",
+   "artists",
+   "studios"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "com.tbmlib/mcp": {
   "hash": "060b226e0a4b0b37",
   "retrieval": true,
@@ -23036,13 +23432,14 @@
   "by": "claude-sonnet-5-5"
  },
  "com.thekoreantoday/news": {
-  "hash": "2d57c21d67e75baf",
+  "hash": "4774a48fc329bc9d",
   "retrieval": true,
   "free": true,
-  "knowledge": "Korean news articles plus Korea daily data like weather, rates",
+  "knowledge": "Korean news articles plus Korean daily data like rates, weather",
   "topics": [
    "news",
-   "korea"
+   "korea",
+   "economy"
   ],
   "by": "claude-opus-5-5"
  },
@@ -23193,6 +23590,18 @@
    "property",
    "flood",
    "us"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.thetempleofdoom.draco/draco": {
+  "hash": "19fdab29e082abbf",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Coding and security answers cited from programming and hacking books",
+  "topics": [
+   "programming",
+   "security",
+   "books"
   ],
   "by": "claude-opus-5-5"
  },
@@ -23592,6 +24001,19 @@
    "local business",
    "directory",
    "us"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.truvanatech/site": {
+  "hash": "0aefec829ad83d46",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Card processing fees, surcharge laws and POS guides for small merchants",
+  "topics": [
+   "payments",
+   "pos",
+   "surcharge laws",
+   "small business"
   ],
   "by": "claude-opus-5-5"
  },
@@ -24132,42 +24554,6 @@
   ],
   "by": "claude-opus-5-5"
  },
- "com.valksor/anglo": {
-  "hash": "58635b23f80ce533",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Old English words, meanings and declension and conjugation tables",
-  "topics": [
-   "old english",
-   "linguistics",
-   "dictionary"
-  ],
-  "by": "claude-opus-5-5"
- },
- "com.valksor/interslavic": {
-  "hash": "001453cd1a95b732",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Interslavic dictionary translations and inflection tables",
-  "topics": [
-   "interslavic",
-   "linguistics",
-   "dictionary"
-  ],
-  "by": "claude-opus-5-5"
- },
- "com.valksor/norse": {
-  "hash": "6d753eacfdc482a4",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Old Norse words, senses, declensions and conjugations from Wiktionary",
-  "topics": [
-   "old norse",
-   "language",
-   "dictionary"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "com.valudati/site": {
   "hash": "f8576c79d2b9bbba",
   "retrieval": true,
@@ -24416,7 +24802,7 @@
   "by": "claude-opus-5-5"
  },
  "com.visdenda/public": {
-  "hash": "864ff9ead8409351",
+  "hash": "ab59a95d2ae59cbb",
   "retrieval": false,
   "free": false,
   "knowledge": "",
@@ -24634,10 +25020,10 @@
   "by": "claude-opus-5-5"
  },
  "com.warreandvavasour/workspacealberta": {
-  "hash": "d82cfa9ad58ea89c",
+  "hash": "9fcbba5d5dbe0266",
   "retrieval": true,
-  "free": false,
-  "knowledge": "Open CanadaBuys and Alberta government tenders and procurement opportunities",
+  "free": true,
+  "knowledge": "CanadaBuys and Alberta government tenders, awards and support programs",
   "topics": [
    "procurement",
    "tenders",
@@ -24675,6 +25061,18 @@
    "appliances",
    "dishwashers",
    "product comparison"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "com.waterlessradiant/site": {
+  "hash": "3c1f5ada4780af1c",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Waterless refrigerant-direct radiant floor heating and cooling guides",
+  "topics": [
+   "hvac",
+   "radiant heating",
+   "heat pumps"
   ],
   "by": "claude-opus-5-5"
  },
@@ -24837,7 +25235,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.whizbrew/whizbrew": {
-  "hash": "5174ca88b65c1ed2",
+  "hash": "f04c987d7b894d29",
   "retrieval": true,
   "free": false,
   "knowledge": "Social media profiles, posts, ad libraries and marketing data",
@@ -25069,7 +25467,7 @@
   "by": "claude-sonnet-5-5"
  },
  "com.writerslogic.agents/writerslogic-agents": {
-  "hash": "9e29e602bfa69501",
+  "hash": "b0830b813458c049",
   "retrieval": false,
   "free": false,
   "knowledge": "",
@@ -25385,6 +25783,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "company.greatwork/labs": {
+  "hash": "403bc12156591307",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "computer.emre.scout/mcp": {
   "hash": "842b2ad689a6b360",
   "retrieval": true,
@@ -25484,6 +25890,18 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "cz.procvicky/pracovni-listy": {
+  "hash": "c4ca1c51e7117705",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Printable Czech school worksheets by topic, grade and subject",
+  "topics": [
+   "education",
+   "worksheets",
+   "czech"
+  ],
+  "by": "claude-opus-5-5"
  },
  "de.abomio/mcp": {
   "hash": "b1e2a16fa82a3ced",
@@ -25586,9 +26004,9 @@
   "by": "claude-sonnet-5-5"
  },
  "de.echocall/echocall": {
-  "hash": "cdf24c26d203033e",
+  "hash": "0e63f5747c49b36e",
   "retrieval": false,
-  "free": false,
+  "free": true,
   "knowledge": "",
   "topics": [],
   "by": "claude-opus-5-5"
@@ -25681,6 +26099,18 @@
    "germany"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "de.nameholder/mcp": {
+  "hash": "f3530cbe60898bcd",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Expired and auction domains with SEO metrics and valuations",
+  "topics": [
+   "domains",
+   "seo",
+   "auctions"
+  ],
+  "by": "claude-opus-5-5"
  },
  "de.nomado24/jobs": {
   "hash": "83a50d00b0350903",
@@ -26564,6 +26994,18 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "dev.mojourney/census": {
+  "hash": "96e9ab757aefaab4",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Public Mojo language repos, versions, adoption and ecosystem growth",
+  "topics": [
+   "mojo",
+   "programming",
+   "github"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "dev.ndekocode.ui/ndekoui": {
   "hash": "d9d35f1dcf374301",
   "retrieval": true,
@@ -26688,14 +27130,14 @@
   "by": "claude-opus-5-5"
  },
  "dev.pages.scrapemole/scrapemole": {
-  "hash": "638113cb8ab3d98f",
+  "hash": "de5e1f4940462b95",
   "retrieval": true,
   "free": false,
-  "knowledge": "YouTube videos, channels, transcripts, comments and Google Trends data",
+  "knowledge": "YouTube videos, transcripts, comments, channels and Google Trends data",
   "topics": [
    "youtube",
-   "video",
-   "trends"
+   "trends",
+   "seo"
   ],
   "by": "claude-opus-5-5"
  },
@@ -27713,15 +28155,14 @@
   "by": "claude-sonnet-5-5"
  },
  "dk.cvrradar/cvrradar": {
-  "hash": "f9ae321819ae8bb7",
+  "hash": "1053f21991ae13e5",
   "retrieval": true,
   "free": false,
-  "knowledge": "Danish company registry data: financials, owners, credit, bankruptcies",
+  "knowledge": "Danish company registry data, financials, owners, credit ratings, bankruptcies",
   "topics": [
    "companies",
    "denmark",
-   "financials",
-   "cvr"
+   "finance"
   ],
   "by": "claude-opus-5-5"
  },
@@ -29260,6 +29701,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "info.relayrace/agentmarket": {
+  "hash": "a0351bbd4bb4f5d8",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "info.stride/stride": {
   "hash": "446735707be51c87",
   "retrieval": true,
@@ -29389,6 +29838,19 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "io.agentscolombia/agentes": {
+  "hash": "25f0a08f618a6e38",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "Colombian law, tax, companies, history and regional open data",
+  "topics": [
+   "law",
+   "colombia",
+   "open data",
+   "history"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.agentsla/agentsla": {
   "hash": "eeebc8d6c5a4b42f",
   "retrieval": false,
@@ -29457,18 +29919,6 @@
   ],
   "by": "claude-sonnet-5-5"
  },
- "io.arxo/code-civil": {
-  "hash": "ddc3dce5fb4bebc3",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "French Civil Code rules with legal grounds",
-  "topics": [
-   "law",
-   "france",
-   "civil-code"
-  ],
-  "by": "claude-sonnet-5-5"
- },
  "io.arxo/fide-chess": {
   "hash": "a9e4b79218ff12b0",
   "retrieval": true,
@@ -29479,19 +29929,6 @@
    "rules",
    "fide",
    "law"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "io.arxo/picc": {
-  "hash": "0a6b92e90ed1f0c5",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "UNIDROIT Principles 2016 contract law rules with source text",
-  "topics": [
-   "law",
-   "contracts",
-   "unidroit",
-   "international"
   ],
   "by": "claude-sonnet-5-5"
  },
@@ -29734,15 +30171,14 @@
   "by": "claude-opus-5-5"
  },
  "io.ddx.pg/archive": {
-  "hash": "3b27c9847c9b3298",
+  "hash": "e138cea316b43302",
   "retrieval": true,
   "free": true,
-  "knowledge": "PostgreSQL mailing lists, commits, source code, commitfest and docs",
+  "knowledge": "PostgreSQL mailing lists, commits, source code, commitfest, docs and wiki",
   "topics": [
    "postgresql",
-   "mailing lists",
-   "source code",
-   "documentation"
+   "databases",
+   "open source"
   ],
   "by": "claude-opus-5-5"
  },
@@ -30131,6 +30567,17 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "io.github.ABGI-Ltd/orkero": {
+  "hash": "77de2e0e201550d9",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Orkero healthcare practice API documentation and endpoint reference",
+  "topics": [
+   "api docs",
+   "healthcare"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.ABTdomain/domainkits-mcp": {
   "hash": "344d682843856714",
   "retrieval": true,
@@ -30253,6 +30700,18 @@
    "robinhood chain"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "io.github.agentoprimus/public-records": {
+  "hash": "7b78f1dd26fbafde",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "US Federal Register rules, proposed rules, notices, comment deadlines",
+  "topics": [
+   "regulation",
+   "federal register",
+   "us"
+  ],
+  "by": "claude-opus-5-5"
  },
  "io.github.agentsearchhq-coder/agentsearch-mcp": {
   "hash": "0fc0e4f6e801aa03",
@@ -30978,6 +31437,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.ArpitGandhi1934/yugenox-jobs": {
+  "hash": "1e4ad4cec5a32672",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Open job postings, employer hiring trends and posted salary ranges",
+  "topics": [
+   "jobs",
+   "salaries",
+   "hiring"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.arseniigruzdev/llmsmap": {
   "hash": "33c93365a6cfa2ba",
   "retrieval": true,
@@ -31246,15 +31717,16 @@
   "by": "claude-opus-5-5"
  },
  "io.github.BCXTRUST/kyma-frequency-mcp": {
-  "hash": "8f367ac107a37feb",
+  "hash": "a9603647b4a3bfa1",
   "retrieval": true,
   "free": true,
-  "knowledge": "KYMA369 healing frequency library, articles and FAQ",
+  "knowledge": "KYMA frequency library, Rife machine and PEMF guides and FAQs",
   "topics": [
    "frequencies",
-   "wellness"
+   "wellness",
+   "pemf"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.beepboop2025/financial-evidence-workspace": {
   "hash": "3abb02042831b652",
@@ -32080,14 +32552,6 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
- },
- "io.github.clerk/mcp-server": {
-  "hash": "d1e980c08e88b674",
-  "retrieval": false,
-  "free": true,
-  "knowledge": "",
-  "topics": [],
-  "by": "claude-opus-5-5"
  },
  "io.github.cloudalien2025/1800deals-directory": {
   "hash": "950ff78068d9c844",
@@ -33603,6 +34067,14 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "io.github.davidmosiah/delx-mcp-a2a": {
+  "hash": "314f04e567eaedcd",
+  "retrieval": false,
+  "free": false,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "io.github.Dawaxwx/dmarc-spf-audit": {
   "hash": "8fd14e26e40d23ab",
   "retrieval": false,
@@ -33789,6 +34261,18 @@
   "free": true,
   "knowledge": "",
   "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "io.github.DirtyReal/delv-mcp": {
+  "hash": "9093d10e3299a701",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Directory of AI tools, MCP servers, agent skills with safety ratings",
+  "topics": [
+   "ai tools",
+   "mcp",
+   "directory"
+  ],
   "by": "claude-opus-5-5"
  },
  "io.github.disclose/lookup-disclose-io": {
@@ -34182,6 +34666,14 @@
    "economy"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "io.github.egehazar/decision-intake": {
+  "hash": "bd8d60e2a9d30750",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "io.github.eggsorpeasxrp-dot/agentmart": {
   "hash": "6a7a7fa48514145e",
@@ -35203,16 +35695,15 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.guyvolvo/oceanofjobs": {
-  "hash": "11eb545c7dc7e13e",
+  "hash": "de7127f2e04fa804",
   "retrieval": true,
   "free": true,
-  "knowledge": "Over a million open job listings and employer profiles",
+  "knowledge": "Open job listings and employer hiring information",
   "topics": [
    "jobs",
-   "employers",
-   "listings"
+   "hiring"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.h2-papers/mcp-server": {
   "hash": "f23882a072948d4b",
@@ -35386,7 +35877,7 @@
   "by": "claude-opus-5-5"
  },
  "io.github.hermoso-ai/hermoso-ai-ad-generator": {
-  "hash": "c7f407fd9c202dde",
+  "hash": "278c8d8d6b911362",
   "retrieval": false,
   "free": false,
   "knowledge": "",
@@ -35394,7 +35885,7 @@
   "by": "claude-opus-5-5"
  },
  "io.github.hermoso-ai/hermoso-social-media-manager": {
-  "hash": "24e0927f7ece5056",
+  "hash": "c3f05550533b7ec6",
   "retrieval": false,
   "free": false,
   "knowledge": "",
@@ -36259,15 +36750,15 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.joelp22-maker/referencesource": {
-  "hash": "2538da4d2675564e",
+  "hash": "b7e4c5c2b4548f47",
   "retrieval": true,
   "free": true,
-  "knowledge": "Verified regulatory thresholds, security controls, software support status with sources",
+  "knowledge": "Verified reference facts: regulations, security controls, model status, privacy laws",
   "topics": [
    "reference data",
    "regulation",
-   "security controls",
-   "fact checking"
+   "compliance",
+   "security"
   ],
   "by": "claude-opus-5-5"
  },
@@ -36352,6 +36843,18 @@
    "prediction markets",
    "polymarket",
    "news"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "io.github.Joshuv-AI/tower-of-babel": {
+  "hash": "ca17b8087b743c1f",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Public-domain full texts: books, papers, declassified documents",
+  "topics": [
+   "books",
+   "public domain",
+   "library"
   ],
   "by": "claude-opus-5-5"
  },
@@ -36983,13 +37486,13 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.LAOSP9/gitpicker": {
-  "hash": "306010c29e393f1d",
+  "hash": "ae09ed4ff8f2fb1c",
   "retrieval": true,
   "free": true,
-  "knowledge": "GitHub repositories, source files, commits, issues and releases",
+  "knowledge": "GitHub repositories, source code, commits, issues and releases",
   "topics": [
    "github",
-   "source code",
+   "code",
    "open source"
   ],
   "by": "claude-opus-5-5"
@@ -37566,17 +38069,16 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.mattlsmith/navmds": {
-  "hash": "d8e46025384808d8",
+  "hash": "fb48e06ccccfca62",
   "retrieval": true,
   "free": true,
-  "knowledge": "US doctors, patient reviews and procedure costs",
+  "knowledge": "Cosmetic procedure overviews, US cost ranges and industry statistics",
   "topics": [
-   "doctors",
+   "cosmetic procedures",
    "healthcare",
-   "pricing",
-   "us"
+   "pricing"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.mattmireles/tesoro-help": {
   "hash": "babd546605e45d46",
@@ -44851,6 +45353,14 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.mikahama/uralicNLP": {
+  "hash": "40aa8157184e0fec",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "io.github.mike-lblc/x402-bazaar-rank": {
   "hash": "cd72a7b68ed73f65",
   "retrieval": true,
@@ -44919,6 +45429,18 @@
    "companies"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "io.github.mirackacmazcom/seo-skills": {
+  "hash": "9a2ab6dfe9032643",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Google leak, search patents, official SEO docs, staff statements",
+  "topics": [
+   "seo",
+   "patents",
+   "google"
+  ],
+  "by": "claude-opus-5-5"
  },
  "io.github.MissPris2023/clausely": {
   "hash": "40afa82c36959e0d",
@@ -45084,9 +45606,9 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.mooshee/untax": {
-  "hash": "91807ed3fe7b6149",
+  "hash": "1e1057a706117bf7",
   "retrieval": false,
-  "free": false,
+  "free": true,
   "knowledge": "",
   "topics": [],
   "by": "claude-opus-5-5"
@@ -45657,6 +46179,19 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.oculonlive/oculon": {
+  "hash": "f245c5f4ea7e96fd",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "OSINT: CVEs, scams, recalls, travel risk, outages, news, research papers",
+  "topics": [
+   "osint",
+   "security",
+   "news",
+   "research"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.ofershap/recipe-library": {
   "hash": "3b35100ad6e5818f",
   "retrieval": true,
@@ -45868,6 +46403,19 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.oscilabs/charitysense": {
+  "hash": "cc0abce110ccc488",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "US nonprofit IRS filings, financials, governance, grants and ratings",
+  "topics": [
+   "nonprofits",
+   "charity",
+   "irs",
+   "us"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.outdoorithm/outdoorithm": {
   "hash": "a417988d74e6f3a7",
   "retrieval": true,
@@ -45967,7 +46515,7 @@
   "by": "claude-opus-5-5"
  },
  "io.github.Parthuss/skwirl": {
-  "hash": "8ebaffc0b217715f",
+  "hash": "d8d8cdeb3a4e616c",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -47675,17 +48223,16 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.pipeworx-io/massachusetts-code": {
-  "hash": "5828803b5218dd8f",
+  "hash": "9a6492a9a46edb92",
   "retrieval": true,
   "free": true,
-  "knowledge": "Massachusetts General Laws by citation",
+  "knowledge": "Massachusetts General Laws statute text by citation or topic",
   "topics": [
    "law",
    "statutes",
-   "massachusetts",
-   "us"
+   "massachusetts"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.pipeworx-io/mdn-search": {
   "hash": "984cde9be0dce1fc",
@@ -49178,6 +49725,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.quantisnow/sec-edgar-mcp": {
+  "hash": "c01e831e7f84fc0b",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "SEC filings, insider trades, 13F holdings, 8-K events, financials",
+  "topics": [
+   "sec",
+   "finance",
+   "filings"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.QueryQuarry/queryquarry": {
   "hash": "a6d71a7005ad8530",
   "retrieval": false,
@@ -49305,12 +49864,12 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.rayhyman333-blip/cynthia": {
-  "hash": "1de7973052adfb58",
+  "hash": "d9af647606cc9268",
   "retrieval": true,
   "free": true,
   "knowledge": "Owner-verified facts and Planet Leads Academy course content",
   "topics": [
-   "verified answers",
+   "knowledge base",
    "courses"
   ],
   "by": "claude-opus-5-5"
@@ -49621,16 +50180,16 @@
   "by": "claude-sonnet-5-5"
  },
  "io.github.Rupesh7128/cofounderbase": {
-  "hash": "d41598baa5857245",
+  "hash": "78f2f1d68a9c2feb",
   "retrieval": true,
   "free": true,
-  "knowledge": "Evidence-checked AI automation agencies by need, tool, country and budget",
+  "knowledge": "Directory of AI automation agencies by tool, country and budget",
   "topics": [
    "agencies",
    "ai automation",
    "directory"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.RustamIsmail/healthy-aging-atlas": {
   "hash": "d4616a5ea2314558",
@@ -50569,6 +51128,18 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "io.github.stand-out-of-my-sun/diogenes-neural-search-engine-mcp": {
+  "hash": "b34f81a844f849ea",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Web search results, research dossiers, news and citations",
+  "topics": [
+   "web search",
+   "research",
+   "news"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.steve-in-tandem/govcon-mcp": {
   "hash": "ea2c253328512052",
   "retrieval": true,
@@ -50705,18 +51276,6 @@
    "lab tests",
    "health",
    "us"
-  ],
-  "by": "claude-sonnet-5-5"
- },
- "io.github.Superfast-Robotics/robot-skill-hub": {
-  "hash": "2f030d42e4a3a89c",
-  "retrieval": true,
-  "free": true,
-  "knowledge": "Robot code, skills and version-specific findings for robotics tasks",
-  "topics": [
-   "robotics",
-   "code",
-   "skills"
   ],
   "by": "claude-sonnet-5-5"
  },
@@ -52087,6 +52646,17 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "io.github.Vuena/vuena-assets": {
+  "hash": "fcdb72497cebd924",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Free CC0 low-poly 3D game models catalog",
+  "topics": [
+   "3d models",
+   "game assets"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "io.github.Vultax/vultax-research": {
   "hash": "4e476a3cfd7e6f34",
   "retrieval": true,
@@ -52239,16 +52809,16 @@
   "by": "claude-opus-5-5"
  },
  "io.github.worklore/worklore": {
-  "hash": "661e072bf086d3c5",
+  "hash": "b189788860db20f1",
   "retrieval": true,
   "free": true,
-  "knowledge": "Worklore stories and skill capability tiers",
+  "knowledge": "Reproducible developer stories about AI agents, tools and practices",
   "topics": [
-   "skills",
-   "agents",
+   "developer",
+   "ai agents",
    "stories"
   ],
-  "by": "claude-sonnet-5-5"
+  "by": "claude-opus-5-5"
  },
  "io.github.workopia/workopia-mcp": {
   "hash": "69e4c6a3b2a10666",
@@ -52618,7 +53188,7 @@
   "by": "claude-opus-5-5"
  },
  "io.github.yuli3/oiyo-world": {
-  "hash": "c98625ed57a944c6",
+  "hash": "d5862c5f1f61de98",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -53418,7 +53988,7 @@
   "by": "claude-opus-5-5"
  },
  "io.strategyarena/strategyarena": {
-  "hash": "910c3214c4bb0d5a",
+  "hash": "ffdaf69bc1a3e543",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -53547,9 +54117,9 @@
   "by": "claude-opus-5-5"
  },
  "io.untax/untax": {
-  "hash": "e96235fca0deb49b",
+  "hash": "1c862799b10eb067",
   "retrieval": false,
-  "free": false,
+  "free": true,
   "knowledge": "",
   "topics": [],
   "by": "claude-opus-5-5"
@@ -54289,6 +54859,14 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "io.usefulapi/viva-com": {
+  "hash": "26c644f261c450b9",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "io.usefulapi/vtiger": {
   "hash": "05c3d17ca4df8797",
   "retrieval": false,
@@ -54482,6 +55060,17 @@
    "iran"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "is.eignast/eignast": {
+  "hash": "8209c03067d2b1d3",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Iceland properties for sale with details and price history",
+  "topics": [
+   "real estate",
+   "iceland"
+  ],
+  "by": "claude-opus-5-5"
  },
  "it.asapdevs/site": {
   "hash": "ba9cd46028666773",
@@ -55437,7 +56026,7 @@
   "by": "claude-sonnet-5-5"
  },
  "net.borbur/salary-calculators": {
-  "hash": "09b3b785fbf23bc8",
+  "hash": "2251d81b517e93cc",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -55671,7 +56260,7 @@
   "by": "claude-opus-5-5"
  },
  "net.jacars/listings": {
-  "hash": "884591536b44f762",
+  "hash": "b6d21d4ef94c2430",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -55839,14 +56428,14 @@
   "by": "claude-sonnet-5-5"
  },
  "net.repleader/mcp": {
-  "hash": "2e993dce71c9967e",
+  "hash": "19ba130f3203e847",
   "retrieval": true,
   "free": true,
-  "knowledge": "US federal court dockets, judges, MDLs, state case law and citations",
+  "knowledge": "US federal court dockets, judges, MDLs, state case law, legal news",
   "topics": [
    "law",
    "courts",
-   "litigation",
+   "case law",
    "us"
   ],
   "by": "claude-opus-5-5"
@@ -56840,14 +57429,14 @@
   "by": "claude-sonnet-5-5"
  },
  "org.cemresearchproject/cem": {
-  "hash": "75bf3fd26112a6a9",
+  "hash": "8f789d759d53676b",
   "retrieval": true,
   "free": true,
-  "knowledge": "CEM research on building with AI: definitions, papers, calculators",
+  "knowledge": "CEM research on building with AI: definitions, papers, reviews",
   "topics": [
    "ai",
    "research",
-   "software development"
+   "software"
   ],
   "by": "claude-opus-5-5"
  },
@@ -56915,6 +57504,17 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "org.cryptoliveleak/agent-access": {
+  "hash": "ebc5e88e5ef7f555",
+  "retrieval": true,
+  "free": false,
+  "knowledge": "Crypto articles and asset profiles from CryptoLiveLeak",
+  "topics": [
+   "crypto",
+   "news"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "org.cucutime/mcp": {
   "hash": "325626221bf30884",
   "retrieval": false,
@@ -56955,6 +57555,18 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "org.dosefacts/dosefacts": {
+  "hash": "56759dc9d5e37eb4",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Medicine fact sheets, ingredients and conditions, India focused",
+  "topics": [
+   "medicine",
+   "drugs",
+   "india"
+  ],
+  "by": "claude-opus-5-5"
  },
  "org.druxtjs/docs": {
   "hash": "3b2ce3bb2920cecd",
@@ -57419,38 +58031,38 @@
   "by": "claude-opus-5-5"
  },
  "org.plantdatabases/askbrassica": {
-  "hash": "fadd8caaf3170450",
+  "hash": "ad43bc90d104bf03",
   "retrieval": true,
   "free": true,
-  "knowledge": "Brassica genes, pangenomes, expression, genotypes, germplasm and papers",
+  "knowledge": "Brassica and canola genes, pangenomes, GWAS, expression, germplasm, papers",
   "topics": [
    "genomics",
    "brassica",
-   "plant science"
+   "plants"
   ],
   "by": "claude-opus-5-5"
  },
  "org.plantdatabases/askpulse": {
-  "hash": "0fe75d943d9155df",
+  "hash": "359901bc37fda5f5",
   "retrieval": true,
   "free": true,
-  "knowledge": "Legume genes, gene families, QTL, expression, germplasm and papers",
+  "knowledge": "Pulse and legume genes, QTL, synteny, expression, germplasm, papers",
   "topics": [
    "genomics",
    "legumes",
-   "plant science"
+   "plants"
   ],
   "by": "claude-opus-5-5"
  },
  "org.plantdatabases/askwheat": {
-  "hash": "ee4dd1d31207688d",
+  "hash": "415f21dd915fb0d1",
   "retrieval": true,
   "free": true,
-  "knowledge": "Wheat genes, Watkins pangenome, mutants, expression, genotypes and papers",
+  "knowledge": "Wheat genes, pangenome, QTL, expression, mutants, germplasm, papers",
   "topics": [
    "genomics",
    "wheat",
-   "plant science"
+   "plants"
   ],
   "by": "claude-opus-5-5"
  },
@@ -57704,6 +58316,18 @@
    "ukraine"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "org.unpatentable/library": {
+  "hash": "feb7fbd4cb68ac8a",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Public-domain invention disclosures usable as open prior art",
+  "topics": [
+   "inventions",
+   "prior art",
+   "patents"
+  ],
+  "by": "claude-opus-5-5"
  },
  "org.uscodex/uscodex": {
   "hash": "0596dbb105fa5d63",
@@ -58015,6 +58639,58 @@
    "eu"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "pl.testyangielskiego/testy": {
+  "hash": "fddf9f3da0ea1cd3",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "English tests and practice questions for Polish learners by CEFR level",
+  "topics": [
+   "english",
+   "language learning",
+   "tests",
+   "poland"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "pl.testyelektryka/testy": {
+  "hash": "05f350946cfc3b6b",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Polish electrician exam ELE.02 and SEP G1 lessons and questions",
+  "topics": [
+   "electrician",
+   "exams",
+   "poland",
+   "education"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "pl.testyniemieckiego/testy": {
+  "hash": "3799b23ee03ce476",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "German tests and practice questions for Polish learners by CEFR level",
+  "topics": [
+   "german",
+   "language learning",
+   "tests",
+   "poland"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "pl.testypolskiego/testy": {
+  "hash": "a1d512cd39959a6f",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Polish language tests for foreigners and B1 state exam prep",
+  "topics": [
+   "polish",
+   "language learning",
+   "tests",
+   "exams"
+  ],
+  "by": "claude-opus-5-5"
  },
  "pl.vanauto/campers": {
   "hash": "440720d68a60f7a6",
@@ -58545,14 +59221,15 @@
   "by": "claude-sonnet-5-5"
  },
  "sg.homejourney/listings": {
-  "hash": "f89b224be093af9f",
+  "hash": "a91653cd38a749a1",
   "retrieval": true,
   "free": true,
-  "knowledge": "Singapore property listings, buying and renting guides, agent lookups",
+  "knowledge": "Singapore property listings, transaction prices, rental yields and buying guides",
   "topics": [
    "real estate",
-   "property",
-   "singapore"
+   "singapore",
+   "property prices",
+   "housing"
   ],
   "by": "claude-opus-5-5"
  },
@@ -58873,6 +59550,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "si.tehnokot/shop": {
+  "hash": "6012d21c5e33dcf6",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "si.thinkhard/prompt-tools": {
   "hash": "b3a88ce4faba1196",
   "retrieval": true,
@@ -59097,6 +59782,14 @@
   ],
   "by": "claude-sonnet-5-5"
  },
+ "so.darwin/darwin": {
+  "hash": "6e1ccbcfa4527a1f",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "so.falcon/frontier-reference": {
   "hash": "5ecd78abd50de0b8",
   "retrieval": true,
@@ -59108,6 +59801,18 @@
    "frontier-tech"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "so.growthgenie/growth-genie-docs": {
+  "hash": "cc3a1306c181dcb3",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Growth Genie documentation: MCP tools, OAuth, scopes, errors, CLI",
+  "topics": [
+   "documentation",
+   "api",
+   "growth genie"
+  ],
+  "by": "claude-opus-5-5"
  },
  "so.ruling/ruling": {
   "hash": "dd3776ad6c3ed59e",
@@ -59334,6 +60039,14 @@
    "api"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "studio.quantura/scout": {
+  "hash": "2f410be15b8e5180",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "studio.skillfolio/skillfolio": {
   "hash": "2456921e087c2cc2",
@@ -59609,16 +60322,11 @@
   "by": "claude-sonnet-5-5"
  },
  "tj.somon/listings": {
-  "hash": "3b14b9cc778c5ce9",
-  "retrieval": true,
+  "hash": "05f5d60eb2e743d5",
+  "retrieval": false,
   "free": true,
-  "knowledge": "Classified listings and new housing developments in Tajikistan",
-  "topics": [
-   "classifieds",
-   "tajikistan",
-   "real estate",
-   "marketplace"
-  ],
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "tn.qanun/qanun-mcp": {
@@ -59754,12 +60462,49 @@
   "topics": [],
   "by": "claude-opus-5-5"
  },
+ "tools.valksor/anglo": {
+  "hash": "58635b23f80ce533",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Old English word senses and declension/conjugation tables from Wiktionary",
+  "topics": [
+   "old english",
+   "linguistics",
+   "dictionary"
+  ],
+  "by": "claude-opus-5-5"
+ },
+ "tools.valksor/interslavic": {
+  "hash": "001453cd1a95b732",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Interslavic dictionary with translations into Slavic languages and paradigms",
+  "topics": [
+   "interslavic",
+   "linguistics",
+   "dictionary",
+   "slavic languages"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "tools.valksor/margrave": {
   "hash": "b9366c962e087dc8",
   "retrieval": false,
   "free": true,
   "knowledge": "",
   "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "tools.valksor/norse": {
+  "hash": "6d753eacfdc482a4",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Old Norse word senses and inflection tables from Wiktionary",
+  "topics": [
+   "old norse",
+   "linguistics",
+   "dictionary"
+  ],
   "by": "claude-opus-5-5"
  },
  "tools.valksor/panembrivdienu": {
@@ -59883,15 +60628,11 @@
   "by": "claude-opus-5-5"
  },
  "tt.pin/listings": {
-  "hash": "d483c37f9c552978",
-  "retrieval": true,
+  "hash": "097d1c6f08d41e46",
+  "retrieval": false,
   "free": true,
-  "knowledge": "Classified listings for sale in Trinidad and Tobago",
-  "topics": [
-   "classifieds",
-   "marketplace",
-   "trinidad and tobago"
-  ],
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "tube.binge/bingetube": {
@@ -60002,6 +60743,19 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "uk.co.clearpostcode/postcodes": {
+  "hash": "b4ea5bac5f7c0225",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "UK postcode locations, councils, wards, constituencies and places",
+  "topics": [
+   "postcodes",
+   "uk",
+   "geography",
+   "geocoding"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "uk.co.cruisify/cruise-search": {
   "hash": "8e2033f966489db2",
   "retrieval": true,
@@ -60013,6 +60767,14 @@
    "uk"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "uk.co.cupboarddepot/site": {
+  "hash": "9ad3948a96937f37",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "uk.co.decordepot/site": {
   "hash": "23e75480111feeaa",
@@ -60090,6 +60852,22 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "uk.co.hallwaytrading/site": {
+  "hash": "62456ea1704d06b9",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "uk.co.hangingstore/site": {
+  "hash": "061b62f5f2d33923",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "uk.co.herstack/herstack": {
   "hash": "da518ef870fcd411",
   "retrieval": true,
@@ -60101,6 +60879,22 @@
    "menopause"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "uk.co.librarydirect/site": {
+  "hash": "c840ca950dc3e337",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "uk.co.liddirect/site": {
+  "hash": "24c8508c520ba1e7",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "uk.co.localseolawfirm/site": {
   "hash": "c0b5729fb5adcb8a",
@@ -60389,6 +61183,14 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "uk.co.sleighhouse/site": {
+  "hash": "87d29abb6b64fa57",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "uk.co.slumberdirect/site": {
   "hash": "826a19c1afe339d3",
   "retrieval": false,
@@ -60396,6 +61198,22 @@
   "knowledge": "",
   "topics": [],
   "by": "claude-sonnet-5-5"
+ },
+ "uk.co.studytrading/site": {
+  "hash": "4b05e4a9ed011d94",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "uk.co.tellyco/site": {
+  "hash": "b812a402d18637b2",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "uk.co.tenderlead/tenderlead": {
   "hash": "2a41cf1fcf4bb230",
@@ -60417,8 +61235,24 @@
   ],
   "by": "claude-opus-5-5"
  },
+ "uk.co.timberoutlet/site": {
+  "hash": "810a52d589ee413e",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
  "uk.co.trailersite/trailersite": {
   "hash": "f0a21aa45c7c2de1",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
+ },
+ "uk.co.uksearchfunds/site": {
+  "hash": "6d58d05ec9e49eb9",
   "retrieval": false,
   "free": true,
   "knowledge": "",
@@ -60447,6 +61281,14 @@
    "home-energy"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "uk.co.whobuyslawfirms/site": {
+  "hash": "4f5f183ad2a33359",
+  "retrieval": false,
+  "free": true,
+  "knowledge": "",
+  "topics": [],
+  "by": "claude-opus-5-5"
  },
  "uk.crash-slots/animal-slots-uk": {
   "hash": "9b6bc064ea548ec4",
@@ -61018,7 +61860,7 @@
   "by": "claude-opus-5-5"
  },
  "wiki.sinapsi/sinapsi": {
-  "hash": "3dd41881f9829005",
+  "hash": "62178550fa1fa548",
   "retrieval": true,
   "free": true,
   "knowledge": "Verified public wikis with cited sections and provenance",
@@ -61202,15 +62044,15 @@
   "by": "claude-opus-5-5"
  },
  "works.narrate/public": {
-  "hash": "59f012a634752ff2",
+  "hash": "0b3982c49530f737",
   "retrieval": true,
   "free": true,
-  "knowledge": "Impact management glossary, sources, indicators, regulations and Dutch statistics",
+  "knowledge": "Impact management glossary, sources, indicators, regulations and funding calendars",
   "topics": [
    "impact management",
    "sustainability",
-   "netherlands",
-   "glossary"
+   "glossary",
+   "netherlands"
   ],
   "by": "claude-opus-5-5"
  },
@@ -61223,15 +62065,11 @@
   "by": "claude-opus-5-5"
  },
  "world.jobo/developer": {
-  "hash": "e28a62e3fe82570d",
-  "retrieval": true,
+  "hash": "a2753c73c0af27bf",
+  "retrieval": false,
   "free": true,
-  "knowledge": "Jobo jobs API company ids, occupations and filter values",
-  "topics": [
-   "jobs",
-   "api",
-   "developer"
-  ],
+  "knowledge": "",
+  "topics": [],
   "by": "claude-opus-5-5"
  },
  "world.jobo/job-search": {
@@ -61364,6 +62202,17 @@
   "topics": [],
   "by": "claude-sonnet-5-5"
  },
+ "xyz.cozu/cozu": {
+  "hash": "84e024ff093b79ac",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Free CC BY 3D models with downloads and credit lines",
+  "topics": [
+   "3d models",
+   "game assets"
+  ],
+  "by": "claude-opus-5-5"
+ },
  "xyz.darksearch/search": {
   "hash": "58aa895a5f1d3775",
   "retrieval": true,
@@ -61396,6 +62245,18 @@
    "stocks"
   ],
   "by": "claude-sonnet-5-5"
+ },
+ "xyz.jakelawrence.www/research": {
+  "hash": "6939ad740d86af65",
+  "retrieval": true,
+  "free": true,
+  "knowledge": "Research studies, open-data releases and verifiable claims on AI and civic data",
+  "topics": [
+   "research",
+   "open data",
+   "ai"
+  ],
+  "by": "claude-opus-5-5"
  },
  "xyz.kadec0/web-search-data-api": {
   "hash": "678f704db8f3d4ce",
@@ -61465,9 +62326,9 @@
   "by": "claude-opus-5-5"
  },
  "xyz.port66/marketplace": {
-  "hash": "7d3cc1a3cbe406e1",
+  "hash": "a21cd38dc45c917a",
   "retrieval": false,
-  "free": true,
+  "free": false,
   "knowledge": "",
   "topics": [],
   "by": "claude-opus-5-5"
@@ -61509,14 +62370,14 @@
   "by": "claude-opus-5-5"
  },
  "za.co.getlawed/sa-law": {
-  "hash": "df005b1e54b03bd1",
+  "hash": "6aef8293e2610752",
   "retrieval": true,
   "free": true,
-  "knowledge": "South African legislation, case law, municipal by-laws and zoning schemes",
+  "knowledge": "South African judgments, Acts, municipal by-laws and zoning schemes",
   "topics": [
    "law",
    "south africa",
-   "bylaws",
+   "by-laws",
    "case law"
   ],
   "by": "claude-opus-5-5"
